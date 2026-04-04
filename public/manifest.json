@@ -1,0 +1,48 @@
+{
+  "name": "Geek Gaming Center CRM",
+  "short_name": "GGC CRM",
+  "description": "Système de gestion pour Geek Gaming Center",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#e94560",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Sessions",
+      "short_name": "Sessions",
+      "description": "Gérer les sessions de gaming",
+      "url": "/dashboard/sessions",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Clients",
+      "short_name": "Clients",
+      "description": "Gérer les clients",
+      "url": "/dashboard/customers",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Rapports",
+      "short_name": "Rapports",
+      "description": "Voir les rapports",
+      "url": "/dashboard/reports",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    }
+  ]
+}

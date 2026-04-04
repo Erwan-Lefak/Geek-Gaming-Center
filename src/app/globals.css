@@ -1,26 +1,686 @@
 @import "tailwindcss";
 
+/* ============================================
+   GEEK GAMING CENTER - DESIGN SYSTEM v1.1
+   Architecture: Tailwind CSS 4.0 + Variables CSS
+   Theme: Cyber Neon Gaming Tech (Dark Default)
+   ============================================ */
+
+/* Local Font - Mister Belvedere (NFL Dolphins style) */
+@font-face {
+  font-family: "MisterBelvedere";
+  src: url('/fonts/MrB.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Root Variables (Dark Mode Default for Gaming) --- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0f;
+  --foreground: #e5e5e5;
+
+  /* Primary Colors - Cyan Tech */
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  --primary-950: #082f49;
+
+  /* Accent Colors - Violet Cyber */
+  --accent-50: #f5f3ff;
+  --accent-100: #ede9fe;
+  --accent-200: #ddd6fe;
+  --accent-300: #c4b5fd;
+  --accent-400: #a78bfa;
+  --accent-500: #8b5cf6;
+  --accent-600: #7c3aed;
+  --accent-700: #6d28d9;
+  --accent-800: #5b21b6;
+  --accent-900: #4c1d95;
+  --accent-950: #2e1065;
+
+  /* Dark Theme Colors */
+  --dark-bg: #0a0a0f;
+  --dark-surface: #12121a;
+  --dark-border: #1e1e2e;
+  --dark-elevated: #1a1a24;
+  --dark-hover: #232333;
+
+  /* Gaming Brand Colors */
+  --gaming-green: #10b981;
+  --gaming-red: #ef4444;
+  --gaming-orange: #f97316;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(18, 18, 26, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 20px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* --- Dark Mode (Default for Gaming) --- */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--dark-bg);
+    --foreground: #e5e5e5;
   }
 }
 
+/* --- Force Dark Mode for Gaming Experience --- */
+html {
+  font-family: "MisterBelvedere", system-ui, -apple-system, sans-serif !important;
+}
+
 body {
-  background: var(--background);
+  background: var(--dark-bg) !important;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "MisterBelvedere", system-ui, -apple-system, sans-serif !important;
+}
+
+/* Force dark background on all elements by default */
+*, *::before, *::after {
+  border-color: var(--glass-border);
+}
+
+/* Ensure main containers have dark background */
+main, div, section, article {
+  background-color: transparent;
+}
+
+/* --- Tailwind Theme Inline Configuration --- */
+@theme inline {
+  /* Background Colors */
+  --color-background: var(--background);
+  --color-surface: var(--dark-surface);
+  --color-elevated: var(--dark-elevated);
+  --color-border: var(--dark-border);
+
+  /* Primary Colors */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+
+  /* Accent Colors */
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
+  --color-accent-950: var(--accent-950);
+
+  /* Gaming Status Colors */
+  --color-success: var(--gaming-green);
+  --color-error: var(--gaming-red);
+  --color-warning: var(--gaming-orange);
+
+  /* Typography */
+  --font-sans: "MisterBelvedere", system-ui, sans-serif;
+  --font-display: "MisterBelvedere", system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Animation */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+/* Focus Visible */
+*:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   ============================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+/* Responsive Glass Card */
+@media (max-width: 768px) {
+  .glass-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .glass-card {
+    padding: 0.75rem;
+  }
+}
+
+/* ============================================
+   TACTILE MAXIMALISM EFFECTS
+   ============================================ */
+
+/* Jelly Button Effect */
+@keyframes jelly {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+}
+
+.jelly-button:active {
+  animation: jelly 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover Glow Effect */
+.hover-glow {
+  transition: box-shadow var(--transition-base);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-400), var(--accent-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   BENTO GRID STYLES
+   ============================================ */
+
+.bento-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Responsive Bento Grid */
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+.bento-item {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 300ms;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Responsive Bento Item */
+@media (max-width: 768px) {
+  .bento-item {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-item {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bento-item {
+    padding: 0.5rem;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   KINETIC TYPOGRAPHY
+   ============================================ */
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.kinetic-text {
+  display: inline-block;
+  animation: slide-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+/* Container responsive avec padding */
+@media (max-width: 768px) {
+  :root {
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 2rem;
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --spacing-xl: 1rem;
+    --spacing-2xl: 1.5rem;
+  }
+
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-xl: 0.75rem;
+    --spacing-2xl: 1rem;
+  }
+
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Padding responsive sur mobile */
+@media (max-width: 768px) {
+  .glass-card,
+  .bento-item {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .glass-card,
+  .bento-item {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-card,
+  .bento-item {
+    padding: 0.5rem;
+  }
+}
+
+/* Taille de texte responsive */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Force l'adaptation sur mobile */
+@media (max-width: 768px) {
+  /* Force full width sur tablettes et desktops */
+  .glass-card,
+  .bento-item {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Force full width sur mobile */
+  .glass-card,
+  .bento-item {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================
+   LIGHT MODE STYLES
+   ============================================ */
+
+html.light {
+  --background: #ffffff;
+  --foreground: #0a0a0f;
+  --surface: #f5f5f5;
+  --elevated: #e8e8e8;
+  --border: #d1d1d1;
+
+  /* Light mode glass effect */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+/* Light mode body styles */
+html.light body {
+  background: #ffffff;
+  color: #0a0a0f;
+}
+
+/* Light mode sections - change backgrounds and text */
+html.light section:not(.hero-section):not(:first-of-type),
+html.light section:not([class*="bg-gradient"]):not(:first-of-type) {
+  background-color: #ffffff;
+}
+
+html.light .bento-item,
+html.light .glass-card {
+  background: #f5f5f5 !important;
+  border-color: #d1d1d1 !important;
+}
+
+html.light .bento-item h1,
+html.light .bento-item h2,
+html.light .bento-item h3,
+html.light .bento-item p,
+html.light .bento-item span,
+html.light .bento-item li,
+html.light .glass-card h1,
+html.light .glass-card h2,
+html.light .glass-card h3,
+html.light .glass-card p,
+html.light .glass-card span,
+html.light .glass-card li {
+  color: #0a0a0f !important;
+}
+
+/* Light mode section backgrounds */
+html.light section.bg-black {
+  background-color: #ffffff !important;
+}
+
+html.light section.bg-black h1,
+html.light section.bg-black h2,
+html.light section.bg-black h3,
+html.light section.bg-black p,
+html.light section.bg-black span,
+html.light section.bg-black li {
+  color: #0a0a0f !important;
+}
+
+/* Light mode footer */
+html.light footer {
+  background: #f5f5f5 !important;
+  border-color: #d1d1d1 !important;
+}
+
+html.light footer h3,
+html.light footer p,
+html.light footer a,
+html.light footer li {
+  color: #0a0a0f !important;
+}
+
+/* Hero section and carousel - always dark, unaffected by theme */
+html.light section:first-of-type {
+  /* Always dark mode - carousel section */
+  background: var(--dark-bg) !important;
+}
+
+html.light section:first-of-type h1,
+html.light section:first-of-type h2,
+html.light section:first-of-type h3,
+html.light section:first-of-type p,
+html.light section:first-of-type span,
+html.light section:first-of-type a {
+  color: #ffffff !important;
+}
+
+/* Keep gradient sections unchanged */
+html.light section[class*="bg-gradient"] {
+  /* Gradient sections remain unchanged */
+}
+
+/* Light mode header */
+html.light header.glass {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light header .nav-link,
+html.light header button:not([class*="bg-gradient"]),
+html.light header svg:not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]) {
+  color: #0a0a0f !important;
+}
+
+/* Keep gradient text as is */
+html.light .gradient-text {
+  -webkit-text-fill-color: transparent;
+}
+
+/* Light mode icons - keep colored icons their original color */
+html.light svg:not(.gradient-text):not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]) {
+  color: #0a0a0f;
+}
+
+/* Light mode hover states */
+html.light button:hover,
+html.light a:hover {
+  color: #0a0a0f !important;
+}
+
+/* Light mode specific - keep certain elements white */
+html.light button.bg-gradient-to-r,
+html.light button.bg-red-600,
+html.light button.bg-primary-500 {
+  color: #ffffff !important;
+}
+
+html.light a.px-6.py-3.bg-red-600,
+html.light a.px-8.py-3.bg-gradient-to-r,
+html.light a.px-8.py-3.bg-red-600,
+html.light a.px-8.py-3.bg-purple-500,
+html.light a.px-8.py-3.bg-blue-500,
+html.light a.px-8.py-3.bg-pink-500 {
+  color: #ffffff !important;
+}
+
+/* Light mode - keep white text on image overlays */
+html.light [class*="from-black"] h3,
+html.light [class*="from-black"] p,
+html.light [class*="from-black"] button {
+  color: #ffffff !important;
+}
+
+/* Collections section - images with overlays */
+html.light section:nth-of-type(2) .bg-gradient-to-t,
+html.light section:nth-of-type(2) h3,
+html.light section:nth-of-type(2) p,
+html.light section:nth-of-type(2) button {
+  color: #ffffff !important;
+}
+
+/* Arena page - specific overrides */
+html.light section[class*="from-accent"] h1,
+html.light section[class*="from-accent"] h2,
+html.light section[class*="from-accent"] p,
+html.light section[class*="from-accent"] span {
+  color: #0a0a0f !important;
+}
+
+/* Arena hero section - keep dark */
+html.light section:nth-of-type(1).relative.flex.items-center,
+html.light section:nth-of-type(1) h1,
+html.light section:nth-of-type(1) p,
+html.light section:nth-of-type(1) button {
+  color: #ffffff !important;
+}
+
+html.light section:nth-of-type(1) .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, rgb(88, 28, 135), rgb(88, 28, 135), rgb(15, 23, 42)) !important;
+}
+
+/* Utility classes for product cards */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
