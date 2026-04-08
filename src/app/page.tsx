@@ -10,9 +10,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Cpu, Gamepad2, Zap, Store, Monitor, UtensilsCrossed, Film, Calendar, Users, ChevronDown, ChevronUp, Instagram } from 'lucide-react';
 import ImageCarousel from '@/components/ui/ImageCarousel';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function HomePage() {
+  const { theme } = useTheme();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Debug : pour voir si le thème est bien détecté
+  console.log('Theme actuel:', theme);
 
   const faqs = [
     {
@@ -56,28 +61,32 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
           <div className="w-full">
             {/* Main Headline */}
-            <h1 className="text-[4rem] sm:text-[4.7rem] md:text-[5.3rem] lg:text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
+            <h1 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
               Votre Destination <span className="gradient-text block">Gaming Ultime</span>
             </h1>
 
             {/* CTA Buttons */}
-            <div className="flex flex-row gap-4 items-start mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 items-start mb-8">
               <Link
                   href="/store"
-                  className="jelly-button group relative px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-xl sm:text-2xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase"
+                  className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-base sm:text-xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase"
                 >
-                  <Cpu className="w-5 h-5 text-primary-400" />
+                  <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />
                   <span>Explorer la Boutique</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
 
               <Link
                   href="/arena"
-                  className="jelly-button group px-8 py-4 bg-surface border border-border font-semibold text-xl sm:text-2xl md:text-3xl hover:bg-elevated transition-all duration-300 flex items-center gap-2 uppercase"
+                  className={`jelly-button group px-6 py-3 border font-semibold text-base sm:text-xl md:text-3xl transition-all duration-300 flex items-center gap-2 uppercase hover:opacity-90 ${
+                    theme === 'light'
+                      ? '!bg-white !text-black border-black [&_svg]:!stroke-black [&_svg]:!text-black'
+                      : 'bg-surface border-border text-white hover:bg-elevated'
+                  }`}
                 >
-                  <Gamepad2 className="w-5 h-5 text-primary-400" />
-                  <span className="text-white">Salle de Jeux</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <Gamepad2 className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'light' ? '' : 'text-primary-400'}`} />
+                  <span className={theme === 'light' ? '!text-black' : 'text-white'}>Salle de Jeux</span>
+                  <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200 ${theme === 'light' ? '' : 'text-white'}`} />
                 </Link>
             </div>
           </div>
@@ -91,30 +100,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Collections Section - 3 Panels */}
-      <section className="bg-black py-8 px-4 md:px-16 lg:px-32">
-        <div className="flex flex-col md:flex-row gap-0 md:gap-0.5 max-w-7xl mx-auto">
+      {/* Collections Section - 4 Panels in 2x2 Grid */}
+      <section className="bg-black py-16 px-8 md:px-24 lg:px-48">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mx-auto">
           {/* Panel 1: Salle de Jeux */}
-          <div className="flex-1 relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] -skew-x-15">
-            <div className="absolute inset-0 skew-x-15 transform-origin-left">
-              <Image
-                src="/section-salle-de-jeux.jpg"
-                alt="Salle de Jeux"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 33.33vw"
-              />
-            </div>
+          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+            <Image
+              src="/section-salle-de-jeux.jpg"
+              alt="Salle de Jeux"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/arena" className="absolute inset-0 z-10">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2 uppercase">
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
                   Salle de Jeux
                 </h3>
-                <p className="text-white/80 text-base md:text-lg mb-4">
+                <p className="!text-white/90 text-base md:text-lg mb-4">
                   Jouez sur PS5, Xbox, VR et simulateurs de course
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
+                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
                   Découvrir
                 </button>
               </div>
@@ -122,26 +129,24 @@ export default function HomePage() {
           </div>
 
           {/* Panel 2: Boutique */}
-          <div className="flex-1 relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] -skew-x-15">
-            <div className="absolute inset-0 skew-x-15 transform-origin-left">
-              <Image
-                src="/section-boutique.jpg"
-                alt="Boutique"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 33.33vw"
-              />
-            </div>
+          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+            <Image
+              src="/section-boutique.jpg"
+              alt="Boutique"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/store" className="absolute inset-0 z-10">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2 uppercase">
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
                   Boutique
                 </h3>
-                <p className="text-white/80 text-base md:text-lg mb-4">
+                <p className="!text-white/90 text-base md:text-lg mb-4">
                   Composants PC, accessoires gaming et équipements
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
+                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
                   Explorer
                 </button>
               </div>
@@ -149,27 +154,50 @@ export default function HomePage() {
           </div>
 
           {/* Panel 3: Restaurant */}
-          <div className="flex-1 relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] -skew-x-15">
-            <div className="absolute inset-0 skew-x-15 transform-origin-left">
-              <Image
-                src="/section-restaurant.jpg"
-                alt="Restaurant"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 33.33vw"
-              />
-            </div>
-            <Link href="#" className="absolute inset-0 z-10">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+            <Image
+              src="/section-restaurant.jpg"
+              alt="Restaurant"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+            <Link href="/restaurant" className="absolute inset-0 z-10">
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2 uppercase">
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
                   Restaurant
                 </h3>
-                <p className="text-white/80 text-base md:text-lg mb-4">
+                <p className="!text-white/90 text-base md:text-lg mb-4">
                   Restauration rapide et snacks pour les gamers
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
+                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
                   Commander
+                </button>
+              </div>
+            </Link>
+          </div>
+
+          {/* Panel 4: Cinéma */}
+          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+            <Image
+              src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
+              alt="Cinéma"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+            <Link href="/cinema" className="absolute inset-0 z-10">
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
+                  Cinéma
+                </h3>
+                <p className="!text-white/90 text-base md:text-lg mb-4">
+                  Séances privées et projections immersives
+                </p>
+                <button className="px-6 py-3 bg-purple-600 hover:bg-purple-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
+                  Réserver
                 </button>
               </div>
             </Link>
@@ -234,8 +262,11 @@ export default function HomePage() {
       </section>
 
       {/* Booking CTA Section */}
-      <section className="bg-gradient-to-br from-primary-400 to-accent-500 min-h-[30vh] flex items-center justify-center px-4">
-        <h1 className="text-[4rem] sm:text-[4.7rem] md:text-[5.3rem] lg:text-[6.7rem] font-bold leading-[0.8] kinetic-text uppercase italic text-white text-center">
+      <section
+        onClick={() => window.location.href = '/arena/booking'}
+        className="bg-gradient-to-br from-primary-400 to-accent-500 min-h-[30vh] flex items-center justify-center px-4 cursor-pointer"
+      >
+        <h1 className="text-[4.5rem] sm:text-[4.7rem] md:text-[5.3rem] lg:text-[6.7rem] font-bold leading-[0.8] kinetic-text uppercase italic text-white text-center">
           Réserver un poste
         </h1>
       </section>
@@ -418,7 +449,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase">Ciné Otaku</h3>
+                <h3 className="text-3xl font-bold text-white mb-3 uppercase">Ciné Otaku</h3>
                 <p className="text-base text-white mb-6">
                   Séances privées d'anime et manga en projection immersive avec son surround et ambiance gaming.
                 </p>
@@ -445,7 +476,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase">Événement Otaku</h3>
+                <h3 className="text-3xl font-bold text-white mb-3 uppercase">Événement Otaku</h3>
                 <p className="text-base text-white mb-6">
                   Soirées spéciales, tournois cosplay et événements exclusifs pour la communauté otaku.
                 </p>
@@ -472,7 +503,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase">Communauté Otaku</h3>
+                <h3 className="text-3xl font-bold text-white mb-3 uppercase">Communauté Otaku</h3>
                 <p className="text-base text-white mb-6">
                   Rejoignez notre communauté passionnée et partagez vos expériences gaming et otaku.
                 </p>
@@ -513,23 +544,68 @@ export default function HomePage() {
             Maintenant ouvert à Yaoundé, Mvog Ada
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {/* Map Image */}
+            {/* Google Map */}
             <div className="aspect-video relative overflow-hidden rounded-xl">
-              <Image
-                src="/section-boutique.jpg"
-                alt="Map"
-                fill
-                className="object-cover"
-              />
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3980.7283179565387!2d11.5022!3d3.8488!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf0d9f123456%3A0x1234567890abcdef!2sBP+01+Yaound%C3%A9!5e0!3m2!1sfr!2scm!4v1700000000000!5m2!1sfr!2scm&q=VG8H%2BMX+Yaound%C3%A9+Cameroun"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="absolute inset-0"
+              ></iframe>
             </div>
-            {/* Location Photo */}
-            <div className="aspect-video relative overflow-hidden rounded-xl">
-              <Image
-                src="/section-salle-de-jeux.jpg"
-                alt="Lieu"
-                fill
-                className="object-cover"
-              />
+            {/* Location Info */}
+            <div className="aspect-video relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-900 to-purple-700 p-6 md:p-8 flex flex-col justify-center">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">Geek Gaming Center</h3>
+              <div className="space-y-3 md:space-y-4 text-white">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-xl">📍</div>
+                  <div>
+                    <p className="font-semibold text-lg">Adresse</p>
+                    <p className="text-purple-200 text-sm md:text-base">BP 01 Yaoundé, Cameroun</p>
+                    <p className="text-purple-200 text-sm md:text-base">Mvog Ada, Yaoundé</p>
+                    <p className="text-purple-300 text-xs md:text-sm mt-1">Plus Code: VG8H+MX Yaoundé</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-xl">🕐</div>
+                  <div>
+                    <p className="font-semibold text-lg">Horaires</p>
+                    <p className="text-purple-200 text-sm md:text-base">Lun - Ven : 9h30 - 21h00</p>
+                    <p className="text-purple-200 text-sm md:text-base">Samedi : 9h30 - 21h00</p>
+                    <p className="text-purple-200 text-sm md:text-base">Dimanche : 12h00 - 21h00</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-xl">📞</div>
+                  <div>
+                    <p className="font-semibold text-lg">Contact</p>
+                    <p className="text-purple-200 text-sm md:text-base">+237 677 02 29 98</p>
+                    <p className="text-purple-200 text-sm md:text-base">contact@geekgamingcenter.cm</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-xl">🎮</div>
+                  <div>
+                    <p className="font-semibold text-lg">Services</p>
+                    <p className="text-purple-200 text-sm md:text-base">Gaming • Boutique • Restaurant • Cinéma</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 md:mt-6">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=VG8H%2BMX+Yaound%C3%A9+Cameroun"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-purple-900 px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-purple-100 transition-colors text-sm md:text-base"
+                >
+                  Itinéraire
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         </div>

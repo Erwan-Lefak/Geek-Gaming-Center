@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { Providers } from '@/components/providers';
 import { DashboardMode } from '@/components/DashboardMode';
+import ChatWidget from '@/components/chat/ChatWidget';
 
 export const metadata: Metadata = {
   title: 'Geek Gaming Center - Boutique Composants & Salle de Jeux',
@@ -88,7 +89,7 @@ export default function RootLayout({
           <CartProvider>
             <ThemeProvider>
               <Header className="dashboard-hidden" />
-            <main className="flex-1 dashboard-hidden">{children}</main>
+            <main className="flex-1 dashboard-hidden pt-7 md:pt-28">{children}</main>
             <footer className="border-t border-border bg-surface dashboard-hidden">
           <div className="container mx-auto px-4 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -128,7 +129,17 @@ export default function RootLayout({
                     </a>
                   </li>
                   <li>
-                    <a href="/booking" className="text-white hover:text-primary-400 transition-colors">
+                    <a href="/restaurant" className="text-white hover:text-primary-400 transition-colors">
+                      Restaurant
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/cinema" className="text-white hover:text-primary-400 transition-colors">
+                      Cinéma
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/arena/booking" className="text-white hover:text-primary-400 transition-colors">
                       Réservations
                     </a>
                   </li>
@@ -191,7 +202,8 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
-            </ThemeProvider>
+            <ChatWidget />
+          </ThemeProvider>
           </CartProvider>
         </Providers>
       </body>

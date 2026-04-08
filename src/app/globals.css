@@ -684,3 +684,1267 @@ html.light section:nth-of-type(1) .bg-gradient-to-br {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+
+/* ============================================
+   LIGHT MODE FOR BOOKING PAGES
+   ============================================ */
+
+/* Light mode for booking pages - main background */
+html.light .bg-gradient-to-br.from-black.via-purple-950.to-black,
+html.light div[class*="bg-gradient-to-br from-black via-purple-950 to-black"] {
+  background: linear-gradient(to bottom right, #f5f5f5, #e8e8e8, #ffffff) !important;
+}
+
+/* Light mode cards in booking pages */
+html.light .bg-white\/10 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+html.light .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Light mode text */
+html.light .text-white {
+  color: #0a0a0f !important;
+}
+
+html.light .text-purple-300,
+html.light .text-purple-200,
+html.light .text-purple-400 {
+  color: #5b21b6 !important;
+}
+
+/* Light mode placeholder */
+html.light .placeholder-purple-300::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Light mode inputs */
+html.light input[type="email"],
+html.light input[type="password"],
+html.light input[type="tel"],
+html.light input[type="text"],
+html.light select {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  color: #0a0a0f !important;
+}
+
+html.light input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Light mode option elements */
+html.light option {
+  background-color: #ffffff !important;
+  color: #0a0a0f !important;
+}
+
+/* Light mode buttons with gradient */
+html.light button[class*="from-purple-600"],
+html.light button[class*="from-purple-"],
+html.light a[class*="from-purple-600"],
+html.light a[class*="from-purple-"] {
+  color: #ffffff !important;
+}
+
+/* Light mode calendar selected state */
+html.light button[class*="from-purple-600 to-pink-600"] {
+  color: #ffffff !important;
+}
+
+/* Light mode error message */
+html.light .bg-red-500\/20 {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+html.light .text-red-200 {
+  color: #991b1b !important;
+}
+
+/* Light mode disabled state */
+html.light .bg-gray-800\/50 {
+  background: rgba(156, 163, 175, 0.3) !important;
+}
+
+html.light .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+html.light .line-through {
+  color: #9ca3af !important;
+}
+
+/* Light mode info box */
+html.light .bg-yellow-600\/20 {
+  background: rgba(217, 119, 6, 0.15) !important;
+}
+
+html.light .text-yellow-300 {
+  color: #92400e !important;
+}
+
+html.light .border-yellow-600\/50 {
+  border-color: rgba(217, 119, 6, 0.3) !important;
+}
+
+/* Light mode policies box */
+html.light .bg-purple-600\/10 {
+  background: rgba(139, 92, 246, 0.1) !important;
+}
+
+html.light .border-purple-600\/30 {
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Light mode hover states */
+html.light button:hover,
+html.light a:hover {
+  color: inherit !important;
+}
+
+/* Light mode available slot */
+html.light .bg-white\/10 {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+html.light button:hover.bg-white\/20 {
+  background: rgba(229, 231, 235, 0.9) !important;
+}
+
+/* Light mode icons that should remain colored */
+html.light svg[class*="text-purple"],
+html.light svg[class*="text-pink"],
+html.light svg[class*="text-green"],
+html.light svg[class*="text-red"],
+html.light svg[class*="text-yellow"],
+html.light svg[class*="text-blue"],
+html.light svg[class*="text-orange"] {
+  color: inherit !important;
+}
+
+/* Light mode background with opacity */
+html.light .bg-purple-600\/20,
+html.light .bg-green-600\/20,
+html.light .bg-yellow-600\/20 {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Light mode calendar day */
+html.light button.bg-white\/5 {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light button:hover.bg-white\/10 {
+  background: rgba(229, 231, 235, 0.8) !important;
+}
+
+/* Light mode selected date display */
+html.light .bg-purple-600\/20 {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+html.light .bg-purple-600\/30 {
+  background: rgba(139, 92, 246, 0.2) !important;
+}
+
+html.light .border-purple-500 {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Light mode disabled text */
+html.light .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+/* Light mode pricing info section */
+html.light .bg-white\/10 {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Light mode payment methods */
+html.light .bg-white\/5 {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+html.light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .hover\:bg-white\/10:hover {
+  background: rgba(229, 231, 235, 0.9) !important;
+}
+
+html.light .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Light mode background pattern */
+html.light .absolute.inset-0.opacity-20 {
+  opacity: 0.05 !important;
+}
+
+/* Light mode calendar icons */
+html.light .bg-purple-600\/20 {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+html.light .bg-green-600\/20 {
+  background: rgba(34, 197, 94, 0.15) !important;
+}
+
+html.light .bg-pink-600\/20 {
+  background: rgba(236, 72, 153, 0.15) !important;
+}
+
+/* Light mode check icons */
+html.light .text-green-400 {
+  color: #16a34a !important;
+}
+
+/* Light mode - keep specific colored text as is */
+html.light .text-purple-600,
+html.light .text-pink-600,
+html.light .text-pink-400,
+html.light .text-pink-300,
+html.light .text-accent-600,
+html.light .text-primary-600 {
+  color: inherit !important;
+}
+
+/* Light mode borders */
+html.light .border-white\/10,
+html.light .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light mode shadows */
+html.light .shadow-2xl,
+html.light .shadow-lg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Light mode tabs/buttons that should stay with their colors */
+html.light .bg-gradient-to-r.from-purple-600.to-pink-600,
+html.light .bg-gradient-to-r.from-purple-600,
+html.light .bg-gradient-to-r.to-pink-600 {
+  color: #ffffff !important;
+}
+
+html.light .hover\:from-purple-700:hover,
+html.light .hover\:to-pink-700:hover {
+  color: #ffffff !important;
+}
+
+/* Light mode - keep colored icons their original colors */
+html.light svg.text-purple-400,
+html.light svg.text-purple-500,
+html.light svg.text-purple-600,
+html.light svg.text-pink-400,
+html.light svg.text-pink-500,
+html.light svg.text-pink-600,
+html.light svg.text-green-400,
+html.light svg.text-green-500,
+html.light svg.text-red-400,
+html.light svg.text-red-500,
+html.light svg.text-yellow-400,
+html.light svg.text-yellow-500,
+html.light svg.text-blue-400,
+html.light svg.text-blue-500,
+html.light svg.text-orange-400,
+html.light svg.text-orange-500 {
+  color: inherit !important;
+}
+
+/* Fix gradient background on buttons in light mode */
+html.light button[class*="bg-gradient-to-r from-purple-600 to-pink-600"],
+html.light button[class*="bg-gradient-to-r from-purple-600"],
+html.light a[class*="bg-gradient-to-r from-purple-600 to-pink-600"],
+html.light a[class*="bg-gradient-to-r from-purple-600"] {
+  background: linear-gradient(to right, #9333ea, #db2777) !important;
+  color: #ffffff !important;
+}
+
+/* Fix input focus states in light mode */
+html.light input:focus,
+html.light select:focus {
+  outline-color: #9333ea !important;
+  border-color: #9333ea !important;
+}
+
+/* Fix calendar styling in light mode */
+html.light button.bg-white\/5.text-white {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: #0a0a0f !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light button.bg-white\/5.text-white:hover {
+  background: rgba(229, 231, 235, 0.9) !important;
+}
+
+/* Fix calendar selected day in light mode */
+html.light button[class*="from-purple-600 to-pink-600"] {
+  background: linear-gradient(to bottom right, #9333ea, #db2777) !important;
+  color: #ffffff !important;
+}
+
+/* Fix disabled buttons in light mode */
+html.light button:disabled {
+  background: rgba(156, 163, 175, 0.3) !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+}
+
+/* Fix text color on gradient backgrounds in light mode */
+html.light [class*="bg-gradient-to-r"] .text-white,
+html.light [class*="from-purple-"] .text-white,
+html.light [class*="to-pink-"] .text-white {
+  color: #ffffff !important;
+}
+
+/* Fix ALL text-white on white backgrounds in light mode */
+html.light button.bg-white\/5 .text-white,
+html.light button.bg-white\/10 .text-white,
+html.light div.bg-white\/5 .text-white,
+html.light div.bg-white\/10 .text-white,
+html.light .bg-white\/5.text-white,
+html.light .bg-white\/10.text-white {
+  color: #0a0a0f !important;
+}
+
+/* Fix time slots text in light mode */
+html.light button.bg-white\/10 .text-white {
+  color: #0a0a0f !important;
+}
+
+html.light button.bg-white\/10 .text-purple-200 {
+  color: #5b21b6 !important;
+}
+
+/* Fix calendar days text in light mode */
+html.light button[class*="bg-white\/5"] span,
+html.light button[class*="bg-white\/10"] span {
+  color: #0a0a0f !important;
+}
+
+html.light button[class*="bg-white\/5"].text-white,
+html.light button[class*="bg-white\/10"].text-white,
+html.light button.bg-white\/5,
+html.light button.bg-white\/10 {
+  color: #0a0a0f !important;
+}
+
+/* Fix font-semibold text in light mode */
+html.light .font-semibold.text-white {
+  color: #0a0a0f !important;
+}
+
+/* Fix specific text elements in light mode cards */
+html.light .bg-white\/10 .text-white,
+html.light .bg-white\/5 .text-white,
+html.light .backdrop-blur .text-white {
+  color: #0a0a0f !important;
+}
+
+/* Fix links and buttons with white text in light mode */
+html.light a.text-white,
+html.light button.text-white,
+html.light span.text-white {
+  color: #0a0a0f !important;
+}
+
+/* BUT: Keep gradient buttons white text */
+html.light button[class*="bg-gradient"] .text-white,
+html.light a[class*="bg-gradient"] .text-white,
+html.light button.bg-gradient-to-r .text-white,
+html.light a.bg-gradient-to-r .text-white,
+html.light .from-purple-600 .text-white,
+html.light .to-pink-600 .text-white {
+  color: #ffffff !important;
+}
+
+/* More specific fixes for calendar and time slots */
+html.light button:not([class*="from-purple"]):not([class*="to-pink"]):not([class*="bg-gradient"]).text-white {
+  color: #0a0a0f !important;
+}
+
+html.light button:not([class*="from-purple"]):not([class*="to-pink"]):not([class*="bg-gradient"]).bg-white\/5 {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #0a0a0f !important;
+}
+
+html.light button:not([class*="from-purple"]):not([class*="to-pink"]):not([class*="bg-gradient"]).bg-white\/10 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #0a0a0f !important;
+}
+
+/* Fix text inside buttons */
+html.light button:not([class*="from-purple"]):not([class*="to-pink"]):not([class*="bg-gradient"]) span {
+  color: #0a0a0f !important;
+}
+
+/* Fix all white text on white/10 and white/5 backgrounds */
+html.light .bg-white\/10 p,
+html.light .bg-white\/10 h1,
+html.light .bg-white\/10 h2,
+html.light .bg-white\/10 h3,
+html.light .bg-white\/10 span:not([class*="from-purple"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+html.light .bg-white\/5 p,
+html.light .bg-white\/5 h1,
+html.light .bg-white\/5 h2,
+html.light .bg-white\/5 h3,
+html.light .bg-white\/5 span:not([class*="from-purple"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+/* Fix flex items with white text */
+html.light .bg-white\/10 .flex .text-white,
+html.light .bg-white\/5 .flex .text-white {
+  color: #0a0a0f !important;
+}
+
+/* Fix items-center and justify-between white text */
+html.light .items-center .text-white:not([class*="from-purple"]):not([class*="to-pink"]),
+html.light .justify-between .text-white:not([class*="from-purple"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+/* Fix grid items white text */
+html.light .grid .text-white:not([class*="from-purple"]):not([class*="to-pink"]),
+html.light .grid-cols-7 .text-white:not([class*="from-purple"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+/* Fix space-y elements white text */
+html.light .space-y-2 .text-white:not([class*="from-purple"]):not([class*="to-pink"]),
+html.light .space-y-3 .text-white:not([class*="from-purple"]):not([class*="to-pink"]),
+html.light .space-y-4 .text-white:not([class*="from-purple"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+/* Fix specific calendar styling */
+html.light .text-center.text-purple-300 {
+  color: #5b21b6 !important;
+}
+
+html.light .text-center.font-semibold.text-sm {
+  color: #0a0a0f !important;
+}
+
+/* Fix all text-white in main content area */
+html.light .relative.z-10 .text-white:not([class*="from-purple"]):not([class*="to-pink"]):not([class*="bg-gradient"]) {
+  color: #0a0a0f !important;
+}
+
+/* Fix paragraph text in light mode */
+html.light p.text-white {
+  color: #0a0a0f !important;
+}
+
+html.light span.text-white {
+  color: #0a0a0f !important;
+}
+
+/* BUT keep white text on gradient backgrounds */
+html.light [class*="bg-gradient"] p.text-white,
+html.light [class*="bg-gradient"] span.text-white,
+html.light [class*="bg-gradient"] div.text-white,
+html.light [class*="from-purple-"] p.text-white,
+html.light [class*="from-purple-"] span.text-white,
+html.light [class*="to-pink-"] p.text-white,
+html.light [class*="to-pink-"] span.text-white {
+  color: #ffffff !important;
+}
+
+/* SUPER RULE: Catch-all for white text on light backgrounds */
+html.light body * {
+  /* Force override all white text that's not on a gradient background */
+}
+
+html.light .text-white {
+  color: #0a0a0f !important;
+}
+
+/* EXCEPTION: Arena console labels on images - ALWAYS WHITE in BOTH modes */
+html.light .bento-item .absolute.inset-0.flex.items-center.justify-center .text-white {
+  color: #ffffff !important;
+}
+
+html.light .bento-item .absolute.inset-0.flex.items-center.justify-center .kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Re-apply white text only for gradient backgrounds */
+html.light .from-purple-600 .text-white,
+html.light .to-pink-600 .text-white,
+html.light .from-purple-600.text-white,
+html.light .to-pink-600.text-white,
+html.light [class*="bg-gradient-from-purple"] .text-white,
+html.light [class*="bg-gradient-to-pink"] .text-white,
+html.light button.bg-gradient-to-r .text-white,
+html.light a.bg-gradient-to-r .text-white,
+html.light .bg-gradient-to-br .text-white,
+html.light .bg-gradient-to-r .text-white {
+  color: #ffffff !important;
+}
+
+/* Fix specific elements that need white text in light mode */
+html.light .text-white[class*="from-purple"],
+html.light .text-white[class*="to-pink"],
+html.light .text-white[class*="bg-gradient"] {
+  color: #ffffff !important;
+}
+
+/* Fix subtitle text - keep purple/pink colors - MUST COME AFTER .text-white rule */
+html.light .text-purple-100,
+html.light .text-purple-200,
+html.light .text-purple-300,
+html.light .text-purple-400,
+html.light .text-purple-500 {
+  color: #7c3aed !important;
+}
+
+/* Fix text-base sm:text-lg with purple */
+html.light .text-purple-300.text-base,
+html.light .text-purple-300.text-sm,
+html.light .text-purple-300.text-lg,
+html.light .text-purple-200.text-base,
+html.light .text-purple-200.text-sm,
+html.light .text-purple-200.text-lg,
+html.light .text-purple-400.text-base,
+html.light .text-purple-400.text-sm,
+html.light .text-purple-400.text-lg {
+  color: #7c3aed !important;
+}
+
+/* Fix paragraph with purple colors */
+html.light p.text-purple-300,
+html.light p.text-purple-200,
+html.light p.text-purple-400,
+html.light p.text-purple-500 {
+  color: #7c3aed !important;
+}
+
+/* Super specific rule for the subtitle paragraph */
+html.light p.text-purple-300.text-base,
+html.light p.text-purple-300.text-sm,
+html.light p.text-purple-300.text-lg {
+  color: #7c3aed !important;
+}
+
+/* Even more specific - target by content */
+html.light .text-center p.text-purple-300,
+html.light .text-center p.text-purple-200,
+html.light .text-center p.text-purple-400 {
+  color: #7c3aed !important;
+}
+
+/* Ultimate catch-all for purple text in light mode */
+html.light *:is(.text-purple-100, .text-purple-200, .text-purple-300, .text-purple-400, .text-purple-500) {
+  color: #7c3aed !important;
+}
+
+/* ============================================
+   KEEP HERO SECTION WHITE TEXT IN LIGHT MODE
+   For /, /store and /arena first sections
+   ============================================ */
+
+/* Hero section - ALL text must be white */
+html.light section:first-of-type *,
+html.light section.relative.flex.items-center.justify-center *,
+html.light section[class*="h-\\[calc"][class*="vh-"] * {
+  color: #ffffff !important;
+}
+
+/* Specific overrides for problematic elements */
+html.light h1.kinetic-text.text-white,
+html.light .kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Extra specific for the home page h1 */
+html.light body h1.text-white,
+html.light body h1.kinetic-text,
+html.light section h1.text-white,
+html.light section h1.kinetic-text {
+  color: #ffffff !important;
+}
+
+html.light section.relative.flex.items-center.justify-center h1,
+html.light section.relative.flex.items-center.justify-center .text-white {
+  color: #ffffff !important;
+}
+
+/* But allow other sections to have dark text EXCEPT gradient buttons */
+html.light section:not(:first-of-type) .text-white:not([class*="bg-gradient"]):not([class*="from-primary"]):not([class*="from-accent"]):not([class*="from-purple"]):not([class*="from-red"]):not([class*="from-blue"]):not([class*="from-pink"]):not([class*="to-primary"]):not([class*="to-accent"]):not([class*="to-purple"]):not([class*="to-red"]):not([class*="to-blue"]):not([class*="to-pink"]) {
+  color: #0a0a0f !important;
+}
+
+/* FINAL OVERRIDE - Must be at the very end of the file */
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center h1.text-white,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden h1.text-white,
+html.light section[class*="h-\\[calc"] h1.text-white,
+html.light body h1.text-white.kinetic-text {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Keep gradient-text span transparent */
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center h1.text-white .gradient-text,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden h1.text-white .gradient-text {
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Keep button text white in hero section */
+html.light section.relative.flex.items-center.justify-center a.text-white,
+html.light section.relative.flex.items-center.justify-center button.text-white,
+html.light section.relative.flex.items-center.justify-center .text-white span,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden a.text-white,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden button.text-white {
+  color: #ffffff !important;
+}
+
+/* Specific for span with text-white inside buttons/links in hero */
+html.light section.relative.flex.items-center.justify-center a span.text-white,
+html.light section.relative.flex.items-center.justify-center button span.text-white,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden a span.text-white,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden button span.text-white,
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a span.text-white {
+  color: #ffffff !important;
+}
+
+/* Icons in hero buttons must be white */
+html.light section.relative.flex.items-center.justify-center a svg,
+html.light section.relative.flex.items-center.justify-center button svg,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden a svg,
+html.light section.relative.flex.items-center.justify-center.overflow-hidden button svg,
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Dark mode - icons in hero buttons must also be white (not blue) */
+html:not(.light) section.relative.flex.items-center.justify-center a svg,
+html:not(.light) section.relative.flex.items-center.justify-center button svg,
+html:not(.light) section.relative.flex.items-center.justify-center.overflow-hidden a svg,
+html:not(.light) section.relative.flex.items-center.justify-center.overflow-hidden button svg,
+html:not(.light) body > div.min-h-screen > section.relative.flex.items-center.justify-center a svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Override specific color classes for icons in hero buttons */
+html.light section.relative.flex.items-center.justify-center a svg.text-primary-400,
+html.light section.relative.flex.items-center.justify-center button svg.text-primary-400,
+html:not(.light) section.relative.flex.items-center.justify-center a svg.text-primary-400,
+html:not(.light) section.relative.flex.items-center.justify-center button svg.text-primary-400,
+html body > div.min-h-screen > section.relative.flex.items-center.justify-center a svg.text-primary-400,
+html body > div.min-h-screen > section.relative.flex.items-center.justify-center a svg.text-primary-400 {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Keep gradient buttons text white in all sections */
+html.light a[class*="bg-gradient-to-r"].text-white,
+html.light button[class*="bg-gradient-to-r"].text-white,
+html.light a.from-primary-500.text-white,
+html.light a.from-accent-500.text-white,
+html.light a.from-purple-500.text-white,
+html.light a.from-red-500.text-white,
+html.light a[class*="bg-gradient"].text-white,
+html.light button[class*="bg-gradient"].text-white {
+  color: #ffffff !important;
+}
+
+/* Gradient buttons in all sections must have white text */
+html a[class*="bg-gradient-to-r"] span,
+html button[class*="bg-gradient-to-r"] span,
+html a.from-primary-500 span,
+html a.from-accent-500 span,
+html a.from-purple-500 span,
+html a.from-red-500 span {
+  color: #ffffff !important;
+}
+
+/* SUPER OVERRIDE - All gradient buttons must have white text */
+html.light a.from-primary-500,
+html.light a.from-accent-500,
+html.light a.from-purple-500,
+html.light a.from-red-500,
+html.light a[class*="bg-gradient-to-r"] {
+  color: #ffffff !important;
+}
+
+html.light a.from-primary-500 *,
+html.light a.from-accent-500 *,
+html.light a.from-purple-500 *,
+html.light a.from-red-500 *,
+html.light a[class*="bg-gradient-to-r"] * {
+  color: #ffffff !important;
+}
+
+/* Specific inline-flex items */
+html.light a.inline-flex.items-center.gap-2[class*="bg-gradient"],
+html.light a.inline-flex.items-center.gap-2.from-primary,
+html.light a.inline-flex.items-center.gap-2.from-accent,
+html.light a.inline-flex.items-center.gap-2.from-purple,
+html.light a.inline-flex.items-center.gap-2.from-red {
+  color: #ffffff !important;
+}
+
+html.light a.inline-flex.items-center.gap-2[class*="bg-gradient"] span,
+html.light a.inline-flex.items-center.gap-2.from-primary span,
+html.light a.inline-flex.items-center.gap-2.from-accent span,
+html.light a.inline-flex.items-center.gap-2.from-purple span,
+html.light a.inline-flex.items-center.gap-2.from-red span {
+  color: #ffffff !important;
+}
+
+/* Blue and pink gradient buttons specifically */
+html.light button.from-blue-500,
+html.light button.from-blue-600,
+html.light button.to-blue-500,
+html.light button.to-blue-600,
+html.light button.from-pink-500,
+html.light button.from-pink-600,
+html.light button.to-pink-500,
+html.light button.to-pink-600 {
+  color: #ffffff !important;
+}
+
+html.light button.from-blue-500 *,
+html.light button.from-blue-600 *,
+html.light button.to-blue-500 *,
+html.light button.to-blue-600 *,
+html.light button.from-pink-500 *,
+html.light button.from-pink-600 *,
+html.light button.to-pink-500 *,
+html.light button.to-pink-600 * {
+  color: #ffffff !important;
+}
+
+/* All buttons with gradient must have white text */
+html.light button[class*="bg-gradient-to-r"].text-white,
+html.light button.bg-gradient-to-r {
+  color: #ffffff !important;
+}
+
+html.light button[class*="bg-gradient-to-r"] span,
+html.light button.bg-gradient-to-r span {
+  color: #ffffff !important;
+}
+
+/* FINAL FINAL OVERRIDE - Must be AFTER everything else */
+html.light button.from-blue-500.text-white,
+html.light button.from-blue-600.text-white,
+html.light button.to-blue-500.text-white,
+html.light button.to-blue-600.text-white,
+html.light button.from-pink-500.text-white,
+html.light button.from-pink-600.text-white {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html.light button.from-blue-500.text-white *,
+html.light button.from-blue-600.text-white *,
+html.light button.to-blue-500.text-white *,
+html.light button.to-blue-600.text-white *,
+html.light button.from-pink-500.text-white *,
+html.light button.from-pink-600.text-white * {
+  color: #ffffff !important;
+}
+
+/* Catch-all for ALL gradient buttons */
+html.light button[class*="from-"][class*="to-"].text-white {
+  color: #ffffff !important;
+}
+
+html.light button[class*="from-"][class*="to-"].text-white * {
+  color: #ffffff !important;
+}
+
+/* Keep colored icons their original colors in light mode */
+html.light svg.text-pink-500 {
+  color: #ec4899 !important;
+  stroke: #ec4899 !important;
+}
+html.light svg.text-pink-400 {
+  color: #f472b6 !important;
+  stroke: #f472b6 !important;
+}
+html.light svg.text-pink-600 {
+  color: #db2777 !important;
+  stroke: #db2777 !important;
+}
+
+html.light svg.text-blue-500 {
+  color: #3b82f6 !important;
+  stroke: #3b82f6 !important;
+}
+html.light svg.text-blue-400 {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+}
+html.light svg.text-blue-600 {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+html.light svg.text-purple-500 {
+  color: #a855f7 !important;
+  stroke: #a855f7 !important;
+}
+html.light svg.text-purple-400 {
+  color: #c084fc !important;
+  stroke: #c084fc !important;
+}
+html.light svg.text-purple-600 {
+  color: #9333ea !important;
+  stroke: #9333ea !important;
+}
+
+html.light svg.text-primary-500 {
+  color: #3b82f6 !important;
+  stroke: #3b82f6 !important;
+}
+html.light svg.text-primary-400 {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+}
+
+html.light svg.text-accent-500 {
+  color: #a855f7 !important;
+  stroke: #a855f7 !important;
+}
+html.light svg.text-accent-400 {
+  color: #c084fc !important;
+  stroke: #c084fc !important;
+}
+
+/* Category cards in store page - keep descriptions dark in light mode */
+html.light [class*="text-white"],
+html.light section [class*="text-white"] {
+  color: #0a0a0f !important;
+}
+
+/* But keep gradient buttons and hero section white */
+html.light section:first-of-type [class*="text-white"],
+html.light section.relative.flex.items-center.justify-center [class*="text-white"],
+html.light button[class*="bg-gradient"] [class*="text-white"],
+html.light a[class*="bg-gradient"] [class*="text-white"],
+html.light button.from-blue [class*="text-white"],
+html.light button.from-pink [class*="text-white"],
+html.light button.from-purple [class*="text-white"],
+html.light button.from-red [class*="text-white"],
+html.light button.from-primary [class*="text-white"],
+html.light button.from-accent [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* Section backgrounds in light mode */
+html.light section.bg-gradient-to-b.from-black.to-gray-900,
+html.light section[class*="bg-gradient-to-b"][class*="from-black"] {
+  background: linear-gradient(to bottom, #f5f5f5, #e8e8e8) !important;
+}
+
+html.light section.bg-black:not([class*="bg-gradient"]),
+html.light section:not([class*="to-gray-900"])[class*="from-black"] {
+  background: #f5f5f5 !important;
+}
+
+/* Target from-black + to-gray-900 combination directly */
+html.light section.from-black.to-gray-900,
+html.light section[class*="from-black"][class*="to-gray-900"],
+html.light div[class*="from-black"][class*="to-gray-900"] {
+  background: linear-gradient(to bottom, #f5f5f5, #e8e8e8) !important;
+}
+
+/* Category card descriptions specifically in /store page */
+html.light section p[class*="text-white"],
+html.light section .text-sm[class*="text-white"],
+html.light .bento-item p[class*="text-white"],
+html.light .bento-item .text-sm {
+  color: #0a0a0f !important;
+}
+
+/* But keep gradient buttons and hero section white */
+html.light section:first-of-type [class*="text-white"],
+html.light section.relative.flex.items-center.justify-center [class*="text-white"],
+html.light button[class*="bg-gradient"] [class*="text-white"],
+html.light a[class*="bg-gradient"] [class*="text-white"],
+html.light button.from-blue [class*="text-white"],
+html.light button.from-pink [class*="text-white"],
+html.light button.from-purple [class*="text-white"],
+html.light button.from-red [class*="text-white"],
+html.light button.from-primary [class*="text-white"],
+html.light button.from-accent [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* Shopper "Nous contacter" button - invert colors in light mode */
+html.light a[href="/store/contact"].bg-transparent.border-2 {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+html.light a[href="/store/contact"].bg-transparent.border-2:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* Keep arrow icon black too */
+html.light a[href="/store/contact"] svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Dark mode - keep transparent with white text (default behavior already works) */
+html:not(.light) a[href="/store/contact"].bg-transparent {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) a[href="/store/contact"].bg-transparent:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html:not(.light) a[href="/store/contact"] svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* More specific rules for "Nous contacter" button - override everything */
+html.light a[href="/store/contact"].bg-transparent {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+html.light a[href="/store/contact"].bg-transparent:hover {
+  background-color: #f0f0f0 !important;
+  background: #f0f0f0 !important;
+}
+
+html.light a[href="/store/contact"].bg-transparent * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Dark mode specific */
+html:not(.light) a[href="/store/contact"].bg-transparent {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) a[href="/store/contact"].bg-transparent:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+html:not(.light) a[href="/store/contact"].bg-transparent * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* PRÊT À SHOPPER section - Nous contacter button */
+/* Light mode: white background, black text */
+html.light section[class*="from-warning-600"] a[href="/store/contact"].bg-white,
+html.light section[class*="to-orange-600"] a[href="/store/contact"].bg-white {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.light section[class*="from-warning-600"] a[href="/store/contact"].bg-white *,
+html.light section[class*="to-orange-600"] a[href="/store/contact"].bg-white * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Dark mode: black background, white text */
+html:not(.light) section[class*="from-warning-600"] a[href="/store/contact"].bg-white,
+html:not(.light) section[class*="to-orange-600"] a[href="/store/contact"].bg-white {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) section[class*="from-warning-600"] a[href="/store/contact"].bg-white *,
+html:not(.light) section[class*="to-orange-600"] a[href="/store/contact"].bg-white * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Override text-warning-600 specifically in light mode */
+html.light section[class*="from-warning-600"] a[href="/store/contact"].text-warning-600,
+html.light section[class*="to-orange-600"] a[href="/store/contact"].text-warning-600 {
+  color: #000000 !important;
+}
+
+html.light section[class*="from-warning-600"] a[href="/store/contact"].text-warning-600 *,
+html.light section[class*="to-orange-600"] a[href="/store/contact"].text-warning-600 * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Force all children elements to black in light mode */
+html.light section[class*="from-warning-600"] a[href="/store/contact"] span,
+html.light section[class*="to-orange-600"] a[href="/store/contact"] span {
+  color: #000000 !important;
+}
+
+html.light section[class*="from-warning-600"] a[href="/store/contact"] svg,
+html.light section[class*="to-orange-600"] a[href="/store/contact"] svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* FINAL OVERRIDE - Force text color for PRÊT À SHOPPER button */
+html.light a[href="/store/contact"].bg-white.text-warning-600 {
+  color: #000000 !important;
+}
+
+html.light a[href="/store/contact"].bg-white.text-warning-600 *,
+html.light a[href="/store/contact"].bg-white.text-warning-600 span,
+html.light a[href="/store/contact"].bg-white.text-warning-600 svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Target the specific class combination */
+html.light a.bg-white.text-warning-600[class*="jelly-button"][href="/store/contact"] {
+  color: #000000 !important;
+}
+
+html.light a.bg-white.text-warning-600[class*="jelly-button"][href="/store/contact"] * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Dark mode */
+html:not(.light) a[href="/store/contact"].bg-white.text-warning-600 {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) a[href="/store/contact"].bg-white.text-warning-600 *,
+html:not(.light) a[href="/store/contact"].bg-white.text-warning-600 span,
+html:not(.light) a[href="/store/contact"].bg-white.text-warning-600 svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* ABSOLUTE FINAL OVERRIDE - Must be last rule in file */
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] {
+  color: #000000 !important;
+}
+
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] *,
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] span,
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg,
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] text {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Dark mode absolute final */
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] *,
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] span,
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg,
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] text {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Fix arrow shape - remove fill, keep only stroke */
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg,
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg *,
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg,
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg * {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
+/* Light mode - black text and arrow stroke */
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] {
+  color: #000000 !important;
+}
+
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] span {
+  color: #000000 !important;
+}
+
+html.light a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+
+/* Dark mode - white text and black background */
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] span {
+  color: #ffffff !important;
+}
+
+html:not(.light) a.jelly-button.group.relative.inline-flex.items-center.gap-3[href="/store/contact"] svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* Gaming Fun Section - Console labels on images - ALWAYS WHITE */
+html.light section.bg-black .bento-item.absolute.inset-0.bg-gradient-to-t span.text-white.kinetic-text,
+html.light section[class*="AFFRONTE"] .absolute.inset-0 span.text-white.kinetic-text,
+html.light section[class*="bg-black"] .bento-item .absolute.inset-0 span.text-white,
+html.light .bento-item.absolute.inset-0.bg-gradient-to-t span.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Target specific console labels in the 2x2 grid */
+html.light section[class*="bg-black"] .grid.grid-cols-2 .bento-item .absolute.inset-0 span,
+html.light .grid.grid-cols-2 .bento-item .absolute.inset-0.bg-gradient-to-t span {
+  color: #ffffff !important;
+}
+
+/* All kinetic-text spans within bento-item overlays */
+html.light .bento-item .absolute.inset-0.bg-gradient-to-t span.kinetic-text,
+html.light .bento-item .absolute.inset-0.bg-gradient-to-t span.text-white {
+  color: #ffffff !important;
+}
+
+/* Force ALL text in gradient overlays on images to white */
+html.light .absolute.inset-0.bg-gradient-to-t span.text-white,
+html.light .absolute.inset-0.bg-gradient-to-t span.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Target by exact structure */
+html.light section[class*="py-16"][class*="bg-black"] .bento-item.group.overflow-hidden .absolute.inset-0.bg-gradient-to-t span {
+  color: #ffffff !important;
+}
+
+/* All spans in gradient overlays with kinetic-text */
+html.light .absolute.inset-0[class*="bg-gradient-to-t"] span.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Most specific - target text-white class directly */
+html.light .absolute.inset-0[class*="from-black"] span.text-white {
+  color: #ffffff !important;
+}
+
+/* Force ALL spans in these specific overlays */
+html.light .grid.grid-cols-2 .bento-item .absolute.inset-0 span {
+  color: #ffffff !important;
+}
+
+/* FINAL ATTEMPT - Use attribute selectors with full path */
+html.light div[class*="grid"][class*="grid-cols-2"] div[class*="bento-item"] div[class*="absolute"][class*="inset-0"][class*="bg-gradient-to-t"] span {
+  color: #ffffff !important;
+}
+
+/* Target from-black/80 specifically */
+html.light div[class*="from-black"] div[class*="to-transparent"] span {
+  color: #ffffff !important;
+}
+
+/* All spans in section with bg-black */
+html.light section.bg-black .absolute.inset-0 span {
+  color: #ffffff !important;
+}
+
+/* Most direct path */
+html.light section[class*="py-16"][class*="bg-black"] .grid .bento-item .absolute span {
+  color: #ffffff !important;
+}
+
+/* SUPER FINAL - Arena console labels - Multiple approaches */
+
+/* Approach 1: Target the exact gradient class combination */
+/* Approach 2: Target all spans in bento-item with absolute positioning */
+html.light .bento-item .absolute.inset-0.flex.items-center.justify-center span {
+  color: #ffffff !important;
+}
+
+/* Approach 3: Target by inline-flex and items-center */
+html.light .absolute.inset-0.flex.items-center.justify-center span.text-white,
+html.light .absolute.inset-0.flex.items-center.justify-center span.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Approach 4: Target text-3xl spans in absolute overlays */
+html.light .absolute.inset-0 span.text-3xl {
+  color: #ffffff !important;
+}
+
+/* Approach 6: Use nth-child for the 2x2 grid */
+html.light .grid.grid-cols-2 .bento-item:nth-child(1) .absolute span,
+html.light .grid.grid-cols-2 .bento-item:nth-child(2) .absolute span,
+html.light .grid.grid-cols-2 .bento-item:nth-child(3) .absolute span,
+html.light .grid.grid-cols-2 .bento-item:nth-child(4) .absolute span {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   RESTAURANT PAGE INFO BAR ICONS
+   Force icon colors in Info Bar section
+   ============================================ */
+
+/* Light mode - icons should be black */
+html.light .restaurant-info-icon svg {
+  stroke: #000000 !important;
+}
+
+/* Dark mode - icons should be white */
+html:not(.light) .restaurant-info-icon svg {
+  stroke: #ffffff !important;
+}
+
+/* ============================================
+   HOME PAGE ARENA BUTTON - LIGHT MODE
+   Force black icons and text in light mode
+   ============================================ */
+
+/* Light mode - Arena button SVG icons should be black */
+html.light a[href="/arena"] svg,
+html.light a[href="/arena"] .lucide-gamepad2,
+html.light a[href="/arena"] .lucide-arrow-right {
+  stroke: #000000 !important;
+  color: #000000 !important;
+}
+
+/* Light mode - Arena button text should be black */
+html.light a[href="/arena"] span {
+  color: #000000 !important;
+}
