@@ -11,7 +11,7 @@ export async function GET(
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { id } = await params
@@ -45,7 +45,7 @@ export async function GET(
     } as any)
 
     if (!customer) {
-      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 } as any)
     }
 
     return NextResponse.json(customer)
@@ -67,7 +67,7 @@ export async function PUT(
     const user = await requireAuth()
 
     if (!hasRole(user, ['MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const body = await request.json()
@@ -108,7 +108,7 @@ export async function DELETE(
     const user = await requireAuth()
 
     if (!hasRole(user, ['MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { id } = await params
@@ -116,9 +116,9 @@ export async function DELETE(
     const customer = await prisma.customer.update({
       where: { id },
       data: { status: 'BLOCKED' },
-    })
+    } as any)
 
-    return NextResponse.json({ message: 'Customer blocked successfully', customer })
+    return NextResponse.json({ message: 'Customer blocked successfully', customer } as any)
   } catch (error: any) {
     console.error('Error deleting customer:', error)
     return NextResponse.json(

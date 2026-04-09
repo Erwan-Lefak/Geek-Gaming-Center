@@ -14,7 +14,7 @@ const createCustomerSchema = z.object({
   city: z.string().optional(),
   notes: z.string().optional(),
   acceptCGV: z.boolean(),
-})
+} as any)
 
 // GET /api/customers - Liste des clients
 export async function GET(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     // Vérification des permissions
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { searchParams } = new URL(request.url)
@@ -66,14 +66,9 @@ export async function GET(request: NextRequest) {
           visitCount: true,
           lastVisit: true,
           createdAt: true,
-          createdBy: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
+          createdById: true,
         },
-      }),
+      } as any),
       prisma.customer.count({ where }),
     ])
 
@@ -85,7 +80,7 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
       },
-    })
+    } as any)
   } catch (error: any) {
     console.error('Error fetching customers:', error)
     return NextResponse.json(
@@ -102,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     // Seuls la caissière, gérant et admin peuvent créer des clients
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const body = await request.json()
@@ -130,9 +125,9 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    } as any)
 
-    return NextResponse.json(customer, { status: 201 })
+    return NextResponse.json(customer, { status: 201 } as any)
   } catch (error: any) {
     console.error('Error creating customer:', error)
 

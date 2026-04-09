@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         duration: durationNum,
         isWeekend: isWeekend,
       },
-    })
+    } as any)
 
     if (!pricing) {
       return NextResponse.json(
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       pricingId: pricing.id,
       price: Number(pricing.price),
       currency: pricing.currency,
-    })
+    } as any)
   } catch (error: any) {
     console.error('Get pricing error:', error)
     return NextResponse.json(

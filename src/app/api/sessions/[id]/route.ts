@@ -11,7 +11,7 @@ export async function GET(
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { id } = await params
@@ -31,10 +31,10 @@ export async function GET(
         },
         invoice: true,
       },
-    })
+    } as any)
 
     if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 } as any)
     }
 
     // Calculer le temps restant
@@ -52,7 +52,7 @@ export async function GET(
       ...session,
       timeRemaining,
       isExpired,
-    })
+    } as any)
   } catch (error: any) {
     console.error('Error fetching session:', error)
     return NextResponse.json(
@@ -71,7 +71,7 @@ export async function PATCH(
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const body = await request.json()
@@ -81,10 +81,10 @@ export async function PATCH(
     const session = await prisma.gamingSession.findUnique({
       where: { id },
       include: { equipment: true },
-    })
+    } as any)
 
     if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 } as any)
     }
 
     let updatedSession
@@ -109,13 +109,13 @@ export async function PATCH(
             customer: true,
             equipment: true,
           },
-        })
+        } as any)
 
         // Mettre à jour l'équipement
         await prisma.equipment.update({
           where: { id: session.equipmentId },
           data: { status: 'IN_USE' },
-        })
+        } as any)
 
         // Mettre à jour le client
         await prisma.customer.update({
@@ -124,7 +124,7 @@ export async function PATCH(
             lastVisit: new Date(),
             visitCount: { increment: 1 },
           },
-        })
+        } as any)
 
         break
 
@@ -145,7 +145,7 @@ export async function PATCH(
             additionalMinutes,
             additionalPrice,
           },
-        })
+        } as any)
 
         // Calculer nouvelle fin
         const currentEnd = session.actualEndAt || session.scheduledEndAt
@@ -161,7 +161,7 @@ export async function PATCH(
             equipment: true,
             extensions: true,
           },
-        })
+        } as any)
 
         break
 
@@ -177,7 +177,7 @@ export async function PATCH(
         updatedSession = await prisma.gamingSession.update({
           where: { id: id },
           data: { status: 'PAUSED' },
-        })
+        } as any)
 
         break
 
@@ -193,7 +193,7 @@ export async function PATCH(
         updatedSession = await prisma.gamingSession.update({
           where: { id: id },
           data: { status: 'ACTIVE' },
-        })
+        } as any)
 
         break
 
@@ -216,13 +216,13 @@ export async function PATCH(
             customer: true,
             equipment: true,
           },
-        })
+        } as any)
 
         // Libérer l'équipement
         await prisma.equipment.update({
           where: { id: session.equipmentId },
           data: { status: 'AVAILABLE' },
-        })
+        } as any)
 
         // Mettre à jour les stats du client
         const totalHours = session.duration / 60
@@ -232,12 +232,12 @@ export async function PATCH(
             totalSpent: { increment: session.price },
             totalHours: { increment: totalHours },
           },
-        })
+        } as any)
 
         break
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 } as any)
     }
 
     return NextResponse.json(updatedSession)

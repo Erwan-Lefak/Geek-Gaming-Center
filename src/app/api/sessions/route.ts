@@ -10,7 +10,7 @@ const createSessionSchema = z.object({
   equipmentId: z.string(),
   duration: z.number().positive(), // en minutes
   notes: z.string().optional(),
-})
+} as any)
 
 // GET /api/sessions - Liste des sessions
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { searchParams } = new URL(request.url)
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
       },
-    })
+    } as any)
   } catch (error: any) {
     console.error('Error fetching sessions:', error)
     return NextResponse.json(
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const body = await request.json()
@@ -119,10 +119,10 @@ export async function POST(request: NextRequest) {
     // Récupérer le client
     const customer = await prisma.customer.findUnique({
       where: { id: data.customerId },
-    })
+    } as any)
 
     if (!customer) {
-      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 } as any)
     }
 
     // Récupérer l'équipement
@@ -136,10 +136,10 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    } as any)
 
     if (!equipment) {
-      return NextResponse.json({ error: 'Equipment not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Equipment not found' }, { status: 404 } as any)
     }
 
     if (equipment.status !== 'AVAILABLE') {
@@ -190,15 +190,15 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    } as any)
 
     // Mettre à jour le statut de l'équipement
     await prisma.equipment.update({
       where: { id: data.equipmentId },
       data: { status: 'RESERVED' },
-    })
+    } as any)
 
-    return NextResponse.json(session, { status: 201 })
+    return NextResponse.json(session, { status: 201 } as any)
   } catch (error: any) {
     console.error('Error creating session:', error)
 
@@ -230,7 +230,7 @@ async function generateSessionNumber(): Promise<string> {
         startsWith: prefix,
       },
     },
-  })
+  } as any)
 
   return `${prefix}-${String(count + 1).padStart(6, '0')}`
 }
@@ -248,7 +248,7 @@ async function createPricing(
       isWeekend: isWeekend(),
       price,
     },
-  })
+  } as any)
 
   return pricing.id
 }

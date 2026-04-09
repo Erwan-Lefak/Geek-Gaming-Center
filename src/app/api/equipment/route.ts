@@ -29,9 +29,9 @@ export async function GET(request: NextRequest) {
           orderBy: [{ isWeekend: 'asc' }, { duration: 'asc' }],
         },
       },
-    })
+    } as any)
 
-    return NextResponse.json({ equipment })
+    return NextResponse.json({ equipment } as any)
   } catch (error: any) {
     console.error('Error fetching equipment:', error)
     return NextResponse.json(

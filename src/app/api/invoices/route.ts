@@ -22,7 +22,7 @@ const createInvoiceSchema = z.object({
   mobileMoneyProvider: z.enum(['ORANGE', 'MTN']).optional(),
   mobileMoneyPhone: z.string().optional(),
   mobileMoneyRef: z.string().optional(),
-})
+} as any)
 
 // GET /api/invoices - Liste des factures
 export async function GET(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { searchParams } = new URL(request.url)
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
       },
-    })
+    } as any)
   } catch (error: any) {
     console.error('Error fetching invoices:', error)
     return NextResponse.json(
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     const user = await requireAuth()
 
     if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN'])) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const body = await request.json()
@@ -141,10 +141,10 @@ export async function POST(request: NextRequest) {
     // Récupérer le client
     const customer = await prisma.customer.findUnique({
       where: { id: data.customerId },
-    })
+    } as any)
 
     if (!customer) {
-      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 } as any)
     }
 
     // Calculer les montants
@@ -196,17 +196,17 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    } as any)
 
     // Si c'est une facture de session, lier la session
     if (data.sessionId && data.type === 'GAMING_SESSION') {
       await prisma.gamingSession.update({
         where: { id: data.sessionId },
         data: { invoiceId: invoice.id },
-      })
+      } as any)
     }
 
-    return NextResponse.json(invoice, { status: 201 })
+    return NextResponse.json(invoice, { status: 201 } as any)
   } catch (error: any) {
     console.error('Error creating invoice:', error)
 
