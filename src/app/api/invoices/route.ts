@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculer les montants
-    const subtotal = data.items.reduce((sum, item) => {
+    const subtotal = (data.items as any[]).reduce((sum: number, item: any) => {
       return sum + (item.quantity * item.unitPrice)
     }, 0)
 
