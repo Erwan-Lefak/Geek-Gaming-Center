@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
           },
           items: true,
         },
-      }),
+      } as any),
       prisma.invoice.count({ where }),
     ])
 
