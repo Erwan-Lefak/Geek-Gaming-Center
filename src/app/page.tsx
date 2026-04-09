@@ -62,7 +62,7 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-10 gap-8 items-center -mt-[12rem] sm:-mt-16 md:mt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-10 gap-8 items-center -mt-24 sm:-mt-16 md:mt-0">
             {/* Left Column - Title and Buttons (70% on tablet and desktop) */}
             <div className="w-full sm:col-span-7">
               {/* Main Headline */}
