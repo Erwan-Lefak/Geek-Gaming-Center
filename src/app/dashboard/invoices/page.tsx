@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Search, FileText, Download, Eye } from 'lucide-react'
-import { formatPrice } from '@/lib/data/invoices'
+import { formatPrice } from '@/lib/data/pricing'
 
 interface Invoice {
   id: string

@@ -72,10 +72,10 @@ export const ROLE_PERMISSIONS = {
 
 export function hasPermission(userRole: UserRole, permission: string): boolean {
   const role = ROLE_PERMISSIONS[userRole]
-  return role.permissions.includes('*') || role.permissions.includes(permission)
+  return (role.permissions as any).includes('*') || (role.permissions as any).includes(permission)
 }
 
 export function canAccessRoute(userRole: UserRole, route: string): boolean {
   const role = ROLE_PERMISSIONS[userRole]
-  return role.canAccess.includes('*') || role.canAccess.some(r => route.startsWith(r))
+  return (role.canAccess as any).includes('*') || role.canAccess.some(r => route.startsWith(r))
 }

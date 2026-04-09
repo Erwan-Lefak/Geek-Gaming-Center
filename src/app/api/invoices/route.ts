@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       return sum + (item.quantity * item.unitPrice)
     }, 0)
 
-    const { taxAmount, total } = calculateTaxAmounts(subtotal - data.discount)
+    const { taxAmount, total } = calculateTaxAmounts(subtotal - (data.discount as number))
 
     // Générer le numéro de facture
     const invoiceNumber = await generateInvoiceNumber(prisma)
@@ -162,11 +162,11 @@ export async function POST(request: NextRequest) {
       data: {
         invoiceNumber,
         customerId: data.customerId,
-        subtotal: subtotal - data.discount,
+        subtotal: subtotal - (data.discount as number),
         taxRate: 19.25,
         taxAmount,
         total,
-        discount: data.discount,
+        discount: data.discount as number,
         paymentMethod: data.paymentMethod,
         paymentStatus: data.paymentStatus,
         paidAt: data.paymentStatus === 'PAID' ? new Date() : null,
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
         createdById: user.id,
         sessionId: data.sessionId,
         items: {
-          create: data.items.map(item => ({
+          create: (data.items as any[]).map((item: any) => ({
             description: item.description,
             quantity: item.quantity,
             unitPrice: item.unitPrice,

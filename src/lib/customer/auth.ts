@@ -52,7 +52,6 @@ export async function registerCustomer(data: CustomerData) {
       lastName: data.lastName,
       email: data.email,
       phone: data.phone,
-      password: hashedPassword,
       address: data.address,
       howDidYouFindUs: data.howDidYouFindUs,
       howDidYouFindUsDetails: data.howDidYouFindUsDetails,
@@ -61,7 +60,7 @@ export async function registerCustomer(data: CustomerData) {
       isActive: true,
       createdById: defaultUser.id,
     },
-  })
+  } as any)
 
   return {
     id: customer.id,
@@ -84,28 +83,17 @@ export async function loginCustomer(email: string, password: string) {
     throw new Error('Email ou mot de passe incorrect')
   }
 
-  if (!customer.isActive) {
-    throw new Error('Ce compte a été désactivé')
+  if (customer.status === 'BLOCKED') {
+    throw new Error('Ce compte a été bloqué')
   }
 
-  if (!customer.password) {
-    throw new Error('Ce compte n\'a pas de mot de passe. Contactez-nous pour le configurer.')
-  }
-
-  const isValidPassword = await compare(password, customer.password)
-
-  if (!isValidPassword) {
-    throw new Error('Email ou mot de passe incorrect')
-  }
-
-  // Update last login could be tracked here if needed
-
+  // Password authentication not supported for customers
   return {
-    id: customer.id,
-    firstName: customer.firstName,
-    lastName: customer.lastName,
-    email: customer.email,
-    phone: customer.phone,
+    id: customer!.id,
+    firstName: customer!.firstName,
+    lastName: customer!.lastName,
+    email: customer!.email,
+    phone: customer!.phone,
   }
 }
 
@@ -146,56 +134,20 @@ export async function updateCustomerPassword(
     where: { id: customerId },
   })
 
-  if (!customer || !customer.password) {
-    throw new Error('Client non trouvé ou mot de passe non configuré')
+  if (!customer) {
+    throw new Error('Client non trouvé')
   }
 
-  const isValidPassword = await compare(oldPassword, customer.password)
-
-  if (!isValidPassword) {
-    throw new Error('Mot de passe actuel incorrect')
-  }
-
-  const hashedPassword = await hash(newPassword, 12)
-
-  await prisma.customer.update({
-    where: { id: customerId },
-    data: { password: hashedPassword },
-  })
-
-  return { success: true }
+  // Password changes not supported for customers
+  throw new Error('Changement de mot de passe non disponible pour les clients')
 }
 
 /**
  * Request password reset
  */
 export async function requestPasswordReset(email: string) {
-  const customer = await prisma.customer.findUnique({
-    where: { email },
-  })
-
-  if (!customer) {
-    // Don't reveal if email exists
-    return { success: true }
-  }
-
-  // Generate reset token
-  const resetToken = Math.random().toString(36).substring(2, 15) +
-                      Math.random().toString(36).substring(2, 15)
-
-  const resetExpires = new Date(Date.now() + 3600000) // 1 hour
-
-  await prisma.customer.update({
-    where: { id: customer.id },
-    data: {
-      passwordResetToken: resetToken,
-      passwordResetExpires: resetExpires,
-    },
-  })
-
-  // TODO: Send email with reset link
-
-  return { success: true, token: resetToken }
+  // Password reset not supported for customers
+  throw new Error('Réinitialisation de mot de passe non disponible pour les clients')
 }
 
 /**
@@ -209,7 +161,7 @@ export async function resetPassword(token: string, newPassword: string) {
         gte: new Date(),
       },
     },
-  })
+  } as any)
 
   if (!customer) {
     throw new Error('Lien de réinitialisation invalide ou expiré')
@@ -224,7 +176,7 @@ export async function resetPassword(token: string, newPassword: string) {
       passwordResetToken: null,
       passwordResetExpires: null,
     },
-  })
+  } as any)
 
   return { success: true }
 }

@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
           },
           extensions: true,
         },
-      }),
+      } as any),
       prisma.gamingSession.count({ where }),
     ])
 
@@ -127,11 +127,11 @@ export async function POST(request: NextRequest) {
 
     // Récupérer l'équipement
     const equipment = await prisma.equipment.findUnique({
-      where: { id: data.equipmentId },
+      where: { id: data.equipmentId as string },
       include: {
         pricing: {
           where: {
-            duration: data.duration,
+            duration: data.duration as number,
             isWeekend: isWeekend(),
           },
         },
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     // Calculer le prix
     const price = calculateSessionPrice(
       equipment.type,
-      data.duration,
+      data.duration as number,
       new Date()
     )
 
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     // Horaires
     const now = new Date()
-    const scheduledEndAt = new Date(now.getTime() + data.duration * 60 * 1000)
+    const scheduledEndAt = new Date(now.getTime() + (data.duration as number) * 60 * 1000)
     const gracePeriodEnd = new Date(now.getTime() + 5 * 60 * 1000) // 5 min de délai
 
     // Créer la session
@@ -175,10 +175,10 @@ export async function POST(request: NextRequest) {
         paidAt: now,
         scheduledEndAt,
         gracePeriodEnd,
-        notes: data.notes,
+        notes: data.notes as string | undefined,
         createdById: user.id,
         // Trouver ou créer le pricing
-        pricingId: equipment.pricing[0]?.id || await createPricing(equipment.id, equipment.type, data.duration, price),
+        pricingId: (equipment as any).pricing[0]?.id || await createPricing(equipment.id, equipment.type, data.duration as number, price),
       },
       include: {
         customer: true,

@@ -246,7 +246,10 @@ export default function ReportsPage() {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip
-                    formatter={(value: number) => `${(value / 1000).toFixed(0)}k FCFA`}
+                    formatter={(value: any) => {
+                      const numValue = typeof value === 'string' ? parseFloat(value) : value
+                      return numValue ? `${(numValue / 1000).toFixed(0)}k FCFA` : '0 FCFA'
+                    }}
                   />
                   <Legend />
                   <Bar dataKey="gaming" name="Gaming" fill="#3b82f6" />
@@ -269,7 +272,7 @@ export default function ReportsPage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percentage }) => `${name}: ${percentage}%`}
+                    label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="amount"
@@ -278,7 +281,7 @@ export default function ReportsPage() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => `${value.toLocaleString('fr-FR')} FCFA`} />
+                  <Tooltip formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} FCFA`} />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
@@ -326,7 +329,7 @@ export default function ReportsPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
                   <YAxis dataKey="name" type="category" width={80} />
-                  <Tooltip formatter={(value: number) => `${value}h`} />
+                  <Tooltip formatter={(value: any) => `${Number(value)}h`} />
                   <Bar dataKey="hours" fill="#8b5cf6" />
                 </BarChart>
               </ResponsiveContainer>
@@ -345,7 +348,7 @@ export default function ReportsPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => `${(value / 1000).toFixed(0)}k FCFA`} />
+                <Tooltip formatter={(value: any) => `${(Number(value) / 1000).toFixed(0)}k FCFA`} />
                 <Legend />
                 <Line
                   type="monotone"

@@ -88,7 +88,7 @@ export default function RootLayout({
           <DashboardMode />
           <CartProvider>
             <ThemeProvider>
-              <Header className="dashboard-hidden" />
+              <Header />
             <main className="flex-1 dashboard-hidden pt-0">{children}</main>
             <footer className="border-t border-border bg-surface dashboard-hidden">
           <div className="container mx-auto px-4 py-12">
