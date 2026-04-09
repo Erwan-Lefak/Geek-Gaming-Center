@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const customer = await prisma.customer.create({
       data: {
         ...data,
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth as string) : null,
         cgvAcceptedAt: new Date(),
         createdById: user.id,
       },
