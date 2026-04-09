@@ -1,0 +1,6 @@
+-- Donner tous les droits sur le schéma public à erwan
+GRANT ALL ON SCHEMA public TO erwan;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO erwan;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO erwan;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO erwan;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO erwan;

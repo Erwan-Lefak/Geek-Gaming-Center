@@ -1,0 +1,477 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2025-01-15",
+    "company": "Geek Gaming Center",
+    "description": "Base de connaissances complète pour le chatbot GGC avec système RAG"
+  },
+  "knowledge": {
+    "company_info": {
+      "name": "Geek Gaming Center",
+      "tagline": "Votre destination gaming ultime",
+      "location": {
+        "address": "Mvog Ada, Yaoundé, Cameroun",
+        "city": "Yaoundé",
+        "country": "Cameroun",
+        "coordinates": {
+          "latitude": 3.8488,
+          "longitude": 11.5022
+        }
+      },
+      "contact": {
+        "email": "contact@geekgamingcenter.cm",
+        "phone": "+237 600 000 000",
+        "website": "https://geekgamingcenter.com"
+      },
+      "description": "Boutique de composants électroniques premium et salle de jeux immersive avec PS5, Xbox, VR et simulation automobile."
+    },
+    "services": {
+      "salle_de_jeux": {
+        "name": "Salle de Jeux",
+        "description": "Espace gaming avec équipements dernière génération",
+        "equipments": [
+          {
+            "id": "ps5",
+            "name": "PS5",
+            "description": "PlayStation 5 avec téléviseur 4K",
+            "price_per_hour": 2000,
+            "features": ["Manettes DualSense", "TV 4K 55\"", "Casque audio", "Siège gaming premium"]
+          },
+          {
+            "id": "ps4",
+            "name": "PS4",
+            "description": "PlayStation 4 Pro",
+            "price_per_hour": 1000,
+            "features": ["Manettes DualShock 4", "TV 4K 50\"", "Casque audio"]
+          },
+          {
+            "id": "xbox",
+            "name": "XBOX Series X",
+            "description": "Xbox Series X avec Game Pass",
+            "price_per_hour": 1500,
+            "features": ["Manette Xbox Elite", "TV 4K 55\"", "Game Pass Ultimate", "Casque audio"]
+          },
+          {
+            "id": "switch",
+            "name": "Nintendo Switch",
+            "description": "Switch avec Mario Kart et Super Smash Bros",
+            "price_per_hour": 1500,
+            "features": ["Écran tabletop", "Manettes Joy-Con", "Jeux populaires"]
+          },
+          {
+            "id": "pc",
+            "name": "PC Gaming",
+            "description": "PC haute configuration pour gaming",
+            "price_per_hour": 1500,
+            "features": ["RTX 4070", "32GB RAM", "240Hz Monitor", "Clavier mécanique", "Souris gaming"]
+          },
+          {
+            "id": "vr",
+            "name": "VR Experience",
+            "description": "Réalité virtuelle immersive",
+            "price_per_hour": 2500,
+            "features": ["PSVR2 ou Oculus Quest 3", "Jeux VR exclusifs", "Espace dédié", "Assistance"]
+          },
+          {
+            "id": "racing",
+            "name": "Racing Simulator",
+            "description": "Simulateur de course professionnel",
+            "price_per_hour": 2000,
+            "features": ["Volant direct drive", "Pédales H-pattern", "Siège baquet", "Écran triple", "Assetto Corsa", "iRacing"]
+          }
+        ],
+        "promotions": [
+          {
+            "name": "Pack 5 heures",
+            "description": "5 heures de gaming",
+            "discount": "10% de réduction",
+            "conditions": "Valable tous les jours"
+          },
+          {
+            "name": "Pack 10 heures",
+            "description": "10 heures de gaming",
+            "discount": "20% de réduction",
+            "conditions": "Valable tous les jours"
+          },
+          {
+            "name": "Happy Hour",
+            "description": "Réduction de 20%",
+            "conditions": "Lundi - Vendredi, 9h30 - 14h00"
+          }
+        ]
+      },
+      "boutique": {
+        "name": "Boutique",
+        "description": "Vente de matériel gaming et composants PC",
+        "categories": [
+          {
+            "name": "Consoles",
+            "products": ["PS5", "PS4", "Xbox Series X", "Nintendo Switch", "Nintendo Switch OLED"]
+          },
+          {
+            "name": "Accessoires",
+            "products": ["Manettes", "Casques gaming", "Claviers", "Souris", "Tapis de souris", "Webcams", "Microphones"]
+          },
+          {
+            "name": "Jeux Vidéo",
+            "products": ["Jeux PS5", "Jeux PS4", "Jeux Xbox", "Jeux Switch", "Cartes eShop", "Cartes PlayStation Plus", "Cartes Xbox Game Pass"]
+          },
+          {
+            "name": "Composants PC",
+            "products": ["Cartes graphiques", "Processeurs", "Cartes mères", "Mémoire RAM", "SSD", "Alimentations", "Boîtiers", "Refroidissement"]
+          },
+          {
+            "name": "Périphériques",
+            "products": ["Écrans gaming", "Enceintes", "Hubs USB", "Câbles", "Supports"]
+          },
+          {
+            "name": "Goodies",
+            "products": ["Figurines", "Posters", "T-shirts", "Tasses", "Autocollants", "Keychains"]
+          }
+        ],
+        "services_boutique": [
+          "Conseil personnalisé pour configuration PC",
+          "Assemblage PC sur mesure",
+          "Installation et configuration",
+          "Garantie et SAV"
+        ]
+      },
+      "arena": {
+        "name": "Arena",
+        "description": "Espace compétition et tournois",
+        "features": [
+          "Tournois réguliers",
+          "Classements mensuels",
+          "Prize pool",
+          "Casting des matchs",
+          "Événements spéciaux (LAN parties, launches, etc.)"
+        ],
+        "upcoming_events": []
+      },
+      "restaurant": {
+        "name": "Snack Bar",
+        "description": "Restauration sur place",
+        "offerings": [
+          "Boissons rafraîchissantes",
+          "Snacks et fast-food",
+          "Plats rapides",
+          "Desserts"
+        ]
+      }
+    },
+    "schedule": {
+      "jours": [
+        {
+          "jour": "Lundi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Mardi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Mercredi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Jeudi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Vendredi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Samedi",
+          "ouverture": "09:30",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        },
+        {
+          "jour": "Dimanche",
+          "ouverture": "12:00",
+          "fermeture": "21:00",
+          "statut": "ouvert"
+        }
+      ],
+      "summary": "Lundi - Samedi : 9h30 - 21h00 | Dimanche : 12h00 - 21h00"
+    },
+    "pricing": {
+      "currency": "XAF",
+      "symbol": "F",
+      "per_hour": {
+        "PC Gaming": 1500,
+        "PS5": 2000,
+        "PS4": 1000,
+        "XBOX Series X": 1500,
+        "Switch": 1500,
+        "VR": 2500,
+        "Simu Racing": 2000
+      },
+      "formules": [
+        {
+          "nom": "Séance découverte",
+          "durée": "1 heure",
+          "prix": "à partir de 1 000F",
+          "description": "Idéal pour tester"
+        },
+        {
+          "nom": "Séance gaming",
+          "durée": "3 heures",
+          "prix": "à partir de 3 000F",
+          "description": "Pour une session complète"
+        },
+        {
+          "nom": "Journée gaming",
+          "durée": "6 heures",
+          "prix": "à partir de 6 000F",
+          "description": "Profitez toute la journée"
+        },
+        {
+          "nom": "Pack journée illimitée",
+          "durée": "illimité",
+          "prix": "sur demande",
+          "description": "Jusqu'à la fermeture"
+        }
+      ]
+    },
+    "reservation": {
+      "description": "Réservez votre session de gaming en ligne",
+      "process": [
+        {
+          "step": 1,
+          "title": "Choisir la date",
+          "description": "Sélectionnez votre date souhaitée sur le calendrier"
+        },
+        {
+          "step": 2,
+          "title": "Choisir le créneau",
+          "description": "Sélectionnez l'horaire qui vous convient (créneaux d'1 heure)"
+        },
+        {
+          "step": 3,
+          "title": "Sélectionner l'équipement",
+          "description": "Choisissez parmi : PS5, PS4, XBOX, Switch, PC, VR, Simu Racing"
+        },
+        {
+          "step": 4,
+          "title": "Confirmer",
+          "description": "Validez votre réservation et présentez-vous à l'heure"
+        }
+      ],
+      "url": "/arena/booking",
+      "rules": [
+        "Arrivez 5 minutes avant votre créneau",
+        "Présentez votre confirmation de réservation",
+        "Annulation gratuite jusqu'à 2h avant le créneau",
+        "Pack de boissons inclus pour les réservations de 3h+"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Quels sont vos horaires d'ouverture ?",
+        "answer": "Nous sommes ouverts Lundi - Samedi de 9h30 à 21h00, et Dimanche de 12h00 à 21h00.",
+        "category": "horaires"
+      },
+      {
+        "question": "Où vous trouvez-vous ?",
+        "answer": "Nous sommes situés à Mvog Ada, Yaoundé, Cameroun.",
+        "category": "localisation"
+      },
+      {
+        "question": "Comment réserver une session de gaming ?",
+        "answer": "Vous pouvez réserver directement sur notre site dans la section Arena → Réserver, ou venir sur place. Choisissez votre date, créneau et équipement, puis confirmez votre réservation.",
+        "category": "reservation"
+      },
+      {
+        "question": "Quels sont les tarifs ?",
+        "answer": "Nos tarifs par heure sont : PC Gaming 1 500F, PS5 2 000F, PS4 1 000F, XBOX Series X 1 500F, Switch 1 500F, VR 2 500F, Simu Racing 2 000F. Des réductions sont disponibles pour les longues sessions.",
+        "category": "tarifs"
+      },
+      {
+        "question": "Acceptez-vous les cartes de paiement ?",
+        "answer": "Oui, nous acceptons les paiements par carte, mobile money et espèces.",
+        "category": "paiement"
+      },
+      {
+        "question": "Puis-je annuler ma réservation ?",
+        "answer": "Oui, l'annulation est gratuite jusqu'à 2 heures avant votre créneau. Au-delà, des frais peuvent s'appliquer.",
+        "category": "reservation"
+      },
+      {
+        "question": "Avez-vous des tournois ?",
+        "answer": "Oui, nous organisons régulièrement des tournois de gaming sur différents jeux (FIFA, COD, Fortnite, etc.). Suivez-nous sur les réseaux sociaux pour ne rien rater !",
+        "category": "evenements"
+      },
+      {
+        "question": "Vendez-vous des consoles et accessoires ?",
+        "answer": "Oui, notre boutique propose des consoles (PS5, Xbox, Switch), des accessoires (manettes, casques), des jeux vidéo et des composants PC.",
+        "category": "boutique"
+      },
+      {
+        "question": "Y a-t-il un âge minimum ?",
+        "answer": "Nous accueillons tous les publics. Les mineurs de moins de 14 ans doivent être accompagnés d'un adulte.",
+        "category": "regles"
+      },
+      {
+        "question": "Puis-je apporter mes propres jeux ?",
+        "answer": "Pour les consoles, vous pouvez apporter vos jeux physiques. Pour le PC gaming, tous les jeux sont déjà installés.",
+        "category": "regles"
+      },
+      {
+        "question": "Offrez-vous des forfaits anniversaire ?",
+        "answer": "Oui ! Nous proposons des forfaits anniversaire avec réservation d'espace, sessions gaming incluses et animations. Contactez-nous pour plus d'informations.",
+        "category": "evenements"
+      },
+      {
+        "question": "Y a-t-il de la restauration sur place ?",
+        "answer": "Oui, notre snack bar propose des boissons, snacks et plats rapides que vous pouvez consommer pendant vos sessions.",
+        "category": "services"
+      },
+      {
+        "question": "Comment vous contacter ?",
+        "answer": "Vous pouvez nous appeler au +237 600 000 000, nous envoyer un email à contact@geekgamingcenter.cm, ou passer nous voir directement à Mvog Ada.",
+        "category": "contact"
+      },
+      {
+        "question": "Proposez-vous des cours ou formations ?",
+        "answer": "Pour le moment, nous nous concentrons sur le gaming loisirs. N'hésitez pas à nous contacter pour des demandes spécifiques.",
+        "category": "services"
+      },
+      {
+        "question": "Y a-t-il un parking ?",
+        "answer": "Oui, un parking est disponible à proximité du centre.",
+        "category": "localisation"
+      }
+    ],
+    "events": {
+      "current": [],
+      "upcoming": [],
+      "categories": [
+        {
+          "name": "Tournois",
+          "description": "Compétitions de jeux vidéo avec prize pool",
+          "examples": ["FIFA Tournament", "Call of Duty Warzone", "Fortnite", "Valorant", "League of Legends"]
+        },
+        {
+          "name": "LAN Parties",
+          "description": "Sessions gaming en groupe",
+          "examples": ["LAN Party Overnight", "Gaming Night"]
+        },
+        {
+          "name": "Lancements",
+          "description": "Lancement de nouveaux jeux ou consoles",
+          "examples": ["Sortie PS5", "Lancement GTA VI"]
+        },
+        {
+          "name": "Événements spéciaux",
+          "description": "Animations et rencontres",
+          "examples": ["Anniversaires", "Team building", "Afterworks gaming"]
+        }
+      ]
+    },
+    "social_media": {
+      "facebook": "https://facebook.com/geekgamingcenter",
+      "instagram": "https://instagram.com/geekgamingcenter",
+      "tiktok": "https://tiktok.com/@geekgamingcenter",
+      "twitter": "https://twitter.com/geekgamingcenter"
+    },
+    "policies": {
+      "reservation": {
+        "annulation": "Gratuite jusqu'à 2h avant le créneau",
+        "retard": "Le créneau ne sera pas prolongé en cas de retard",
+        "no_show": "No-show = facturation du créneau complet"
+      },
+      "payment": {
+        "methods": ["Espèces", "Carte bancaire", "Mobile Money"],
+        "online_payment": "Disponible sur le site pour les réservations"
+      },
+      "conduct": {
+        "respect": "Le respect entre joueurs est obligatoire",
+        "equipment": "Tout dégât matériel sera facturé",
+        "alcohol": "L'abus d'alcool est interdit"
+      }
+    }
+  },
+  "chitchat": {
+    "greetings": {
+      "input": ["bonjour", "salut", "hello", "hi", "hey", "bonsoir", "ça va", "cv"],
+      "responses": [
+        "Bonjour ! 👋 Bienvenue au Geek Gaming Center ! Comment puis-je vous aider ?",
+        "Salut ! 👋 Je suis l'assistant du Geek Gaming Center. Que puis-je faire pour vous ?",
+        "Hello gamer ! 🎮 Besoin d'infos sur nos tarifs, horaires ou réservations ?"
+      ]
+    },
+    "goodbyes": {
+      "input": ["au revoir", "bye", "à bientôt", "ciao", "merci au revoir"],
+      "responses": [
+        "Au revoir ! 👋 À bientôt au Geek Gaming Center !",
+        "Bye ! N'hésitez pas à revenir si vous avez d'autres questions ! 🎮",
+        "À bientôt ! On se retrouve à Mvog Ada pour une session gaming !"
+      ]
+    },
+    "thanks": {
+      "input": ["merci", "thanks", "merci beaucoup", "parfait", "super", "génial"],
+      "responses": [
+        "Je vous en prie ! 👍 Avez-vous besoin d'autre chose ?",
+        "Avec plaisir ! N'hésitez pas si vous avez d'autres questions !",
+        "De rien ! On vous attend au Geek Gaming Center ! 🎮"
+      ]
+    },
+    "what_can_you_do": {
+      "input": ["que peux-tu faire", "que faire", "comment aider", " tes services"],
+      "responses": [
+        "Je peux vous aider sur :\n\n🕐 Nos horaires d'ouverture\n🎮 Les réservations de sessions gaming\n💰 Nos tarifs et promotions\n🛒 La boutique et les produits\n📍 Notre localisation à Mvog Ada\n🏆 Les événements et tournois\n📞 Nous contacter\n\nQue souhaitez-vous savoir ?"
+      ]
+    }
+  },
+  "context_templates": {
+    "pricing": {
+      "template": "Pour les tarifs : PC Gaming {pc}F/h, PS5 {ps5}F/h, PS4 {ps4}F/h, XBOX {xbox}F/h, Switch {switch}F/h, VR {vr}F/h, Simu Racing {racing}F/h. Réductions disponibles pour les longues sessions !",
+      "variables": {
+        "pc": 1500,
+        "ps5": 2000,
+        "ps4": 1000,
+        "xbox": 1500,
+        "switch": 1500,
+        "vr": 2500,
+        "racing": 2000
+      }
+    },
+    "hours": {
+      "template": "Horaires : Lundi - Samedi de {weekday_open} à {weekday_close}, Dimanche de {weekend_open} à {weekend_close}",
+      "variables": {
+        "weekday_open": "9h30",
+        "weekday_close": "21h00",
+        "weekend_open": "12h00",
+        "weekend_close": "21h00"
+      }
+    },
+    "location": {
+      "template": "Nous sommes à {location}, {city}, {country}. Contact : {phone} ou {email}",
+      "variables": {
+        "location": "Mvog Ada",
+        "city": "Yaoundé",
+        "country": "Cameroun",
+        "phone": "+237 600 000 000",
+        "email": "contact@geekgamingcenter.cm"
+      }
+    },
+    "reservation": {
+      "template": "Pour réserver : 1) Allez sur {url} 2) Choisissez date et créneau 3) Sélectionnez équipement 4) Confirmez",
+      "variables": {
+        "url": "/arena/booking"
+      }
+    }
+  }
+}

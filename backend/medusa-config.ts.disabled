@@ -1,0 +1,39 @@
+import { defineConfig } from "@medusajs/framework/utils";
+
+export default defineConfig({
+  projectConfig: {
+    http: {
+      storeCors: process.env.STORE_CORS || "http://localhost:3000",
+      adminCors: process.env.ADMIN_CORS || "http://localhost:7001",
+    },
+    database: {
+      url: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/geek_gaming_db",
+      driver: "pg",
+    },
+    redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
+  },
+  modules: [
+    {
+      resolve: "./src/modules/booking",
+      dependencies: ["resource"],
+    },
+    {
+      resolve: "./src/modules/resource",
+    },
+    {
+      resolve: "@medusajs/cache-redis",
+      options: {
+        redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
+      },
+    },
+  ],
+  links: [
+    {
+      name: "booking-resource-link",
+      modules: {
+        booking: "booking",
+        resource: "resource",
+      },
+    },
+  ],
+});

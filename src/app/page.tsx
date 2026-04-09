@@ -59,9 +59,9 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 md:grid-cols-10 gap-8 items-center -mt-8 md:mt-0">
-            {/* Left Column - Title and Buttons (70%) */}
-            <div className="w-full md:col-span-7">
+          <div className="grid grid-cols-1 sm:grid-cols-10 gap-8 items-center -mt-8 md:mt-0">
+            {/* Left Column - Title and Buttons (70% on tablet and desktop) */}
+            <div className="w-full sm:col-span-7">
               {/* Main Headline */}
               <h1 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
                 <span className="text-black">Votre Destination</span> <span className="gradient-text block">Gaming Ultime</span>
@@ -93,13 +93,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column - Location Image (30%) */}
-            <div className="hidden md:flex w-full md:col-span-3 justify-end items-center">
+            {/* Right Column - Location Image (30% on tablet and desktop) */}
+            <div className="hidden sm:flex w-full sm:col-span-3 justify-end items-center">
               <Image
                 src="/geek-gaming-center-location.png"
                 alt="Geek Gaming Center Location"
-                width={600}
-                height={600}
+                width={1000}
+                height={1000}
                 className="w-full h-auto object-contain drop-shadow-2xl"
                 priority
               />
