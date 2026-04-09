@@ -57,9 +57,12 @@ export default function HomePage() {
         {/* Image Carousel Background */}
         <ImageCarousel />
 
+        {/* Blue-Purple Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 via-violet-600/40 to-purple-600/40 mix-blend-multiply pointer-events-none" />
+
         {/* Content */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-10 gap-8 items-center -mt-8 md:mt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-10 gap-8 items-center -mt-20 sm:-mt-24 md:mt-0">
             {/* Left Column - Title and Buttons (70% on tablet and desktop) */}
             <div className="w-full sm:col-span-7">
               {/* Main Headline */}
