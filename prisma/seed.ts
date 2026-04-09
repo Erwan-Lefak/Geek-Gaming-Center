@@ -139,7 +139,7 @@ async function main() {
       update: {},
       create: {
         name: eq.name,
-        type: eq.type,
+        type: eq.type as any,
         code: eq.code,
         location: eq.location,
         status: 'AVAILABLE',

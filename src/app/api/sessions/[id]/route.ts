@@ -5,7 +5,7 @@ import { requireAuth, hasRole } from '@/lib/auth/utils'
 // GET /api/sessions/[id] - Détails d'une session
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const { id } = await params
     const session = await prisma.gamingSession.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         customer: true,
         equipment: true,
@@ -64,7 +65,7 @@ export async function GET(
 // PATCH /api/sessions/[id] - Modifier une session
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -75,9 +76,10 @@ export async function PATCH(
 
     const body = await request.json()
     const { action, ...data } = body
+    const { id } = await params
 
     const session = await prisma.gamingSession.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { equipment: true },
     })
 
@@ -98,7 +100,7 @@ export async function PATCH(
         }
 
         updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             status: 'ACTIVE',
             startedAt: new Date(),
@@ -139,7 +141,7 @@ export async function PATCH(
 
         const extension = await prisma.sessionExtension.create({
           data: {
-            sessionId: params.id,
+            sessionId: id,
             additionalMinutes,
             additionalPrice,
           },
@@ -150,7 +152,7 @@ export async function PATCH(
         const newEnd = new Date(currentEnd.getTime() + additionalMinutes * 60 * 1000)
 
         updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             scheduledEndAt: newEnd,
           },
@@ -173,7 +175,7 @@ export async function PATCH(
         }
 
         updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id: id },
           data: { status: 'PAUSED' },
         })
 
@@ -189,7 +191,7 @@ export async function PATCH(
         }
 
         updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id: id },
           data: { status: 'ACTIVE' },
         })
 
@@ -205,7 +207,7 @@ export async function PATCH(
         }
 
         updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id: id },
           data: {
             status: 'COMPLETED',
             actualEndAt: new Date(),

@@ -5,7 +5,7 @@ import { requireAuth, hasRole } from '@/lib/auth/utils'
 // GET /api/customers/[id] - Détails d'un client
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const { id } = await params
     const customer = await prisma.customer.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         createdBy: {
           select: {
@@ -41,7 +42,7 @@ export async function GET(
           orderBy: { createdAt: 'desc' },
         },
       },
-    })
+    } as any)
 
     if (!customer) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
@@ -60,7 +61,7 @@ export async function GET(
 // PUT /api/customers/[id] - Modifier un client
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -70,9 +71,10 @@ export async function PUT(
     }
 
     const body = await request.json()
+    const { id } = await params
 
     const customer = await prisma.customer.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...body,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
@@ -85,7 +87,7 @@ export async function PUT(
           },
         },
       },
-    })
+    } as any)
 
     return NextResponse.json(customer)
   } catch (error: any) {
@@ -100,7 +102,7 @@ export async function PUT(
 // DELETE /api/customers/[id] - Supprimer un client (soft delete)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -109,9 +111,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const { id } = await params
     // Soft delete - marquer comme BLOCKED
     const customer = await prisma.customer.update({
-      where: { id: params.id },
+      where: { id },
       data: { status: 'BLOCKED' },
     })
 
