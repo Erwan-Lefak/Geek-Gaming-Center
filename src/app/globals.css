@@ -506,7 +506,7 @@ html.light {
 
 /* Light mode body styles */
 html.light body {
-  background: #ffffff;
+  background: #ffffff !important;
   color: #0a0a0f;
 }
 
@@ -567,7 +567,7 @@ html.light footer li {
 /* Hero section and carousel - always dark, unaffected by theme */
 html.light section:first-of-type {
   /* Always dark mode - carousel section */
-  background: var(--dark-bg) !important;
+  background: linear-gradient(to bottom, #f5f5f5, #ffffff) !important;
 }
 
 html.light section:first-of-type h1,
@@ -576,7 +576,7 @@ html.light section:first-of-type h3,
 html.light section:first-of-type p,
 html.light section:first-of-type span,
 html.light section:first-of-type a {
-  color: #ffffff !important;
+  color: #0a0a0f !important;
 }
 
 /* Keep gradient sections unchanged */
