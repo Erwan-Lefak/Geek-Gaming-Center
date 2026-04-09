@@ -428,7 +428,7 @@ main, div, section, article {
 }
 
 /* Taille de texte responsive */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   h1 {
     font-size: 1.75rem;
   }
@@ -468,7 +468,7 @@ main, div, section, article {
   h3 {
     font-size: 1rem;
   }
-}
+} */
 
 /* Force l'adaptation sur mobile */
 @media (max-width: 768px) {
@@ -597,7 +597,7 @@ html.light header.glass {
 
 html.light header .nav-link,
 html.light header button:not([class*="bg-gradient"]),
-html.light header svg:not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]) {
+html.light header svg:not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-orange"]) {
   color: #0a0a0f !important;
 }
 
@@ -607,7 +607,7 @@ html.light .gradient-text {
 }
 
 /* Light mode icons - keep colored icons their original color */
-html.light svg:not(.gradient-text):not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]) {
+html.light svg:not(.gradient-text):not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-success"]):not([class*="text-error"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-red"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-orange"]) {
   color: #0a0a0f;
 }
 

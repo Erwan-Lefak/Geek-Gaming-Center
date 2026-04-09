@@ -119,10 +119,10 @@ export default function HomePage() {
       </section>
 
       {/* Collections Section - 4 Panels in 2x2 Grid */}
-      <section className="bg-black py-16 px-8 md:px-24 lg:px-48">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mx-auto">
+      <section className="bg-black py-16 px-4 sm:px-8 md:px-16 lg:px-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full mx-auto">
           {/* Panel 1: Salle de Jeux */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
               src="/section-salle-de-jeux.jpg"
               alt="Salle de Jeux"
@@ -133,21 +133,23 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/arena" className="absolute inset-0 z-10">
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
-                  Salle de Jeux
+                <h3 className="!text-4xl md:!text-5xl lg:!text-6xl xl:!text-7xl font-bold !text-white mb-2 uppercase leading-none flex items-center gap-3">
+                  <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-red-400" />
+                  <span>Salle de Jeux</span>
                 </h3>
                 <p className="!text-white/90 text-base md:text-lg mb-4">
                   Jouez sur PS5, Xbox, VR et simulateurs de course
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
-                  Découvrir
+                <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <span>Découvrir</span>
                 </button>
               </div>
             </Link>
           </div>
 
           {/* Panel 2: Boutique */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
               src="/section-boutique.jpg"
               alt="Boutique"
@@ -158,21 +160,23 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/store" className="absolute inset-0 z-10">
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
-                  Boutique
+                <h3 className="!text-4xl md:!text-5xl lg:!text-6xl xl:!text-7xl font-bold !text-white mb-2 uppercase leading-none flex items-center gap-3">
+                  <Store className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-blue-400" />
+                  <span>Boutique</span>
                 </h3>
                 <p className="!text-white/90 text-base md:text-lg mb-4">
                   Composants PC, accessoires gaming et équipements
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
-                  Explorer
+                <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <span>Explorer</span>
                 </button>
               </div>
             </Link>
           </div>
 
           {/* Panel 3: Restaurant */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
               src="/section-restaurant.jpg"
               alt="Restaurant"
@@ -183,21 +187,23 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/restaurant" className="absolute inset-0 z-10">
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
-                  Restaurant
+                <h3 className="!text-4xl md:!text-5xl lg:!text-6xl xl:!text-7xl font-bold !text-white mb-2 uppercase leading-none flex items-center gap-3">
+                  <UtensilsCrossed className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-orange-400" />
+                  <span>Restaurant</span>
                 </h3>
                 <p className="!text-white/90 text-base md:text-lg mb-4">
                   Restauration rapide et snacks pour les gamers
                 </p>
-                <button className="px-6 py-3 bg-red-600 hover:bg-red-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
-                  Commander
+                <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <span>Commander</span>
                 </button>
               </div>
             </Link>
           </div>
 
           {/* Panel 4: Cinéma */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square md:h-96 lg:h-[500px] w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
               src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
               alt="Cinéma"
@@ -208,14 +214,16 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
             <Link href="/cinema" className="absolute inset-0 z-10">
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-20">
-                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-2 uppercase">
-                  Cinéma
+                <h3 className="!text-4xl md:!text-5xl lg:!text-6xl xl:!text-7xl font-bold !text-white mb-2 uppercase leading-none flex items-center gap-3">
+                  <Film className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-purple-400" />
+                  <span>Cinéma</span>
                 </h3>
                 <p className="!text-white/90 text-base md:text-lg mb-4">
                   Séances privées et projections immersives
                 </p>
-                <button className="px-6 py-3 bg-purple-600 hover:bg-purple-700 border-2 border-white !text-white font-bold text-sm md:text-base uppercase transition-all duration-300">
-                  Réserver
+                <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <span>Réserver</span>
                 </button>
               </div>
             </Link>
@@ -224,22 +232,22 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-black py-16 md:py-20">
+      <section className="bg-black pt-0 pb-16">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 md:mb-12 text-white">
+          <h2 className="!text-3xl md:!text-4xl lg:!text-5xl font-bold mb-6 md:mb-10 text-white text-center">
             Pourquoi <span className="gradient-text">Geek Gaming Center</span> ?
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
-            <div className="bento-item">
+            <div className="relative overflow-hidden group rounded-2xl bg-gradient-to-br from-primary-500/10 to-primary-600/5 border border-primary-500/20 p-6 hover:border-primary-500/40 transition-all duration-300">
               <div className="flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center">
-                  <Cpu className="w-6 h-6 text-primary-400" />
+                <div className="w-16 h-16 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Cpu className="w-8 h-8 text-primary-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">Composants Premium</h3>
-                  <p className="text-base text-white">
+                  <h3 className="!text-2xl md:!text-3xl font-bold mb-3 text-white uppercase">Composants Premium</h3>
+                  <p className="text-base md:text-lg text-white/90">
                     Processeurs, cartes graphiques, mémoires, boîtiers et tous les composants pour construire votre PC de rêve.
                   </p>
                 </div>
@@ -247,14 +255,14 @@ export default function HomePage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="bento-item">
+            <div className="relative overflow-hidden group rounded-2xl bg-gradient-to-br from-accent-500/10 to-accent-600/5 border border-accent-500/20 p-6 hover:border-accent-500/40 transition-all duration-300">
               <div className="flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-xl bg-accent-500/10 flex items-center justify-center">
-                  <Gamepad2 className="w-6 h-6 text-accent-400" />
+                <div className="w-16 h-16 rounded-xl bg-accent-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Gamepad2 className="w-8 h-8 text-accent-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">Salle de Jeux Immersive</h3>
-                  <p className="text-base text-white">
+                  <h3 className="!text-2xl md:!text-3xl font-bold mb-3 text-white uppercase">Salle de Jeux Immersive</h3>
+                  <p className="text-base md:text-lg text-white/90">
                     Louez des postes PS4, PS5, Xbox, explorez la réalité virtuelle ou testez nos simulateurs de course automobile.
                   </p>
                 </div>
@@ -262,15 +270,30 @@ export default function HomePage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="bento-item">
+            <div className="relative overflow-hidden group rounded-2xl bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-6 hover:border-success/40 transition-all duration-300">
               <div className="flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-success" />
+                <div className="w-16 h-16 rounded-xl bg-success/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Zap className="w-8 h-8 text-success" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">Expertise Technique</h3>
-                  <p className="text-base text-white">
+                  <h3 className="!text-2xl md:!text-3xl font-bold mb-3 text-white uppercase">Expertise Technique</h3>
+                  <p className="text-base md:text-lg text-white/90">
                     Notre équipe vous conseille pour assembler votre PC et optimiser votre setup gaming.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 4 - Cinéma & Restaurant */}
+            <div className="relative overflow-hidden group rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 p-6 hover:border-orange-500/40 transition-all duration-300">
+              <div className="flex flex-col gap-4">
+                <div className="w-16 h-16 rounded-xl bg-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <UtensilsCrossed className="w-8 h-8 !text-orange-400" />
+                </div>
+                <div>
+                  <h3 className="!text-2xl md:!text-3xl font-bold mb-3 text-white uppercase">Cinéma & Restaurant</h3>
+                  <p className="text-base md:text-lg text-white/90">
+                    Séances privées de films et restauration rapide pour une expérience unique.
                   </p>
                 </div>
               </div>
@@ -282,9 +305,9 @@ export default function HomePage() {
       {/* Booking CTA Section */}
       <section
         onClick={() => window.location.href = '/arena/booking'}
-        className="bg-gradient-to-br from-primary-400 to-accent-500 min-h-[30vh] flex items-center justify-center px-4 cursor-pointer"
+        className="bg-gradient-to-br from-primary-400 to-accent-500 min-h-[20vh] sm:min-h-[30vh] flex items-center justify-center px-4 cursor-pointer"
       >
-        <h1 className="text-[4.5rem] sm:text-[4.7rem] md:text-[5.3rem] lg:text-[6.7rem] font-bold leading-[0.8] kinetic-text uppercase italic text-white text-center">
+        <h1 className="text-[3.5rem] sm:text-[5.5rem] md:text-[6.5rem] lg:text-[7rem] font-bold leading-[0.8] kinetic-text uppercase italic text-white text-center">
           Réserver un poste
         </h1>
       </section>
@@ -351,101 +374,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="bg-black py-12 md:py-16 px-4">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {/* Service 1: Boutique */}
-            <div className="bento-item text-center">
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-primary-500/20 flex items-center justify-center">
-                  <Store className="w-10 h-10 text-primary-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-3 uppercase">Boutique</h3>
-                  <p className="text-base text-white mb-6">
-                    Découvrez notre sélection de composants PC, accessoires gaming et équipements haut de gamme.
-                  </p>
-                  <Link
-                    href="/store"
-                    className="px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2"
-                  >
-                    Voir la boutique
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 2: Salle de Jeux */}
-            <div className="bento-item text-center">
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-accent-500/20 flex items-center justify-center">
-                  <Gamepad2 className="w-10 h-10 text-accent-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-3 uppercase">Salle de Jeux</h3>
-                  <p className="text-base text-white mb-6">
-                    Réservez vos postes PS5, Xbox, VR ou simulateurs de course automobile.
-                  </p>
-                  <Link
-                    href="/arena/booking"
-                    className="px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2"
-                  >
-                    Réserver
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 3: Ciné */}
-            <div className="bento-item text-center">
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-purple-500/20 flex items-center justify-center">
-                  <Monitor className="w-10 h-10 text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-3 uppercase">Ciné</h3>
-                  <p className="text-base text-white mb-6">
-                    Profitez de séances privées de cinéma avec écrans ultra-haute définition et son immersif.
-                  </p>
-                  <Link
-                    href="#"
-                    className="px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2"
-                  >
-                    Réserver
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Service 4: Restaurant */}
-            <div className="bento-item text-center">
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-red-500/20 flex items-center justify-center">
-                  <UtensilsCrossed className="w-10 h-10 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-3 uppercase">Restaurant</h3>
-                  <p className="text-base text-white mb-6">
-                    Dégustez notre restauration rapide et snacks savoureux pour les gamers.
-                  </p>
-                  <Link
-                    href="#"
-                    className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2"
-                  >
-                    Voir le menu
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Otaku Section */}
       <section className="bg-black py-12 md:py-16 px-4">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
@@ -471,10 +399,10 @@ export default function HomePage() {
                 <p className="text-base text-white mb-6">
                   Séances privées d'anime et manga en projection immersive avec son surround et ambiance gaming.
                 </p>
-                <button className="px-6 py-3 w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
+                <Link href="/cinema" className="px-6 py-3 w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
                   En savoir plus
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -498,10 +426,10 @@ export default function HomePage() {
                 <p className="text-base text-white mb-6">
                   Soirées spéciales, tournois cosplay et événements exclusifs pour la communauté otaku.
                 </p>
-                <button className="px-6 py-3 w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
+                <Link href="/events" className="px-6 py-3 w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
                   En savoir plus
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -525,10 +453,10 @@ export default function HomePage() {
                 <p className="text-base text-white mb-6">
                   Rejoignez notre communauté passionnée et partagez vos expériences gaming et otaku.
                 </p>
-                <button className="px-6 py-3 w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
+                <a href="https://chat.whatsapp.com/LgWkec30Wh5LFds0Iw78al" target="_blank" rel="noopener noreferrer" className="px-6 py-3 w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
                   En savoir plus
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
           </div>

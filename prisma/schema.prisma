@@ -1,7 +1,3 @@
-// ============================================
-// GEEK GAMING CENTER - CRM PRISMA SCHEMA
-// ============================================
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,80 +7,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================
-// AUTHENTIFICATION & UTILISATEURS
-// ============================================
-
 model User {
-  id            String    @id @default(cuid()) @map("id")
-  email         String    @unique @map("email")
-  password      String    @map("password")
-  name          String    @map("name")
-  role          UserRole  @default(CASHIER) @map("role")
-  phone         String?   @map("phone")
-  isActive      Boolean   @default(true) @map("is_active")
-  lastLogin     DateTime? @map("last_login")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  createdCustomers Customer[] @relation("CreatedBy")
-  sessions         GamingSession[]
-  invoices         Invoice[]
+  id                 String              @id @default(cuid()) @map("id")
+  email              String              @unique @map("email")
+  password           String              @map("password")
+  name               String              @map("name")
+  phone              String?             @map("phone")
+  isActive           Boolean             @default(true) @map("is_active")
+  lastLogin          DateTime?           @map("last_login")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  role               UserRole            @default(CASHIER) @map("role")
+  auditLogs          AuditLog[]
+  createdCustomers   Customer[]          @relation("CreatedBy")
+  sessions           GamingSession[]
+  invoices           Invoice[]
   maintenanceTickets MaintenanceTicket[]
-  auditLogs        AuditLog[]
 
   @@index([email])
   @@index([role])
   @@map("users")
 }
 
-enum UserRole {
-  CASHIER        // Caissière
-  TECHNICIAN     // Technicien
-  MANAGER        // Gérant
-  SHAREHOLDER    // Actionnaire
-  ADMIN          // Administrateur système
-
-  @@map("userrole")
-}
-
-// ============================================
-// CLIENTS
-// ============================================
-
 model Customer {
-  id            String       @id @default(cuid()) @map("id")
-  firstName     String       @map("first_name")
-  lastName      String       @map("last_name")
-  email         String?      @unique @map("email")
-  phone         String       @map("phone")
-  dateOfBirth   DateTime?    @map("date_of_birth")
-  address       String?      @map("address")
-  city          String?      @map("city")
-  status        CustomerStatus @default(NEW) @map("status")
-  notes         String?      @map("notes")
-  acceptCGV     Boolean      @default(false) @map("accept_cgv")
-  cgvAcceptedAt DateTime?    @map("cgv_accepted_at")
-  totalSpent    Decimal      @default(0) @db.Decimal(12, 2) @map("total_spent")
-  totalHours    Decimal      @default(0) @db.Decimal(10, 2) @map("total_hours")
-  visitCount    Int          @default(0) @map("visit_count")
-  lastVisit     DateTime?    @map("last_visit")
-
-  // CRM
-  tags          String[]     @map("tags")
-  preferences   Json?        @map("preferences")
-
-  createdById   String       @map("created_by_id")
-  createdBy     User         @relation("CreatedBy", fields: [createdById], references: [id])
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-
-  // Relations
-  sessions      GamingSession[]
-  reservations  Reservation[]
-  invoices      Invoice[]
+  id            String          @id @default(cuid()) @map("id")
+  firstName     String          @map("first_name")
+  lastName      String          @map("last_name")
+  email         String?         @unique @map("email")
+  phone         String          @map("phone")
+  dateOfBirth   DateTime?       @map("date_of_birth")
+  address       String?         @map("address")
+  city          String?         @map("city")
+  notes         String?         @map("notes")
+  acceptCGV     Boolean         @default(false) @map("accept_cgv")
+  cgvAcceptedAt DateTime?       @map("cgv_accepted_at")
+  totalSpent    Decimal         @default(0) @map("total_spent") @db.Decimal(12, 2)
+  totalHours    Decimal         @default(0) @map("total_hours") @db.Decimal(10, 2)
+  visitCount    Int             @default(0) @map("visit_count")
+  lastVisit     DateTime?       @map("last_visit")
+  createdById   String          @map("created_by_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  preferences   Json?           @map("preferences")
+  tags          String[]        @map("tags")
+  status        CustomerStatus  @default(NEW) @map("status")
   cartItems     CartItem[]
+  createdBy     User            @relation("CreatedBy", fields: [createdById], references: [id])
+  eventBookings EventBooking[]
+  sessions      GamingSession[]
+  invoices      Invoice[]
+  reservations  Reservation[]
 
   @@index([email])
   @@index([phone])
@@ -93,44 +65,23 @@ model Customer {
   @@map("customers")
 }
 
-enum CustomerStatus {
-  NEW       // Nouveau client (moins de 3 visites)
-  REGULAR   // Client régulier (3-10 visites)
-  VIP       // Client VIP (plus de 10 visites ou fort dépensier)
-  INACTIVE  // Inactif depuis plus de 3 mois
-  BLOCKED   // Client bloqué
-
-  @@map("customerstatus")
-}
-
-// ============================================
-// ÉQUIPEMENTS & TARIFICATION
-// ============================================
-
 model Equipment {
-  id              String          @id @default(cuid()) @map("id")
-  name            String          @map("name")
-  type            EquipmentType   @map("type")
-  code            String          @unique @map("code") // "PS5-01", "PC-GAMING-01"
-  status          EquipmentStatus @default(AVAILABLE) @map("status")
-  specifications  Json?           @map("specifications")
-
-  // Emplacement
-  location        String?         @map("location") // Zone, rangée, numéro
-
-  // Maintenance
-  lastMaintenance DateTime?       @map("last_maintenance")
-  nextMaintenance DateTime?       @map("next_maintenance")
-  healthScore     Int             @default(100) @map("health_score") // 0-100
-
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
-
-  // Relations
-  pricing         Pricing[]
-  sessions        GamingSession[]
-  reservations    Reservation[]
+  id                 String              @id @default(cuid()) @map("id")
+  name               String              @map("name")
+  type               EquipmentType       @map("type")
+  code               String              @unique @map("code")
+  status             EquipmentStatus     @default(AVAILABLE) @map("status")
+  specifications     Json?               @map("specifications")
+  location           String?             @map("location")
+  lastMaintenance    DateTime?           @map("last_maintenance")
+  nextMaintenance    DateTime?           @map("next_maintenance")
+  healthScore        Int                 @default(100) @map("health_score")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  sessions           GamingSession[]
   maintenanceTickets MaintenanceTicket[]
+  pricing            Pricing[]
+  reservations       Reservation[]
 
   @@index([type])
   @@index([status])
@@ -138,95 +89,48 @@ model Equipment {
   @@map("equipment")
 }
 
-enum EquipmentType {
-  @@map("equipmenttype")
-  PS5
-  PS4
-  XBOX_SERIES_X
-  XBOX_ONE
-  PC_GAMING
-  OCULUS_VR
-  VR_PS4
-  SIMU_RACING
-  ARCADE
-  RETRO
-}
-
-enum EquipmentStatus {
-  @@map("equipmentstatus")
-  AVAILABLE
-  IN_USE
-  RESERVED
-  MAINTENANCE
-  BROKEN
-  RETIRED
-}
-
 model Pricing {
-  id              String       @id @default(cuid()) @map("id")
-  equipmentId     String       @map("equipment_id")
-  equipment       Equipment    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
-  duration        Int          @map("duration") // Durée en minutes
-  isWeekend       Boolean      @default(false) @map("is_weekend")
-  price           Decimal      @db.Decimal(10, 2) @map("price")
-  currency        String       @default("XAF") @map("currency") // FCFA
-
-  createdAt       DateTime     @default(now()) @map("created_at")
-  updatedAt       DateTime     @updatedAt @map("updated_at")
-  sessions        GamingSession[]
+  id          String          @id @default(cuid()) @map("id")
+  equipmentId String          @map("equipment_id")
+  duration    Int             @map("duration")
+  isWeekend   Boolean         @default(false) @map("is_weekend")
+  price       Decimal         @map("price") @db.Decimal(10, 2)
+  currency    String          @default("XAF") @map("currency")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  sessions    GamingSession[]
+  equipment   Equipment       @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
 
   @@unique([equipmentId, duration, isWeekend])
   @@index([equipmentId])
   @@map("pricing")
 }
 
-// ============================================
-// SESSIONS DE GAMING
-// ============================================
-
 model GamingSession {
-  id              String            @id @default(cuid()) @map("id")
-  sessionNumber   String            @unique @map("session_number")
-
-  customerId      String            @map("customer_id")
-  customer        Customer          @relation(fields: [customerId], references: [id])
-
-  equipmentId     String            @map("equipment_id")
-  equipment       Equipment         @relation(fields: [equipmentId], references: [id])
-
-  // Tarification
-  pricingId       String            @map("pricing_id")
-  pricing         Pricing           @relation(fields: [pricingId], references: [id])
-  duration        Int               @map("duration") // Durée payée en minutes
-  price           Decimal           @db.Decimal(10, 2) @map("price")
-
-  // Statut session
-  status          SessionStatus     @default(PENDING) @map("status")
-
-  // Horaires
-  paidAt          DateTime          @map("paid_at")
-  startedAt       DateTime?         @map("started_at")
-  scheduledEndAt  DateTime          @map("scheduled_end_at")
-  actualEndAt     DateTime?         @map("actual_end_at")
-
-  // Délai d'installation (5 min)
-  gracePeriodEnd  DateTime?         @map("grace_period_end")
-
-  // Extensions de temps
-  extensions      SessionExtension[]
-
-  // Notes
-  notes           String?           @map("notes")
-
-  // Création et modification
-  createdById     String            @map("created_by_id")
-  createdBy       User              @relation(fields: [createdById], references: [id])
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
-
-  // Facturation
-  invoiceId       String?           @unique @map("invoice_id")
-  invoice         Invoice?          @relation("GamingSessionToInvoice", fields: [invoiceId], references: [id])
+  id             String             @id @default(cuid()) @map("id")
+  sessionNumber  String             @unique @map("session_number")
+  customerId     String             @map("customer_id")
+  equipmentId    String             @map("equipment_id")
+  pricingId      String             @map("pricing_id")
+  duration       Int                @map("duration")
+  price          Decimal            @map("price") @db.Decimal(10, 2)
+  status         SessionStatus      @default(PENDING) @map("status")
+  paidAt         DateTime           @map("paid_at")
+  startedAt      DateTime?          @map("started_at")
+  scheduledEndAt DateTime           @map("scheduled_end_at")
+  actualEndAt    DateTime?          @map("actual_end_at")
+  gracePeriodEnd DateTime?          @map("grace_period_end")
+  notes          String?            @map("notes")
+  createdById    String             @map("created_by_id")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  invoiceId      String?            @unique @map("invoice_id")
+  createdBy      User               @relation(fields: [createdById], references: [id])
+  customer       Customer           @relation(fields: [customerId], references: [id])
+  equipment      Equipment          @relation(fields: [equipmentId], references: [id])
+  invoice        Invoice?           @relation("GamingSessionToInvoice", fields: [invoiceId], references: [id])
+  pricing        Pricing            @relation(fields: [pricingId], references: [id])
+  extensions     SessionExtension[]
 
   @@index([customerId])
   @@index([equipmentId])
@@ -237,69 +141,43 @@ model GamingSession {
 }
 
 model SessionExtension {
-  id              String        @id @default(cuid()) @map("id")
-  sessionId       String        @map("session_id")
-  session         GamingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  additionalMinutes Int         @map("additional_minutes")
-  additionalPrice  Decimal      @db.Decimal(10, 2) @map("additional_price")
-  extendedAt       DateTime     @default(now()) @map("extended_at")
+  id                String        @id @default(cuid()) @map("id")
+  sessionId         String        @map("session_id")
+  additionalMinutes Int           @map("additional_minutes")
+  additionalPrice   Decimal       @map("additional_price") @db.Decimal(10, 2)
+  extendedAt        DateTime      @default(now()) @map("extended_at")
+  session           GamingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
   @@map("session_extensions")
 }
 
-enum SessionStatus {
-  @@map("sessionstatus")
-  PENDING      // Payé, pas encore démarré (délai 5 min)
-  ACTIVE       // En cours
-  PAUSED       // En pause
-  COMPLETED    // Terminé normalement
-  EXPIRED      // Temps écoulé
-  CANCELLED    // Annulé
-}
-
-// ============================================
-// FACTURATION
-// ============================================
-
 model Invoice {
-  id              String        @id @default(cuid()) @map("id")
-  invoiceNumber   String        @unique @map("invoice_number")
-  invoiceDate     DateTime      @default(now()) @map("invoice_date")
-  dueDate         DateTime?     @map("due_date")
-
-  customerId      String        @map("customer_id")
-  customer        Customer      @relation(fields: [customerId], references: [id])
-
-  // Montants
-  subtotal        Decimal       @db.Decimal(12, 2) @map("subtotal")
-  taxRate         Decimal       @default(19.25) @db.Decimal(5, 2) @map("tax_rate") // TVA Cameroun
-  taxAmount       Decimal       @db.Decimal(12, 2) @map("tax_amount")
-  total           Decimal       @db.Decimal(12, 2) @map("total")
-  discount        Decimal       @default(0) @db.Decimal(10, 2) @map("discount")
-
-  // Paiement
-  paymentMethod   PaymentMethod @map("payment_method")
-  paymentStatus   PaymentStatus @default(PENDING) @map("payment_status")
-  paidAt          DateTime?     @map("paid_at")
-
-  // Mobile Money
-  mobileMoneyProvider String?    @map("mobile_money_provider") // "ORANGE", "MTN"
-  mobileMoneyPhone    String?    @map("mobile_money_phone")
-  mobileMoneyRef      String?    @map("mobile_money_ref") // Référence transaction
-
-  // Détails
-  type            InvoiceType   @map("type")
-  items           InvoiceItem[] @relation("InvoiceItemToInvoice")
-  notes           String?       @map("notes")
-
-  createdById     String        @map("created_by_id")
-  createdBy       User          @relation(fields: [createdById], references: [id])
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-
-  // Relations
-  session         GamingSession? @relation("GamingSessionToInvoice")
+  id                  String         @id @default(cuid()) @map("id")
+  invoiceNumber       String         @unique @map("invoice_number")
+  invoiceDate         DateTime       @default(now()) @map("invoice_date")
+  dueDate             DateTime?      @map("due_date")
+  customerId          String         @map("customer_id")
+  subtotal            Decimal        @map("subtotal") @db.Decimal(12, 2)
+  taxRate             Decimal        @default(19.25) @map("tax_rate") @db.Decimal(5, 2)
+  taxAmount           Decimal        @map("tax_amount") @db.Decimal(12, 2)
+  total               Decimal        @map("total") @db.Decimal(12, 2)
+  discount            Decimal        @default(0) @map("discount") @db.Decimal(10, 2)
+  paymentMethod       PaymentMethod  @map("payment_method")
+  paymentStatus       PaymentStatus  @default(PENDING) @map("payment_status")
+  paidAt              DateTime?      @map("paid_at")
+  mobileMoneyProvider String?        @map("mobile_money_provider")
+  mobileMoneyPhone    String?        @map("mobile_money_phone")
+  mobileMoneyRef      String?        @map("mobile_money_ref")
+  type                InvoiceType    @map("type")
+  notes               String?        @map("notes")
+  createdById         String         @map("created_by_id")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+  session             GamingSession? @relation("GamingSessionToInvoice")
+  items               InvoiceItem[]  @relation("InvoiceItemToInvoice")
+  createdBy           User           @relation(fields: [createdById], references: [id])
+  customer            Customer       @relation(fields: [customerId], references: [id])
 
   @@index([invoiceNumber])
   @@index([customerId])
@@ -309,94 +187,49 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id              String    @id @default(cuid()) @map("id")
-  invoiceId       String    @map("invoice_id")
-  invoice         Invoice   @relation("InvoiceItemToInvoice", fields: [invoiceId], references: [id], onDelete: Cascade)
-  productId       String?   @map("product_id")
-  product         Product?  @relation(fields: [productId], references: [id])
-  description     String    @map("description")
-  quantity        Int       @map("quantity")
-  unitPrice       Decimal   @db.Decimal(10, 2) @map("unit_price")
-  totalPrice      Decimal   @db.Decimal(10, 2) @map("total_price")
+  id          String   @id @default(cuid()) @map("id")
+  invoiceId   String   @map("invoice_id")
+  productId   String?  @map("product_id")
+  description String   @map("description")
+  quantity    Int      @map("quantity")
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(10, 2)
+  totalPrice  Decimal  @map("total_price") @db.Decimal(10, 2)
+  invoice     Invoice  @relation("InvoiceItemToInvoice", fields: [invoiceId], references: [id], onDelete: Cascade)
+  product     Product? @relation(fields: [productId], references: [id])
 
   @@index([invoiceId])
   @@index([productId])
   @@map("invoice_items")
 }
 
-enum InvoiceType {
-  @@map("invoicetype")
-  GAMING_SESSION
-  BOUTIQUE_SALE
-  RESERVATION
-  CREDIT_NOTE
-}
-
-enum PaymentMethod {
-  @@map("paymentmethod")
-  CASH
-  MOBILE_MONEY_ORANGE
-  MOBILE_MONEY_MTN
-  CARD
-  BANK_TRANSFER
-}
-
-enum PaymentStatus {
-  @@map("paymentstatus")
-  PENDING
-  PAID
-  PARTIALLY_PAID
-  CANCELLED
-  REFUNDED
-}
-
-// ============================================
-// BOUTIQUE & STOCKS
-// ============================================
-
 model Product {
-  id              String        @id @default(cuid()) @map("id")
-  name            String        @map("name")
-  description     String?       @map("description")
-  category        String        @map("category")
-  subcategory     String?       @map("subcategory")
-  brand           String?       @map("brand")
-  sku             String        @unique @map("sku")
-
-  // Prix
-  costPrice       Decimal       @db.Decimal(10, 2) @map("cost_price")
-  sellingPrice    Decimal       @db.Decimal(10, 2) @map("selling_price")
-  currency        String        @default("XAF") @map("currency")
-
-  // Stock
-  currentStock    Int           @default(0) @map("current_stock")
-  minStock        Int           @default(5) @map("min_stock")
-  maxStock        Int           @default(50) @map("max_stock")
-  reorderPoint    Int           @default(10) @map("reorder_point")
-
-  // Fournisseur
-  supplierId      String?       @map("supplier_id")
-  supplier        Supplier?     @relation(fields: [supplierId], references: [id])
-
-  // Images
-  images          String[]      @map("images")
-  thumbnail       String?       @map("thumbnail")
-
-  // Statuts
-  isActive        Boolean       @default(true) @map("is_active")
-  isFeatured      Boolean       @default(false) @map("is_featured")
-
-  // Métadonnées
-  specifications  Json?         @map("specifications")
-  tags            String[]      @map("tags")
-
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-
-  // Relations
-  stockMovements  StockMovement[] @relation("ProductToStockMovement")
-  cartItems       CartItem[]
-  invoiceItems    InvoiceItem[]
+  id             String          @id @default(cuid()) @map("id")
+  name           String          @map("name")
+  description    String?         @map("description")
+  category       String          @map("category")
+  subcategory    String?         @map("subcategory")
+  brand          String?         @map("brand")
+  sku            String          @unique @map("sku")
+  costPrice      Decimal         @map("cost_price") @db.Decimal(10, 2)
+  sellingPrice   Decimal         @map("selling_price") @db.Decimal(10, 2)
+  currency       String          @default("XAF") @map("currency")
+  currentStock   Int             @default(0) @map("current_stock")
+  minStock       Int             @default(5) @map("min_stock")
+  maxStock       Int             @default(50) @map("max_stock")
+  reorderPoint   Int             @default(10) @map("reorder_point")
+  supplierId     String?         @map("supplier_id")
+  images         String[]        @map("images")
+  thumbnail      String?         @map("thumbnail")
+  isActive       Boolean         @default(true) @map("is_active")
+  isFeatured     Boolean         @default(false) @map("is_featured")
+  specifications Json?           @map("specifications")
+  tags           String[]        @map("tags")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  cartItems      CartItem[]
+  invoiceItems   InvoiceItem[]
+  supplier       Supplier?       @relation(fields: [supplierId], references: [id])
+  stockMovements StockMovement[] @relation("ProductToStockMovement")
 
   @@index([category])
   @@index([sku])
@@ -405,19 +238,16 @@ model Product {
 }
 
 model StockMovement {
-  id              String          @id @default(cuid()) @map("id")
-  productId       String          @map("product_id")
-  product         Product         @relation("ProductToStockMovement", fields: [productId], references: [id], onDelete: Cascade)
-  quantity        Int             @map("quantity") // Positif = entrée, Négatif = sortie
-  type            MovementType    @map("type")
-  reason          String?         @map("reason")
-  reference       String?         @map("reference") // Bon de livraison, facture, etc.
-
-  // Valeur (pour valorisation stock)
-  unitCost        Decimal?        @db.Decimal(10, 2) @map("unit_cost")
-  totalValue      Decimal?        @db.Decimal(12, 2) @map("total_value")
-
-  createdAt       DateTime        @default(now()) @map("created_at")
+  id         String       @id @default(cuid()) @map("id")
+  productId  String       @map("product_id")
+  quantity   Int          @map("quantity")
+  type       MovementType @map("type")
+  reason     String?      @map("reason")
+  reference  String?      @map("reference")
+  unitCost   Decimal?     @map("unit_cost") @db.Decimal(10, 2)
+  totalValue Decimal?     @map("total_value") @db.Decimal(12, 2)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  product    Product      @relation("ProductToStockMovement", fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([type])
@@ -425,86 +255,51 @@ model StockMovement {
   @@map("stock_movements")
 }
 
-enum MovementType {
-  @@map("movementtype")
-  PURCHASE       // Entrée achat
-  SALE           // Sortie vente
-  RETURN         // Retour client
-  ADJUSTMENT     // Ajustement inventaire
-  DAMAGE         // Casse/détérioration
-  TRANSFER       // Transfert
-  INITIAL        // Stock initial
-}
-
 model Supplier {
-  id              String        @id @default(cuid()) @map("id")
-  name            String        @map("name")
-  contactPerson   String?       @map("contact_person")
-  email           String?       @map("email")
-  phone           String        @map("phone")
-  address         String?       @map("address")
-  city            String?       @map("city")
-  country         String        @default("Cameroun") @map("country")
-
-  // Conditions
-  paymentTerms    String?       @map("payment_terms") // "30 jours", "comptant"
-  leadTime        Int?          @map("lead_time") // Délai de livraison en jours
-  notes           String?       @map("notes")
-
-  isActive        Boolean       @default(true) @map("is_active")
-
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-
-  // Relations
-  products        Product[]
+  id            String    @id @default(cuid()) @map("id")
+  name          String    @map("name")
+  contactPerson String?   @map("contact_person")
+  email         String?   @map("email")
+  phone         String    @map("phone")
+  address       String?   @map("address")
+  city          String?   @map("city")
+  country       String    @default("Cameroun") @map("country")
+  paymentTerms  String?   @map("payment_terms")
+  leadTime      Int?      @map("lead_time")
+  notes         String?   @map("notes")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  products      Product[]
 
   @@index([name])
   @@map("suppliers")
 }
 
-// ============================================
-// RÉSERVATIONS
-// ============================================
-
 model Reservation {
-  id              String          @id @default(cuid()) @map("id")
-  reservationNumber String        @unique @map("reservation_number")
-
-  customerId      String          @map("customer_id")
-  customer        Customer        @relation(fields: [customerId], references: [id])
-
-  equipmentId     String          @map("equipment_id")
-  equipment       Equipment       @relation(fields: [equipmentId], references: [id])
-
-  // Période
-  startTime       DateTime        @map("start_time")
-  endTime         DateTime        @map("end_time")
-  duration        Int             @map("duration") // en minutes
-
-  // Tarif & Paiement
-  estimatedPrice  Decimal         @db.Decimal(10, 2) @map("estimated_price")
-  depositAmount   Decimal         @db.Decimal(10, 2) @map("deposit_amount")
-  depositPaid     Boolean         @default(false) @map("deposit_paid")
-  depositPaidAt   DateTime?       @map("deposit_paid_at")
-
-  // Statut
-  status          ReservationStatus @default(PENDING) @map("status")
-
-  // Confirmation & Rappels
-  confirmedAt     DateTime?       @map("confirmed_at")
-  reminderSent    Boolean         @default(false) @map("reminder_sent")
-  reminderSentAt  DateTime?       @map("reminder_sent_at")
-
-  // No-show & Annulation
-  noShow          Boolean         @default(false) @map("no_show")
-  cancelledAt     DateTime?       @map("cancelled_at")
-  cancellationReason String?      @map("cancellation_reason")
-
-  notes           String?         @map("notes")
-
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
+  id                 String            @id @default(cuid()) @map("id")
+  reservationNumber  String            @unique @map("reservation_number")
+  customerId         String            @map("customer_id")
+  equipmentId        String            @map("equipment_id")
+  startTime          DateTime          @map("start_time")
+  endTime            DateTime          @map("end_time")
+  duration           Int               @map("duration")
+  estimatedPrice     Decimal           @map("estimated_price") @db.Decimal(10, 2)
+  depositAmount      Decimal           @map("deposit_amount") @db.Decimal(10, 2)
+  depositPaid        Boolean           @default(false) @map("deposit_paid")
+  depositPaidAt      DateTime?         @map("deposit_paid_at")
+  status             ReservationStatus @default(PENDING) @map("status")
+  confirmedAt        DateTime?         @map("confirmed_at")
+  reminderSent       Boolean           @default(false) @map("reminder_sent")
+  reminderSentAt     DateTime?         @map("reminder_sent_at")
+  noShow             Boolean           @default(false) @map("no_show")
+  cancelledAt        DateTime?         @map("cancelled_at")
+  cancellationReason String?           @map("cancellation_reason")
+  notes              String?           @map("notes")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  customer           Customer          @relation(fields: [customerId], references: [id])
+  equipment          Equipment         @relation(fields: [equipmentId], references: [id])
 
   @@index([customerId])
   @@index([equipmentId])
@@ -513,44 +308,23 @@ model Reservation {
   @@map("reservations")
 }
 
-enum ReservationStatus {
-  @@map("reservationstatus")
-  PENDING
-  CONFIRMED
-  CHECKED_IN
-  COMPLETED
-  CANCELLED
-  NO_SHOW
-}
-
-// ============================================
-// MAINTENANCE TECHNIQUE
-// ============================================
-
 model MaintenanceTicket {
-  id              String              @id @default(cuid()) @map("id")
-  ticketNumber    String              @unique @map("ticket_number")
-
-  equipmentId     String              @map("equipment_id")
-  equipment       Equipment           @relation(fields: [equipmentId], references: [id])
-
-  // Description
-  title           String              @map("title")
-  description     String              @map("description")
-  priority        Priority            @default(MEDIUM) @map("priority")
-  status          TicketStatus        @default(OPEN) @map("status")
-
-  // Diagnostic
-  diagnosis       String?             @map("diagnosis")
-  solution        String?             @map("solution")
-
-  assignedToId    String?             @map("assigned_to_id")
-  assignedTo      User?               @relation(fields: [assignedToId], references: [id])
-  completedAt     DateTime?           @map("completed_at")
-  resolvedAt      DateTime?           @map("resolved_at")
-
-  createdAt       DateTime            @default(now()) @map("created_at")
-  updatedAt       DateTime            @updatedAt @map("updated_at")
+  id           String       @id @default(cuid()) @map("id")
+  ticketNumber String       @unique @map("ticket_number")
+  equipmentId  String       @map("equipment_id")
+  title        String       @map("title")
+  description  String       @map("description")
+  priority     Priority     @default(MEDIUM) @map("priority")
+  status       TicketStatus @default(OPEN) @map("status")
+  diagnosis    String?      @map("diagnosis")
+  solution     String?      @map("solution")
+  assignedToId String?      @map("assigned_to_id")
+  completedAt  DateTime?    @map("completed_at")
+  resolvedAt   DateTime?    @map("resolved_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  assignedTo   User?        @relation(fields: [assignedToId], references: [id])
+  equipment    Equipment    @relation(fields: [equipmentId], references: [id])
 
   @@index([equipmentId])
   @@index([status])
@@ -558,137 +332,268 @@ model MaintenanceTicket {
   @@map("maintenance_tickets")
 }
 
-enum Priority {
-  @@map("priority")
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum TicketStatus {
-  @@map("ticketstatus")
-  OPEN
-  IN_PROGRESS
-  WAITING_PARTS
-  RESOLVED
-  CLOSED
-}
-
-// ============================================
-// REPORTING & ANALYTICS
-// ============================================
-
 model DailyReport {
-  id              String    @id @default(cuid()) @map("id")
-  date            DateTime  @unique @map("date")
-  dayOfWeek       Int       @map("day_of_week")
-
-  // Chiffre d'affaires
-  gamingRevenue   Decimal   @default(0) @db.Decimal(12, 2) @map("gaming_revenue")
-  boutiqueRevenue Decimal   @default(0) @db.Decimal(12, 2) @map("boutique_revenue")
-  totalRevenue    Decimal   @default(0) @db.Decimal(12, 2) @map("total_revenue")
-
-  // Taxes
-  taxCollected    Decimal   @default(0) @db.Decimal(12, 2) @map("tax_collected")
-
-  // Sessions
-  sessionCount    Int       @default(0) @map("session_count")
-  totalHours      Decimal   @default(0) @db.Decimal(10, 2) @map("total_hours")
-
-  // Clients
-  uniqueCustomers Int       @default(0) @map("unique_customers")
-  newCustomers    Int       @default(0) @map("new_customers")
-
-  // Paiements
-  cashPayments    Decimal   @default(0) @db.Decimal(10, 2) @map("cash_payments")
-  mobileMoneyPayments Decimal @default(0) @db.Decimal(10, 2) @map("mobile_money_payments")
-  cardPayments    Decimal   @default(0) @db.Decimal(10, 2) @map("card_payments")
-
-  // Top équipements
-  topEquipment    Json?     @map("top_equipment")
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id                  String   @id @default(cuid()) @map("id")
+  date                DateTime @unique @map("date")
+  dayOfWeek           Int      @map("day_of_week")
+  gamingRevenue       Decimal  @default(0) @map("gaming_revenue") @db.Decimal(12, 2)
+  boutiqueRevenue     Decimal  @default(0) @map("boutique_revenue") @db.Decimal(12, 2)
+  totalRevenue        Decimal  @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  taxCollected        Decimal  @default(0) @map("tax_collected") @db.Decimal(12, 2)
+  sessionCount        Int      @default(0) @map("session_count")
+  totalHours          Decimal  @default(0) @map("total_hours") @db.Decimal(10, 2)
+  uniqueCustomers     Int      @default(0) @map("unique_customers")
+  newCustomers        Int      @default(0) @map("new_customers")
+  cashPayments        Decimal  @default(0) @map("cash_payments") @db.Decimal(10, 2)
+  mobileMoneyPayments Decimal  @default(0) @map("mobile_money_payments") @db.Decimal(10, 2)
+  cardPayments        Decimal  @default(0) @map("card_payments") @db.Decimal(10, 2)
+  topEquipment        Json?    @map("top_equipment")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
   @@index([date])
   @@map("daily_reports")
 }
 
 model MonthlyReport {
-  id              String    @id @default(cuid()) @map("id")
-  year            Int       @map("year")
-  month           Int       @map("month")
-  uniqueDate      DateTime  @unique @map("unique_date")
-
-  // CA mensuel
-  gamingRevenue   Decimal   @default(0) @db.Decimal(12, 2) @map("gaming_revenue")
-  boutiqueRevenue Decimal   @default(0) @db.Decimal(12, 2) @map("boutique_revenue")
-  totalRevenue    Decimal   @default(0) @db.Decimal(12, 2) @map("total_revenue")
-
-  // Objectifs
-  monthlyTarget   Decimal   @db.Decimal(12, 2) @map("monthly_target")
-  targetAchieved  Boolean   @map("target_achieved")
-  achievementRate Decimal   @db.Decimal(5, 2) @map("achievement_rate")
-
-  // Sessions
-  sessionCount    Int       @default(0) @map("session_count")
-  totalHours      Decimal   @default(0) @db.Decimal(10, 2) @map("total_hours")
-  avgSessionDuration Decimal @db.Decimal(10, 2) @map("avg_session_duration")
-
-  // Clients
-  uniqueCustomers Int       @default(0) @map("unique_customers")
-  newCustomers    Int       @default(0) @map("new_customers")
-  returningCustomers Int    @default(0) @map("returning_customers")
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id                 String   @id @default(cuid()) @map("id")
+  year               Int      @map("year")
+  month              Int      @map("month")
+  uniqueDate         DateTime @unique @map("unique_date")
+  gamingRevenue      Decimal  @default(0) @map("gaming_revenue") @db.Decimal(12, 2)
+  boutiqueRevenue    Decimal  @default(0) @map("boutique_revenue") @db.Decimal(12, 2)
+  totalRevenue       Decimal  @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  monthlyTarget      Decimal  @map("monthly_target") @db.Decimal(12, 2)
+  targetAchieved     Boolean  @map("target_achieved")
+  achievementRate    Decimal  @map("achievement_rate") @db.Decimal(5, 2)
+  sessionCount       Int      @default(0) @map("session_count")
+  totalHours         Decimal  @default(0) @map("total_hours") @db.Decimal(10, 2)
+  avgSessionDuration Decimal  @map("avg_session_duration") @db.Decimal(10, 2)
+  uniqueCustomers    Int      @default(0) @map("unique_customers")
+  newCustomers       Int      @default(0) @map("new_customers")
+  returningCustomers Int      @default(0) @map("returning_customers")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   @@index([year, month])
   @@map("monthly_reports")
 }
 
-// ============================================
-// PANIER (SESSION TEMPORAIRE)
-// ============================================
-
 model CartItem {
-  id          String    @id @default(cuid()) @map("id")
-  sessionId   String    @unique @map("session_id") // Session ID temporaire
-
-  customerId  String?   @map("customer_id")
-  customer    Customer? @relation(fields: [customerId], references: [id])
-
-  productId   String    @map("product_id")
-  product     Product   @relation(fields: [productId], references: [id])
-  quantity    Int       @map("quantity")
-
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id         String    @id @default(cuid()) @map("id")
+  sessionId  String    @unique @map("session_id")
+  customerId String?   @map("customer_id")
+  productId  String    @map("product_id")
+  quantity   Int       @map("quantity")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
 
   @@index([sessionId])
   @@index([customerId])
   @@map("cart_items")
 }
 
-// ============================================
-// AUDIT & JOURNALISATION
-// ============================================
-
 model AuditLog {
-  id          String    @id @default(cuid()) @map("id")
-  userId      String    @map("user_id")
-  user        User      @relation(fields: [userId], references: [id])
-  action      String    @map("action")
-  entity      String    @map("entity") // Type d'entité modifiée
-  entityId    String    @map("entity_id")
-  changes     Json?     @map("changes") // Diff des changements
-  ipAddress   String?   @map("ip_address")
-  userAgent   String?   @map("user_agent")
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id        String   @id @default(cuid()) @map("id")
+  userId    String   @map("user_id")
+  action    String   @map("action")
+  entity    String   @map("entity")
+  entityId  String   @map("entity_id")
+  changes   Json?    @map("changes")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([entity])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model Event {
+  id          String         @id @default(cuid()) @map("id")
+  title       String         @map("title")
+  description String         @map("description")
+  type        EventType      @map("type")
+  eventDate   DateTime       @map("event_date")
+  startTime   String         @map("start_time")
+  endTime     String?        @map("end_time")
+  price       Int            @default(0) @map("price")
+  maxCapacity Int            @map("max_capacity")
+  bookedCount Int            @default(0) @map("booked_count")
+  imageUrl    String?        @map("image_url")
+  location    String?        @map("location")
+  isActive    Boolean        @default(true) @map("is_active")
+  isPublished Boolean        @default(false) @map("is_published")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  bookings    EventBooking[]
+
+  @@index([eventDate])
+  @@index([type])
+  @@index([isActive, isPublished])
+  @@map("events")
+}
+
+model EventBooking {
+  id              String    @id @default(cuid()) @map("id")
+  eventId         String    @map("event_id")
+  customerId      String?   @map("customer_id")
+  attendeeName    String    @map("attendee_name")
+  attendeeEmail   String    @map("attendee_email")
+  attendeePhone   String?   @map("attendee_phone")
+  numberOfTickets Int       @map("number_of_tickets")
+  totalPrice      Int       @map("total_price")
+  status          String    @default("confirmed") @map("status")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([customerId])
+  @@index([status])
+  @@map("event_bookings")
+}
+
+enum UserRole {
+  CASHIER
+  TECHNICIAN
+  MANAGER
+  SHAREHOLDER
+  ADMIN
+
+  @@map("userrole")
+}
+
+enum CustomerStatus {
+  NEW
+  REGULAR
+  VIP
+  INACTIVE
+  BLOCKED
+
+  @@map("customerstatus")
+}
+
+enum EquipmentType {
+  PS5
+  PS4
+  XBOX_SERIES_X
+  XBOX_ONE
+  PC_GAMING
+  OCULUS_VR
+  VR_PS4
+  SIMU_RACING
+  ARCADE
+  RETRO
+
+  @@map("equipmenttype")
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  IN_USE
+  RESERVED
+  MAINTENANCE
+  BROKEN
+  RETIRED
+
+  @@map("equipmentstatus")
+}
+
+enum SessionStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+
+  @@map("sessionstatus")
+}
+
+enum InvoiceType {
+  GAMING_SESSION
+  BOUTIQUE_SALE
+  RESERVATION
+  CREDIT_NOTE
+
+  @@map("invoicetype")
+}
+
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY_ORANGE
+  MOBILE_MONEY_MTN
+  CARD
+  BANK_TRANSFER
+
+  @@map("paymentmethod")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  CANCELLED
+  REFUNDED
+
+  @@map("paymentstatus")
+}
+
+enum MovementType {
+  PURCHASE
+  SALE
+  RETURN
+  ADJUSTMENT
+  DAMAGE
+  TRANSFER
+  INITIAL
+
+  @@map("movementtype")
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+
+  @@map("reservationstatus")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+
+  @@map("priority")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_PARTS
+  RESOLVED
+  CLOSED
+
+  @@map("ticketstatus")
+}
+
+enum EventType {
+  COSPLAY
+  TOURNAMENT
+  GAME_LAUNCH
+  SPECIAL
+  CINE
+  ANNIVERSARY
+
+  @@map("eventtype")
 }

@@ -22,8 +22,8 @@ export default function Header() {
     { href: '/', label: 'Accueil' },
     { href: '/store', label: 'Boutique' },
     { href: '/arena', label: 'Salle de Jeux' },
-    { href: '/arena/booking', label: 'Réservations' },
-    { href: '/about', label: 'À Propos' },
+    { href: '/cinema', label: 'Cinéma' },
+    { href: '/restaurant', label: 'Restaurant' },
   ];
 
   return (

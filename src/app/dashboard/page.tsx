@@ -16,6 +16,7 @@ export default async function DashboardPage() {
     activeSessions,
     totalCustomers,
     lowStockProducts,
+    upcomingEvents,
   ] = await Promise.all([
     // CA du jour
     prisma.invoice.aggregate({
@@ -51,6 +52,19 @@ export default async function DashboardPage() {
           lte: prisma.product.fields.minStock,
         },
       },
+    }),
+
+    // Événements bientôt complets ou complets (7 prochains jours)
+    prisma.event.findMany({
+      where: {
+        isActive: true,
+        isPublished: true,
+        eventDate: {
+          gte: new Date().toISOString().split('T')[0],
+          lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        }
+      },
+      orderBy: { eventDate: 'asc' }
     }),
   ])
 
@@ -154,6 +168,86 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Event Alerts */}
+      {upcomingEvents.length > 0 && (
+        <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-slate-800">Alertes Événements</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {upcomingEvents
+              .filter(event => {
+                const availableSlots = event.maxCapacity - event.bookedCount
+                return availableSlots <= 10
+              })
+              .map((event) => {
+                const availableSlots = event.maxCapacity - event.bookedCount
+                const isFull = availableSlots === 0
+                const almostFull = availableSlots <= 10 && availableSlots > 0
+
+                return (
+                  <div
+                    key={event.id}
+                    className={`rounded-xl p-4 border-2 ${
+                      isFull
+                        ? 'bg-red-50 border-red-200'
+                        : almostFull
+                        ? 'bg-orange-50 border-orange-200'
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-bold text-slate-800 flex-1">{event.title}</h3>
+                      {isFull && (
+                        <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse whitespace-nowrap">
+                          COMPLET
+                        </span>
+                      )}
+                      {almostFull && !isFull && (
+                        <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full whitespace-nowrap">
+                          Presque complet
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-600 mb-2">
+                      {new Date(event.eventDate).toLocaleDateString('fr-FR', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">
+                        Places: <span className={`font-bold ${isFull ? 'text-red-600' : almostFull ? 'text-orange-600' : 'text-slate-800'}`}>
+                          {availableSlots} / {event.maxCapacity}
+                        </span>
+                      </span>
+                      <Link
+                        href="/dashboard/events"
+                        className="text-purple-600 hover:text-purple-800 font-medium text-sm"
+                      >
+                        Gérer →
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
+
+          {upcomingEvents.filter(e => (e.maxCapacity - e.bookedCount) <= 10).length === 0 && (
+            <div className="text-center text-slate-500 py-8">
+              <p>Aucune alerte d'événement pour les 7 prochains jours</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">

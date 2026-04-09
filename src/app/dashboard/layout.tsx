@@ -13,6 +13,7 @@ const navigation = [
   { name: 'Factures', href: '/dashboard/invoices', icon: '📄', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
   { name: 'Produits', href: '/dashboard/products', icon: '📦', roles: ['MANAGER', 'ADMIN'] },
   { name: 'Équipements', href: '/dashboard/equipment', icon: '🔧', roles: ['TECHNICIAN', 'MANAGER', 'ADMIN'] },
+  { name: 'Événements', href: '/dashboard/events', icon: '🎉', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
   { name: 'Maintenance', href: '/dashboard/maintenance', icon: '🔨', roles: ['TECHNICIAN', 'MANAGER', 'ADMIN'] },
   { name: 'Rapports', href: '/dashboard/reports', icon: '📈', roles: ['MANAGER', 'SHAREHOLDER', 'ADMIN'] },
 ]
