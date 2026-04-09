@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     const data = createInvoiceSchema.parse(body)
 
     // Validation Mobile Money
-    if (data.paymentMethod.startsWith('MOBILE_MONEY')) {
+    if ((data.paymentMethod as string).startsWith('MOBILE_MONEY')) {
       if (!data.mobileMoneyPhone || !data.mobileMoneyProvider) {
         return NextResponse.json(
           { error: 'Mobile Money phone number and provider are required' },
