@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      if (!validateMobilePhoneNumber(data.mobileMoneyPhone, data.mobileMoneyProvider)) {
+      if (!validateMobilePhoneNumber(data.mobileMoneyPhone as string, data.mobileMoneyProvider as string)) {
         return NextResponse.json(
           { error: 'Invalid phone number for selected Mobile Money provider' },
           { status: 400 }
