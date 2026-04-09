@@ -24,9 +24,17 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border h-[96px]">
-      <div className="container mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 glass">
+      {/* Mobile Announcement Bar */}
+      <Link href="/arena/booking" className="lg:hidden block bg-gradient-to-r from-blue-600 to-violet-600 text-white py-2 px-4 text-center border-b-2 border-white/30 hover:opacity-90 transition-opacity cursor-pointer">
+        <p className="text-sm font-semibold uppercase tracking-wide">
+          Réservez maintenant
+        </p>
+      </Link>
+
+      {/* Header Content */}
+      <div className="border-b border-border h-[96px]">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-16 h-16 rounded-lg group-hover:shadow-glow transition-all duration-300 overflow-hidden">
