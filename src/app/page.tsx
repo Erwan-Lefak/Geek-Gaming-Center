@@ -53,7 +53,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-4.25rem)] sm:h-[calc(100vh-6rem)] mt-[4.25rem] sm:mt-[6rem]">
+      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-6rem)] sm:h-[calc(100vh-6rem)] mt-[6rem]">
         {/* Image Carousel Background */}
         <ImageCarousel />
 

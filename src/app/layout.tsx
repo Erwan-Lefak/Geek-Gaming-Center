@@ -89,7 +89,7 @@ export default function RootLayout({
           <CartProvider>
             <ThemeProvider>
               <Header className="dashboard-hidden" />
-            <main className="flex-1 dashboard-hidden pt-7 md:pt-28">{children}</main>
+            <main className="flex-1 dashboard-hidden pt-0">{children}</main>
             <footer className="border-t border-border bg-surface dashboard-hidden">
           <div className="container mx-auto px-4 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
