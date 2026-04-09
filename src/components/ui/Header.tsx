@@ -26,8 +26,8 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass">
       {/* Mobile Announcement Bar */}
-      <Link href="/arena/booking" className="lg:hidden block bg-gradient-to-r from-blue-600 to-violet-600 text-white py-2 px-4 text-center border-b-2 border-white/30 hover:opacity-90 transition-opacity cursor-pointer">
-        <p className="text-sm font-semibold uppercase tracking-wide">
+      <Link href="/arena/booking" className="lg:hidden block bg-gradient-to-r from-blue-600 to-violet-600 text-white py-0.5 px-4 text-center border-b-2 border-white/30 hover:opacity-90 transition-opacity cursor-pointer">
+        <p className="text-2xl font-bold uppercase tracking-wide my-0">
           Réservez maintenant
         </p>
       </Link>

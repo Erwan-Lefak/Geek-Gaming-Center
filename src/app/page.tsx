@@ -53,20 +53,22 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-6rem)] sm:h-[calc(100vh-6rem)] mt-[8.5rem]">
+      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-6rem)] sm:h-[calc(100vh-6rem)] mt-[8.5rem] md:mt-[6rem]">
         {/* Image Carousel Background */}
         <ImageCarousel />
 
         {/* Content */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
-          <div className="w-full">
-            {/* Main Headline */}
-            <h1 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
-              Votre Destination <span className="gradient-text block">Gaming Ultime</span>
-            </h1>
+          <div className="grid grid-cols-1 md:grid-cols-10 gap-8 items-center -mt-8 md:mt-0">
+            {/* Left Column - Title and Buttons (70%) */}
+            <div className="w-full md:col-span-7">
+              {/* Main Headline */}
+              <h1 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
+                <span className="text-black">Votre Destination</span> <span className="gradient-text block">Gaming Ultime</span>
+              </h1>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start mb-8">
+              {/* CTA Buttons */}
+              <div className="flex flex-col md:flex-row gap-4 items-start mb-8">
               <Link
                   href="/store"
                   className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-base sm:text-xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase"
@@ -88,13 +90,26 @@ export default function HomePage() {
                   <span className={theme === 'light' ? '!text-black' : 'text-white'}>Salle de Jeux</span>
                   <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200 ${theme === 'light' ? '' : 'text-white'}`} />
                 </Link>
+              </div>
+            </div>
+
+            {/* Right Column - Location Image (30%) */}
+            <div className="hidden md:flex w-full md:col-span-3 justify-end items-center">
+              <Image
+                src="/geek-gaming-center-location.png"
+                alt="Geek Gaming Center Location"
+                width={600}
+                height={600}
+                className="w-full h-auto object-contain drop-shadow-2xl"
+                priority
+              />
             </div>
           </div>
         </div>
 
         {/* Description text positioned at bottom */}
         <div className="absolute bottom-[42px] left-0 right-0 z-10 px-4">
-          <p className="text-sm sm:text-base md:text-lg text-white text-center">
+          <p className="text-base sm:text-base md:text-lg text-white text-center">
             Boutique de composants électroniques premium et salle de jeux immersive. PS5, Xbox, VR et simulation automobile.
           </p>
         </div>
