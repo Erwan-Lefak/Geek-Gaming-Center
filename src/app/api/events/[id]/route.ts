@@ -5,11 +5,12 @@ import { getCurrentUser } from '@/lib/auth/utils'
 // GET - Récupérer un événement spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         bookings: {
           take: 10,
@@ -38,9 +39,10 @@ export async function GET(
 // PUT - Mettre à jour un événement
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const user = await getCurrentUser()
 
     if (!user) {
@@ -53,7 +55,7 @@ export async function PUT(
     const data = await request.json()
 
     const event = await prisma.event.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: data.title,
         description: data.description,
@@ -83,9 +85,10 @@ export async function PUT(
 // DELETE - Supprimer un événement
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const user = await getCurrentUser()
 
     if (!user) {
@@ -96,7 +99,7 @@ export async function DELETE(
     }
 
     await prisma.event.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ success: true })

@@ -5,11 +5,12 @@ import { getCurrentUser } from '@/lib/auth/utils'
 // GET - Récupérer les réservations d'un événement
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const bookings = await prisma.eventBooking.findMany({
-      where: { eventId: params.id },
+      where: { eventId: id },
       include: {
         customer: true
       },
@@ -29,15 +30,16 @@ export async function GET(
 // POST - Créer une réservation
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const user = await getCurrentUser()
     const data = await request.json()
 
     // Vérifier que l'événement existe et a des places
     const event = await prisma.event.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!event) {
@@ -60,7 +62,7 @@ export async function POST(
     // Créer la réservation
     const booking = await prisma.eventBooking.create({
       data: {
-        eventId: params.id,
+        eventId: id,
         customerId: user?.id || null,
         attendeeName: data.attendeeName,
         attendeeEmail: data.attendeeEmail,
@@ -73,7 +75,7 @@ export async function POST(
 
     // Mettre à jour le compteur de réservations
     await prisma.event.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         bookedCount: {
           increment: requestedTickets
