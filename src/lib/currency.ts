@@ -15,12 +15,11 @@ import { CartItem } from '@/types/cart';
  * formatFCFA(1234567) // "1 234 567 FCFA"
  */
 export function formatFCFA(price: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XAF', // FCFA ISO code
+  const formatted = new Intl.NumberFormat('fr-FR', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price);
+  return `${formatted} FCFA`;
 }
 
 /**

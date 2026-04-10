@@ -584,6 +584,37 @@ html.light section:first-of-type a {
   color: #0a0a0f !important;
 }
 
+/* Keep warning/orange text in hero section */
+html.light section:first-of-type .text-warning,
+html.light section:first-of-type svg.text-warning,
+html.light section:first-of-type p.text-warning,
+html.light section:first-of-type h3.text-warning {
+  color: #f97316 !important;
+}
+
+/* Keep warning/orange for chevrons and inline text - SUPER SPECIFIC */
+html.light section:first-of-type .flex.items-center.gap-2,
+html.light section:first-of-type .flex.items-center.gap-2 *,
+html.light section:first-of-type .flex.items-center.gap-2 .text-warning,
+html.light section:first-of-type .flex.items-center.gap-2 p,
+html.light section:first-of-type .flex.items-center.gap-2 svg {
+  color: #f97316 !important;
+}
+
+/* Extra specific rule for tagline container */
+html.light section > div.container > div.grid > div.space-y-6 .flex.items-center.gap-2 p,
+html.light section > div.container > div.grid > div.space-y-6 .flex.items-center.gap-2 svg {
+  color: #f97316 !important;
+}
+
+/* Force SVG color in tagline - MOST SPECIFIC */
+html.light section:first-of-type .flex.items-center.gap-2 > svg,
+html.light section:first-of-type .flex.items-center.gap-2 svg.lucide-chevron-right,
+html.light section div.space-y-6 .flex.items-center.gap-2 > svg {
+  color: #f97316 !important;
+  fill: #f97316 !important;
+}
+
 /* Keep gradient sections unchanged */
 html.light section[class*="bg-gradient"] {
   /* Gradient sections remain unchanged */
@@ -1585,7 +1616,14 @@ html.light button.from-accent [class*="text-white"] {
 /* Section backgrounds in light mode */
 html.light section.bg-gradient-to-b.from-black.to-gray-900,
 html.light section[class*="bg-gradient-to-b"][class*="from-black"] {
-  background: linear-gradient(to bottom, #f5f5f5, #e8e8e8) !important;
+  background: #ffffff !important;
+}
+
+/* Force white background for store featured products section */
+html.light section.bg-gradient-to-b.from-black[class*="to-red-900"],
+html.light section.py-16.md\:py-24.bg-gradient-to-b {
+  background: #ffffff !important;
+  background-image: none !important;
 }
 
 html.light section.bg-black:not([class*="bg-gradient"]),

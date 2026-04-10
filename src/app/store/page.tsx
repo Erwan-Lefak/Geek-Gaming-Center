@@ -8,10 +8,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, ChevronRight, Quote, ShoppingCart, Gamepad2, Headphones, Keyboard, Mouse, Monitor, Shirt, Coffee, LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronRight, Quote, ShoppingCart, Gamepad2, Headphones, Keyboard, Mouse, Monitor, Shirt, Coffee, Store, Truck, CreditCard, LucideIcon } from 'lucide-react';
 import ProductIcon from '@/components/ProductIcon';
 import ProductImage from '@/components/ProductImage';
 import { useCart } from '@/contexts/CartContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { formatFCFA } from '@/lib/currency';
 
 interface Product {
@@ -36,6 +37,7 @@ interface Category {
 
 export default function StorePage() {
   const { addItem } = useCart();
+  const { theme } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -140,12 +142,24 @@ export default function StorePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section - Same design as Arena page */}
-      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-4.25rem)] sm:h-[calc(100vh-6rem)] mt-[4.25rem] sm:mt-[6rem]">
-        {/* Background with gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-6rem)] sm:h-[calc(100vh-6rem)] mt-[8.5rem] md:mt-[6rem]">
+        {/* Background with image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/store-hero.jpg"
+            alt="Boutique Geek Gaming Center"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
 
-        {/* Decorative gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-warning-900/20 to-warning-800/10" />
+        {/* Red Gradient Overlay - adapts to theme */}
+        <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${
+          theme === 'light'
+            ? 'from-red-950/85 via-red-950/75 to-white'
+            : 'from-red-950/85 via-red-950/90 to-black'
+        }`} />
 
         {/* Content - Split layout */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
@@ -158,12 +172,12 @@ export default function StorePage() {
               </h1>
 
               {/* Tagline */}
-              <div className="flex items-center gap-2 mb-6">
-                <ChevronRight className="w-6 h-6 text-warning" />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-warning uppercase tracking-wide">
+              <div className="flex items-center gap-2 mb-6" style={{ color: '#f97316' }}>
+                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#f97316' }}>
                   TOUT POUR LES GAMERS À YAOUNDÉ
                 </p>
-                <ChevronRight className="w-6 h-6 text-warning" />
+                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
               </div>
 
               {/* CTA */}
@@ -196,10 +210,11 @@ export default function StorePage() {
               <div className="w-64 h-96 overflow-hidden group -skew-x-15">
                 <div className="absolute inset-0 skew-x-15 transform-origin-left">
                   <Image
-                    src="/section-boutique.jpg"
+                    src="/store-hero.jpg"
                     alt="Boutique"
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    width={256}
+                    height={384}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
               </div>
@@ -230,46 +245,11 @@ export default function StorePage() {
             </div>
           </div>
         </div>
-
-        {/* Decorative bottom quote mark */}
-        <div className="absolute bottom-8 right-8 lg:right-16">
-          <Quote className="w-16 h-16 text-warning-400/30" />
-        </div>
-      </section>
-
-      {/* Categories Overview */}
-      <section id="categories" className="py-16 md:py-24 bg-black">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-white text-center">
-            Nos <span className="gradient-text">Catégories</span>
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.filter(cat => cat.value !== 'all').map((category, index) => {
-              const IconComponent = category.icon;
-              return (
-                <div
-                  key={index}
-                  className="bento-item group cursor-pointer"
-                  onClick={() => setActiveCategory(category.value)}
-                >
-                  <div className="flex flex-col items-center text-center gap-4">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-                      <IconComponent className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{category.title}</h3>
-                    <p className="text-sm text-white/60">{category.description}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </section>
 
       {/* Featured Products Carousel */}
       {featuredProducts.length > 0 && (
-        <section className="py-16 md:py-24 bg-gradient-to-b from-black to-gray-900">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-black via-red-950/30 to-red-900/50">
           <div className="container mx-auto px-4 sm:px-6 md:px-8">
             <div className="flex items-center justify-between mb-12">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
@@ -303,7 +283,7 @@ export default function StorePage() {
 
                     {/* Product Info */}
                     <div className="flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-primary-400 transition-colors">{product.name}</h3>
+                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-red-400 transition-colors">{product.name}</h3>
                       <p className="text-sm text-white/70 mb-2 line-clamp-2">{product.description}</p>
 
                       {/* Price and CTA */}
@@ -388,7 +368,7 @@ export default function StorePage() {
 
                     {/* Product Info */}
                     <div className="flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">{product.name}</h3>
+                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-red-400 transition-colors">{product.name}</h3>
                       <p className="text-sm text-white/70 mb-2 flex-grow line-clamp-2">{product.description}</p>
                       <p className={`text-xs mb-4 ${
                         product.stock > 10 ? 'text-success' :
@@ -498,107 +478,13 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-16 md:py-24 bg-black">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            {/* Left side - Description */}
-            <div>
-              <h2 className="text-[2.5rem] sm:text-[3rem] md:text-[3.5rem] lg:text-[4rem] font-bold leading-[0.8] kinetic-text text-white uppercase italic mb-8">
-                POURQUOI NOUS CHOISIR ?
-              </h2>
-
-              <div className="bento-item p-8 space-y-6">
-                <p className="text-lg text-white/90 leading-relaxed">
-                  <span className="font-bold text-warning">Produits authentiques</span> - Nous garantissons l'authenticité de tous nos produits. Pas de contrefaçon, que du matériel gaming officiel.
-                </p>
-                <p className="text-lg text-white/90 leading-relaxed">
-                  <span className="font-bold text-primary-400">Prix compétitifs</span> - Les meilleurs prix de Yaoundé sur les consoles, accessoires et jeux vidéo.
-                </p>
-                <p className="text-lg text-white/90 leading-relaxed">
-                  <span className="font-bold text-accent-400">Conseils d'experts</span> - Notre équipe de gamers passionnés vous aide à trouver l'équipement parfait.
-                </p>
-                <p className="text-lg text-white/90 leading-relaxed">
-                  <span className="font-bold text-success">Garantie satisfait</span> - Satisfait ou remboursé sous 30 jours sur tous nos produits.
-                </p>
-              </div>
-            </div>
-
-            {/* Right side - Store Image */}
-            <div className="order-1 lg:order-2">
-              <div className="bento-item group overflow-hidden">
-                <div className="relative aspect-[4/3] -skew-x-15">
-                  <div className="absolute inset-0 skew-x-15 transform-origin-left">
-                    <Image
-                      src="/section-boutique.jpg"
-                      alt="Geek Gaming Store"
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-center">
-                    <span className="text-4xl font-bold text-white kinetic-text italic uppercase">LA BOUTIQUE</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24 bg-gradient-to-br from-warning-600 to-orange-600">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            {/* Left side - Text content */}
-            <div className="space-y-6 lg:space-y-8">
-              {/* Main heading */}
-              <h2 className="text-[4rem] sm:text-[4.7rem] md:text-[5.3rem] lg:text-[6.7rem] font-bold leading-[0.8] kinetic-text text-white uppercase italic mb-4">
-                PRÊT À SHOPPER ?
-              </h2>
-
-              {/* Tagline */}
-              <div className="flex items-center gap-2 mb-6">
-                <ChevronRight className="w-6 h-6 text-white" />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white uppercase tracking-wide">
-                  DÉCOUVREZ TOUTE NOTRE GAMME
-                </p>
-                <ChevronRight className="w-6 h-6 text-white" />
-              </div>
-
-              {/* CTA */}
-              <div className="space-y-2">
-                <p className="text-lg sm:text-xl text-white/90 mb-4 uppercase">
-                  Visitez-nous en boutique ou contactez-nous
-                </p>
-                <Link
-                  href="/store/contact"
-                  className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-warning-600 font-semibold text-xl sm:text-2xl md:text-3xl shadow-glow hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase"
-                >
-                  Nous contacter
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Right side - Empty space */}
-            <div className="relative hidden lg:block">
-              {/* Empty space to maintain grid layout */}
-            </div>
-          </div>
-        </div>
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-      </section>
-
       {/* Info Section */}
       <section className="py-16 md:py-24 bg-black">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bento-item">
               <div className="flex items-center gap-4 mb-4">
-                <ShoppingCart className="w-8 h-8 text-warning" />
+                <Store className="w-8 h-8 text-warning" />
                 <h3 className="text-xl md:text-2xl font-bold text-white">Boutique</h3>
               </div>
               <p className="text-base text-white/80">
@@ -608,7 +494,7 @@ export default function StorePage() {
 
             <div className="bento-item">
               <div className="flex items-center gap-4 mb-4">
-                <ArrowRight className="w-8 h-8 text-primary-400" />
+                <Truck className="w-8 h-8 text-primary-400" />
                 <h3 className="text-xl md:text-2xl font-bold text-white">Livraison</h3>
               </div>
               <p className="text-base text-white/80 mb-2">
@@ -621,7 +507,7 @@ export default function StorePage() {
 
             <div className="bento-item">
               <div className="flex items-center gap-4 mb-4">
-                <ArrowRight className="w-8 h-8 text-success" />
+                <CreditCard className="w-8 h-8 text-success" />
                 <h3 className="text-xl md:text-2xl font-bold text-white">Paiement</h3>
               </div>
               <p className="text-base text-white/80">
