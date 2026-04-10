@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { ArrowRight, Cpu, Gamepad2, Zap, Store, Monitor, UtensilsCrossed, Film, Calendar, Users, ChevronDown, ChevronUp, Instagram } from 'lucide-react';
 import ImageCarousel from '@/components/ui/ImageCarousel';
 import { useTheme } from '@/contexts/ThemeContext';
+import InstagramGallery from '@/components/InstagramGallery';
 
 export default function HomePage() {
   const { theme } = useTheme();
@@ -178,7 +179,7 @@ export default function HomePage() {
           {/* Panel 3: Restaurant */}
           <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
-              src="/section-restaurant.jpg"
+              src="/geek-gaming-center-restaurant.png"
               alt="Restaurant"
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -205,7 +206,7 @@ export default function HomePage() {
           {/* Panel 4: Cinéma */}
           <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
             <Image
-              src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
+              src="/cinema-latest.png"
               alt="Cinéma"
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -319,7 +320,7 @@ export default function HomePage() {
             {/* Gallery Image 1 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
+                src="/gallery-1.jpg"
                 alt="Gallery 1"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -328,7 +329,7 @@ export default function HomePage() {
             {/* Gallery Image 2 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-47.jpg"
+                src="/gallery-2.jpg"
                 alt="Gallery 2"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -337,7 +338,7 @@ export default function HomePage() {
             {/* Gallery Image 3 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-48.jpg"
+                src="/gallery-3.jpg"
                 alt="Gallery 3"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -346,7 +347,7 @@ export default function HomePage() {
             {/* Gallery Image 4 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-49.jpg"
+                src="/gallery-4.jpg"
                 alt="Gallery 4"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -355,7 +356,7 @@ export default function HomePage() {
             {/* Gallery Image 5 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-50.jpg"
+                src="/gallery-5.jpg"
                 alt="Gallery 5"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -364,7 +365,7 @@ export default function HomePage() {
             {/* Gallery Image 6 */}
             <div className="aspect-square relative overflow-hidden group">
               <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-51.jpg"
+                src="/gallery-6.jpg"
                 alt="Gallery 6"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -379,11 +380,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* Card 1: Ciné Otaku */}
-            {/* Card 1: Ciné Otaku */}
             <div className="bento-item group overflow-hidden">
               <div className="relative h-48 md:h-56 overflow-hidden rounded-t-xl">
                 <Image
-                  src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
+                  src="/sinners.webp"
                   alt="Ciné Otaku"
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -397,7 +397,7 @@ export default function HomePage() {
               <div className="p-6">
                 <h3 className="text-3xl font-bold text-white mb-3 uppercase">Ciné Otaku</h3>
                 <p className="text-base text-white mb-6">
-                  Séances privées d'anime et manga en projection immersive avec son surround et ambiance gaming.
+                  Séances privées de films et séries en projection immersive avec son surround et ambiance gaming. Tous les genres : animé, action, aventure, thriller, et plus encore.
                 </p>
                 <Link href="/cinema" className="px-6 py-3 w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold uppercase text-lg hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2">
                   En savoir plus
@@ -410,7 +410,7 @@ export default function HomePage() {
             <div className="bento-item group overflow-hidden">
               <div className="relative h-48 md:h-56 overflow-hidden rounded-t-xl">
                 <Image
-                  src="/arena-gallery/PHOTO-2024-12-07-12-31-47.jpg"
+                  src="/event-otaku.jpg"
                   alt="Événement Otaku"
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -437,7 +437,7 @@ export default function HomePage() {
             <div className="bento-item group overflow-hidden">
               <div className="relative h-48 md:h-56 overflow-hidden rounded-t-xl">
                 <Image
-                  src="/arena-gallery/PHOTO-2024-12-07-12-31-48.jpg"
+                  src="/community-otaku.png"
                   alt="Communauté Otaku"
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -467,18 +467,18 @@ export default function HomePage() {
       <section className="bg-gradient-to-br from-accent-500 to-purple-600 py-16 md:py-24 px-4">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center">
+            <Link href="/arena/booking" className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center hover:scale-110 transition-transform duration-200 cursor-pointer" style={{ color: '#ffffff !important' }}>
               Anniversaire
-            </h1>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center">
+            </Link>
+            <Link href="/arena/booking" className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center hover:scale-110 transition-transform duration-200 cursor-pointer" style={{ color: '#ffffff !important' }}>
               Groupe
-            </h1>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center">
+            </Link>
+            <Link href="/arena/booking" className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center hover:scale-110 transition-transform duration-200 cursor-pointer" style={{ color: '#ffffff !important' }}>
               Événement
-            </h1>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center">
+            </Link>
+            <Link href="/arena/booking" className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight kinetic-text uppercase italic text-white text-center hover:scale-110 transition-transform duration-200 cursor-pointer" style={{ color: '#ffffff !important' }}>
               Réservation
-            </h1>
+            </Link>
           </div>
         </div>
       </section>
@@ -490,10 +490,10 @@ export default function HomePage() {
             Maintenant ouvert à Yaoundé, Mvog Ada
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {/* Google Map */}
-            <div className="aspect-video relative overflow-hidden rounded-xl">
+            {/* Google Map - Mode direct sans API key */}
+            <div className="aspect-[16/9] relative overflow-hidden rounded-2xl">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3980.7283179565387!2d11.5022!3d3.8488!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf0d9f123456%3A0x1234567890abcdef!2sBP+01+Yaound%C3%A9!5e0!3m2!1sfr!2scm!4v1700000000000!5m2!1sfr!2scm&q=VG8H%2BMX+Yaound%C3%A9+Cameroun"
+                src="https://maps.google.com/maps?q=Geek+Gaming+Center,Mvog+Ada,Yaoundé,Cameroon&t=m&z=15&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -503,54 +503,21 @@ export default function HomePage() {
                 className="absolute inset-0"
               ></iframe>
             </div>
-            {/* Location Info */}
-            <div className="aspect-video relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-900 to-purple-700 p-6 md:p-8 flex flex-col justify-center">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">Geek Gaming Center</h3>
-              <div className="space-y-3 md:space-y-4 text-white">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-xl">📍</div>
-                  <div>
-                    <p className="font-semibold text-lg">Adresse</p>
-                    <p className="text-purple-200 text-sm md:text-base">BP 01 Yaoundé, Cameroun</p>
-                    <p className="text-purple-200 text-sm md:text-base">Mvog Ada, Yaoundé</p>
-                    <p className="text-purple-300 text-xs md:text-sm mt-1">Plus Code: VG8H+MX Yaoundé</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-xl">🕐</div>
-                  <div>
-                    <p className="font-semibold text-lg">Horaires</p>
-                    <p className="text-purple-200 text-sm md:text-base">Lun - Ven : 9h30 - 21h00</p>
-                    <p className="text-purple-200 text-sm md:text-base">Samedi : 9h30 - 21h00</p>
-                    <p className="text-purple-200 text-sm md:text-base">Dimanche : 12h00 - 21h00</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-xl">📞</div>
-                  <div>
-                    <p className="font-semibold text-lg">Contact</p>
-                    <p className="text-purple-200 text-sm md:text-base">+237 677 02 29 98</p>
-                    <p className="text-purple-200 text-sm md:text-base">contact@geekgamingcenter.cm</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-xl">🎮</div>
-                  <div>
-                    <p className="font-semibold text-lg">Services</p>
-                    <p className="text-purple-200 text-sm md:text-base">Gaming • Boutique • Restaurant • Cinéma</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 md:mt-6">
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=VG8H%2BMX+Yaound%C3%A9+Cameroun"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-purple-900 px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-purple-100 transition-colors text-sm md:text-base"
-                >
-                  Itinéraire
-                  <ArrowRight className="w-4 h-4" />
-                </a>
+            {/* Image de la salle de jeux */}
+            <div className="relative aspect-[16/9] overflow-hidden rounded-2xl shadow-2xl">
+              <Image
+                src="/images/Salle de Jeux/PHOTO-2025-01-03-20-56-48.webp"
+                alt="Geek Gaming Center - Salle de Jeux"
+                fill
+                className="object-cover hover:scale-105 transition-transform duration-500"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2" style={{ color: '#ffffff !important' }}>Geek Gaming Center</h3>
+                <p className="text-white/90 text-sm md:text-base" style={{ color: 'rgba(255, 255, 255, 0.9) !important' }}>
+                  Gaming • Boutique • Restaurant • Cinéma • Événements
+                </p>
               </div>
             </div>
           </div>
@@ -596,68 +563,7 @@ export default function HomePage() {
       {/* Instagram Section */}
       <section className="bg-black py-12 md:py-16 px-4">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 mb-8 md:mb-12">
-            {/* Instagram Image 1 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-49.jpg"
-                alt="Instagram 1"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-            {/* Instagram Image 2 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-50.jpg"
-                alt="Instagram 2"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-            {/* Instagram Image 3 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-51.jpg"
-                alt="Instagram 3"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-            {/* Instagram Image 4 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-46.jpg"
-                alt="Instagram 4"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-            {/* Instagram Image 5 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-47.jpg"
-                alt="Instagram 5"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-            {/* Instagram Image 6 */}
-            <div className="aspect-square relative overflow-hidden group">
-              <Image
-                src="/arena-gallery/PHOTO-2024-12-07-12-31-48.jpg"
-                alt="Instagram 6"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white uppercase italic">
-              Suivez nous sur Instagram
-            </h2>
-            <Instagram className="w-8 h-8 text-pink-500" />
-          </div>
+          <InstagramGallery />
         </div>
       </section>
     </div>

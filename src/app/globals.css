@@ -1286,13 +1286,31 @@ html.light section h1.kinetic-text {
   color: #ffffff !important;
 }
 
+/* Links with kinetic-text should stay white in all modes */
+html.light a.kinetic-text,
+html.dark a.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Services CTA section links with kinetic-text - ALWAYS WHITE */
+html.light section[class*="from-accent-500"] a.kinetic-text,
+html.dark section[class*="from-accent-500"] a.kinetic-text {
+  color: #ffffff !important;
+}
+
+/* Even more specific - Links with text-white kinetic-text in any section */
+html.light section a.text-white.kinetic-text,
+html.dark section a.text-white.kinetic-text {
+  color: #ffffff !important;
+}
+
 html.light section.relative.flex.items-center.justify-center h1,
 html.light section.relative.flex.items-center.justify-center .text-white {
   color: #ffffff !important;
 }
 
 /* But allow other sections to have dark text EXCEPT gradient buttons */
-html.light section:not(:first-of-type) .text-white:not([class*="bg-gradient"]):not([class*="from-primary"]):not([class*="from-accent"]):not([class*="from-purple"]):not([class*="from-red"]):not([class*="from-blue"]):not([class*="from-pink"]):not([class*="to-primary"]):not([class*="to-accent"]):not([class*="to-purple"]):not([class*="to-red"]):not([class*="to-blue"]):not([class*="to-pink"]) {
+html.light section:not(:first-of-type) .text-white:not([class*="bg-gradient"]):not([class*="from-primary"]):not([class*="from-accent"]):not([class*="from-purple"]):not([class*="from-red"]):not([class*="from-blue"]):not([class*="from-pink"]):not([class*="to-primary"]):not([class*="to-accent"]):not([class*="to-purple"]):not([class*="to-red"]):not([class*="to-blue"]):not([class*="to-pink"]):not(.kinetic-text) {
   color: #0a0a0f !important;
 }
 
@@ -1538,9 +1556,16 @@ html.light svg.text-accent-400 {
 }
 
 /* Category cards in store page - keep descriptions dark in light mode */
-html.light [class*="text-white"],
-html.light section [class*="text-white"] {
+html.light [class*="text-white"]:not(.kinetic-text),
+html.light section [class*="text-white"]:not(.kinetic-text) {
   color: #0a0a0f !important;
+}
+
+/* Kinetic-text elements MUST stay white in light mode */
+html.light .kinetic-text,
+html.light section .kinetic-text,
+html.light a.kinetic-text {
+  color: #ffffff !important;
 }
 
 /* But keep gradient buttons and hero section white */
