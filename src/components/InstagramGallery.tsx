@@ -37,7 +37,7 @@ const InstagramGallery = () => {
         <iframe
           src="//lightwidget.com/widgets/caf67b0528575e0aa322c58018136e86.html"
           scrolling="no"
-          allowtransparency="true"
+          allowTransparency
           className="lightwidget-widget w-full border-0 overflow-hidden"
           style={{ height: '400px' }}
         />
