@@ -77,7 +77,7 @@ export default function HomePage() {
                   href="/store"
                   className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-base sm:text-xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase"
                 >
-                  <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />
+                  <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   <span>Explorer la Boutique</span>
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
@@ -86,13 +86,13 @@ export default function HomePage() {
                   href="/arena"
                   className={`jelly-button group px-6 py-3 border font-semibold text-base sm:text-xl md:text-3xl transition-all duration-300 flex items-center gap-2 uppercase hover:opacity-90 ${
                     theme === 'light'
-                      ? '!bg-white !text-black border-black [&_svg]:!stroke-black [&_svg]:!text-black'
+                      ? '!bg-white !text-black border-black'
                       : 'bg-surface border-border text-white hover:bg-elevated'
                   }`}
                 >
-                  <Gamepad2 className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'light' ? '' : 'text-primary-400'}`} />
+                  <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: theme === 'light' ? '#000000' : '#ffffff' }} />
                   <span className={theme === 'light' ? '!text-black' : 'text-white'}>Salle de Jeux</span>
-                  <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200 ${theme === 'light' ? '' : 'text-white'}`} />
+                  <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200 ${theme === 'light' ? '!text-black' : 'text-white'}`} />
                 </Link>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function HomePage() {
                   Jouez sur PS5, Xbox, VR et simulateurs de course
                 </p>
                 <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-200" />
                   <span>Découvrir</span>
                 </button>
               </div>
@@ -169,7 +169,7 @@ export default function HomePage() {
                   Composants PC, accessoires gaming et équipements
                 </p>
                 <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-200" />
                   <span>Explorer</span>
                 </button>
               </div>
@@ -196,7 +196,7 @@ export default function HomePage() {
                   Restauration rapide et snacks pour les gamers
                 </p>
                 <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-200" />
                   <span>Commander</span>
                 </button>
               </div>
@@ -223,7 +223,7 @@ export default function HomePage() {
                   Séances privées et projections immersives
                 </p>
                 <button className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 font-semibold text-base md:text-lg text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase">
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-200" />
                   <span>Réserver</span>
                 </button>
               </div>

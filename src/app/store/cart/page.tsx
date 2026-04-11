@@ -161,7 +161,7 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      href={`/store/products/${item.productId}`}
+                      href={`/store/products/${item.product.slug}`}
                       className="text-lg font-semibold text-white hover:text-primary-400 transition-colors line-clamp-2"
                     >
                       {item.product.name}

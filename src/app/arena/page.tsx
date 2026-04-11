@@ -9,8 +9,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ArrowRight, Clock, MapPin, Users, Gamepad2, Monitor, Zap, Cpu, Calendar, Trophy, ChevronRight, Quote } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ArenaPage() {
+  const { theme } = useTheme();
   const [activeFeature, setActiveFeature] = useState<number | null>(null);
 
   const features = [
@@ -92,12 +94,24 @@ export default function ArenaPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section - Match screenshot design exactly */}
-      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-4.25rem)] sm:h-[calc(100vh-6rem)] mt-[4.25rem] sm:mt-[6rem]">
-        {/* Background with gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+      <section className="relative flex items-center justify-center overflow-hidden h-[calc(100vh-6rem)] sm:h-[calc(100vh-6rem)] mt-[8.5rem] md:mt-[6rem]">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/Salle de Jeux/PHOTO-2024-12-07-12-31-50.jpg"
+            alt="Salle de Jeux Background"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
 
-        {/* Decorative gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-900/20 to-primary-800/10" />
+        {/* Red Gradient Overlay - adapts to theme like store page */}
+        <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${
+          theme === 'light'
+            ? 'from-red-950/85 via-red-950/75 to-white'
+            : 'from-red-950/85 via-red-950/90 to-black'
+        }`} />
 
         {/* Content - Split layout */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
@@ -110,12 +124,12 @@ export default function ArenaPage() {
               </h1>
 
               {/* Tagline */}
-              <div className="flex items-center gap-2 mb-6">
-                <ChevronRight className="w-6 h-6 text-primary-400" />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-400 uppercase tracking-wide">
+              <div className="flex items-center gap-2 mb-6" style={{ color: '#f97316' }}>
+                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#f97316' }}>
                   VOTRE ESPACE À YAOUNDÉ POUR VOUS DIVERTIR
                 </p>
-                <ChevronRight className="w-6 h-6 text-primary-400" />
+                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
               </div>
 
               {/* CTA */}
@@ -125,7 +139,7 @@ export default function ArenaPage() {
                 </p>
                 <Link
                   href="/arena/booking"
-                  className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-xl sm:text-2xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 uppercase"
+                  className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 font-semibold text-xl sm:text-2xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 uppercase"
                 >
                   Réserver maintenant
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
@@ -173,21 +187,19 @@ export default function ArenaPage() {
             </div>
           </div>
         </div>
-
-        {/* Decorative bottom quote mark */}
-        <div className="absolute bottom-8 right-8 lg:right-16">
-          <Quote className="w-16 h-16 text-primary-400/30" />
-        </div>
       </section>
 
       {/* Features Overview */}
-      <section id="services" className="py-16 md:py-24 bg-black">
+      <section id="services" className="py-8 md:py-16 bg-black" style={{
+        backgroundColor: theme === 'light' ? '#ffffff' : '#000000',
+        cssText: theme === 'light' ? 'background-color: #ffffff !important' : 'background-color: #000000 !important'
+      }}>
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-white text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-white text-center -mt-4">
             Pourquoi choisir notre <span className="gradient-text">Salle de Jeux</span> ?
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div
                 key={index}

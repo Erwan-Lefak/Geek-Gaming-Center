@@ -17,6 +17,7 @@ import { formatFCFA } from '@/lib/currency';
 
 interface Product {
   id: string;
+  slug: string;
   name: string;
   description: string;
   price: number;
@@ -154,11 +155,11 @@ export default function StorePage() {
           />
         </div>
 
-        {/* Red Gradient Overlay - adapts to theme */}
+        {/* Blue Gradient Overlay - adapts to theme */}
         <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${
           theme === 'light'
-            ? 'from-red-950/85 via-red-950/75 to-white'
-            : 'from-red-950/85 via-red-950/90 to-black'
+            ? 'from-blue-950/85 via-blue-950/75 to-white'
+            : 'from-blue-950/85 via-blue-950/90 to-black'
         }`} />
 
         {/* Content - Split layout */}
@@ -172,12 +173,12 @@ export default function StorePage() {
               </h1>
 
               {/* Tagline */}
-              <div className="flex items-center gap-2 mb-6" style={{ color: '#f97316' }}>
-                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#f97316' }}>
+              <div className="flex items-center gap-2 mb-6" style={{ color: '#3b82f6 !important', cssText: 'color: #3b82f6 !important' }}>
+                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6 !important', stroke: '#3b82f6 !important', fill: 'none !important', cssText: 'color: #3b82f6 !important; stroke: #3b82f6 !important; fill: none !important' }} />
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#3b82f6 !important', cssText: 'color: #3b82f6 !important' }}>
                   TOUT POUR LES GAMERS À YAOUNDÉ
                 </p>
-                <ChevronRight className="w-6 h-6" style={{ color: '#f97316', stroke: '#f97316' }} />
+                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6 !important', stroke: '#3b82f6 !important', fill: 'none !important', cssText: 'color: #3b82f6 !important; stroke: #3b82f6 !important; fill: none !important' }} />
               </div>
 
               {/* CTA */}
@@ -188,7 +189,7 @@ export default function StorePage() {
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="#products"
-                    className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-warning-500 to-warning-600 font-semibold text-xl sm:text-2xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 uppercase"
+                    className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 font-semibold text-xl sm:text-2xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 uppercase"
                   >
                     Voir les produits
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
@@ -207,40 +208,39 @@ export default function StorePage() {
             {/* Right side - Store images */}
             <div className="relative hidden lg:flex flex-row gap-3">
               {/* Image 1 */}
-              <div className="w-64 h-96 overflow-hidden group -skew-x-15">
-                <div className="absolute inset-0 skew-x-15 transform-origin-left">
-                  <Image
-                    src="/store-hero.jpg"
-                    alt="Boutique"
-                    width={256}
-                    height={384}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+              <div className="w-64 h-64 overflow-hidden group">
+                <Image
+                  src="/Boutique/PHOTO-2026-01-12-12-49-19(3).jpg"
+                  alt="Boutique"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  unoptimized
+                />
               </div>
 
               {/* Image 2 */}
-              <div className="w-64 h-96 overflow-hidden group -skew-x-15">
-                <div className="absolute inset-0 skew-x-15 transform-origin-left">
-                  <Image
-                    src="/section-salle-de-jeux.jpg"
-                    alt="Produits Gaming"
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+              <div className="w-64 h-64 overflow-hidden group">
+                <Image
+                  src="/Boutique/PHOTO-2026-01-12-12-49-23.jpg"
+                  alt="Produits Gaming"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  unoptimized
+                />
               </div>
 
               {/* Image 3 */}
-              <div className="w-64 h-96 overflow-hidden group -skew-x-15">
-                <div className="absolute inset-0 skew-x-15 transform-origin-left">
-                  <Image
-                    src="/section-restaurant.jpg"
-                    alt="Accessoires"
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+              <div className="w-64 h-64 overflow-hidden group">
+                <Image
+                  src="/Boutique/PHOTO-2026-01-12-12-49-30.jpg"
+                  alt="Accessoires"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  unoptimized
+                />
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function StorePage() {
 
       {/* Featured Products Carousel */}
       {featuredProducts.length > 0 && (
-        <section className="py-16 md:py-24 bg-gradient-to-b from-black via-red-950/30 to-red-900/50">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-black via-blue-950/30 to-blue-900/50">
           <div className="container mx-auto px-4 sm:px-6 md:px-8">
             <div className="flex items-center justify-between mb-12">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
@@ -268,7 +268,7 @@ export default function StorePage() {
                 {featuredProducts.map((product) => (
                   <Link
                     key={product.id}
-                    href={`/store/products/${product.id}`}
+                    href={`/store/products/${product.slug}`}
                     className="w-72 flex-shrink-0 bento-item group overflow-hidden flex flex-col"
                   >
                     {/* Product Image/Icon */}
@@ -283,7 +283,7 @@ export default function StorePage() {
 
                     {/* Product Info */}
                     <div className="flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-red-400 transition-colors">{product.name}</h3>
+                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">{product.name}</h3>
                       <p className="text-sm text-white/70 mb-2 line-clamp-2">{product.description}</p>
 
                       {/* Price and CTA */}
@@ -353,7 +353,7 @@ export default function StorePage() {
                 {currentProducts.map((product) => (
                   <Link
                     key={product.id}
-                    href={`/store/products/${product.id}`}
+                    href={`/store/products/${product.slug}`}
                     className="bento-item group overflow-hidden flex flex-col"
                   >
                     {/* Product Image/Icon */}
@@ -368,7 +368,7 @@ export default function StorePage() {
 
                     {/* Product Info */}
                     <div className="flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-red-400 transition-colors">{product.name}</h3>
+                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">{product.name}</h3>
                       <p className="text-sm text-white/70 mb-2 flex-grow line-clamp-2">{product.description}</p>
                       <p className={`text-xs mb-4 ${
                         product.stock > 10 ? 'text-success' :

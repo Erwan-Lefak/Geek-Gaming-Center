@@ -17,11 +17,11 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ items }: BreadcrumbProps) {
   return (
-    <nav className="flex items-center space-x-2 text-sm overflow-x-auto pb-2">
+    <nav className="flex items-center space-x-0.5 sm:space-x-2 text-sm overflow-x-auto pb-2">
       {items.map((item, index) => (
         <div key={index} className="flex items-center">
           {index > 0 && (
-            <svg className="w-4 h-4 mx-2 text-white/40 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 mx-0 sm:mx-2 text-white/40 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
           )}

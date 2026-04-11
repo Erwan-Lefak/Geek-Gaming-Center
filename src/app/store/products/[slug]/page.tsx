@@ -113,7 +113,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .map(convertToProduct);
 
   return (
-    <div className="min-h-screen bg-background pt-[96px]">
+    <div className="min-h-screen bg-background pt-[130px]">
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
         <Breadcrumb

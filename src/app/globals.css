@@ -1577,6 +1577,186 @@ html.light svg.text-primary-400 {
   stroke: #60a5fa !important;
 }
 
+/* Fix Gamepad2 icon color in hero button for light mode */
+html.light section.relative.flex.items-center.justify-center a[href="/arena"] svg[style*="color"] {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+html.light section.relative.flex.items-center.justify-center a[href="/arena"] svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a[href="/arena"] svg,
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a[href="/arena"] svg * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+
+/* Fix Cpu icon color in hero button for light mode - Explorer la Boutique */
+html.light section.relative.flex.items-center.justify-center a[href="/store"] svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a[href="/store"] svg,
+html.light body > div.min-h-screen > section.relative.flex.items-center.justify-center a[href="/store"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* Keep panel icons colored in light mode - Ultra-specific rules */
+html.light section.bg-black .grid svg.text-red-400,
+html.light section.bg-black .grid svg.text-blue-400,
+html.light section.bg-black .grid svg.text-orange-400,
+html.light section.bg-black .grid svg.text-purple-400 {
+  color: inherit !important;
+  stroke: inherit !important;
+}
+html.light section[class*="bg-black"] .grid svg.text-red-400 {
+  color: #f87171 !important;
+  stroke: #f87171 !important;
+}
+html.light section[class*="bg-black"] .grid svg.text-blue-400 {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+}
+html.light section[class*="bg-black"] .grid svg.text-orange-400 {
+  color: #fb923c !important;
+  stroke: #fb923c !important;
+}
+html.light section[class*="bg-black"] .grid svg.text-purple-400 {
+  color: #c084fc !important;
+  stroke: #c084fc !important;
+}
+
+/* Ultra-specific rules for panel icons - targeting h3 with !text-white */
+html.light section[class*="bg-black"] h3[class*="text-white"] svg.text-red-400,
+html.light section[class*="bg-black"] h3 svg.text-red-400 {
+  color: #f87171 !important;
+  stroke: #f87171 !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] svg.text-blue-400,
+html.light section[class*="bg-black"] h3 svg.text-blue-400 {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] svg.text-orange-400,
+html.light section[class*="bg-black"] h3 svg.text-orange-400 {
+  color: #fb923c !important;
+  stroke: #fb923c !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] svg.text-purple-400,
+html.light section[class*="bg-black"] h3 svg.text-purple-400 {
+  color: #c084fc !important;
+  stroke: #c084fc !important;
+  fill: none !important;
+}
+
+/* Even more specific - targeting all child elements */
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-red-400,
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-red-400 *,
+html.light section[class*="bg-black"] h3 * svg.text-red-400,
+html.light section[class*="bg-black"] h3 * svg.text-red-400 * {
+  color: #f87171 !important;
+  stroke: #f87171 !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-blue-400,
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-blue-400 *,
+html.light section[class*="bg-black"] h3 * svg.text-blue-400,
+html.light section[class*="bg-black"] h3 * svg.text-blue-400 * {
+  color: #60a5fa !important;
+  stroke: #60a5fa !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-orange-400,
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-orange-400 *,
+html.light section[class*="bg-black"] h3 * svg.text-orange-400,
+html.light section[class*="bg-black"] h3 * svg.text-orange-400 * {
+  color: #fb923c !important;
+  stroke: #fb923c !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-purple-400,
+html.light section[class*="bg-black"] h3[class*="text-white"] * svg.text-purple-400 *,
+html.light section[class*="bg-black"] h3 * svg.text-purple-400,
+html.light section[class*="bg-black"] h3 * svg.text-purple-400 * {
+  color: #c084fc !important;
+  stroke: #c084fc !important;
+  fill: none !important;
+}
+
+/* Force button arrows to be white in light mode */
+html.light section[class*="bg-black"] button.text-white svg,
+html.light section[class*="bg-black"] button.text-white svg *,
+html.light section[class*="bg-black"] button[class*="text-white"] svg,
+html.light section[class*="bg-black"] button[class*="text-white"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] button svg.text-white,
+html.light section[class*="bg-black"] button svg.text-white * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* Ultra-specific rules for each button color */
+html.light section[class*="bg-black"] button[class*="from-red-500"] svg,
+html.light section[class*="bg-black"] button[class*="from-red-500"] svg *,
+html.light section[class*="bg-black"] button[class*="from-red-600"] svg,
+html.light section[class*="bg-black"] button[class*="from-red-600"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] button[class*="from-blue-500"] svg,
+html.light section[class*="bg-black"] button[class*="from-blue-500"] svg *,
+html.light section[class*="bg-black"] button[class*="from-blue-600"] svg,
+html.light section[class*="bg-black"] button[class*="from-blue-600"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] button[class*="from-orange-500"] svg,
+html.light section[class*="bg-black"] button[class*="from-orange-500"] svg *,
+html.light section[class*="bg-black"] button[class*="from-orange-600"] svg,
+html.light section[class*="bg-black"] button[class*="from-orange-600"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+html.light section[class*="bg-black"] button[class*="from-purple-500"] svg,
+html.light section[class*="bg-black"] button[class*="from-purple-500"] svg *,
+html.light section[class*="bg-black"] button[class*="from-purple-600"] svg,
+html.light section[class*="bg-black"] button[class*="from-purple-600"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* Force mobile menu links to be white in light mode */
+html.light nav[class*="fixed"] a.text-white,
+html.light nav[class*="fixed"] a.text-white *,
+html.light nav.fixed a.text-white,
+html.light nav.fixed a.text-white * {
+  color: #ffffff !important;
+}
+html.light nav[class*="fixed"][style*="z-index"] a.text-white,
+html.light nav[class*="fixed"][style*="z-index"] a.text-white *,
+html.light nav[style*="z-index"] a.text-white,
+html.light nav[style*="z-index"] a.text-white * {
+  color: #ffffff !important;
+}
+
 html.light svg.text-accent-500 {
   color: #a855f7 !important;
   stroke: #a855f7 !important;
@@ -1613,6 +1793,85 @@ html.light button.from-accent [class*="text-white"] {
   color: #ffffff !important;
 }
 
+/* Mobile menu must stay white in light mode */
+html.light nav.fixed a.text-white,
+html.light nav[class*="fixed"] a.text-white,
+html.light nav[style*="z-index"] a.text-white,
+html.light nav[class*="fixed"][style*="z-index"] a.text-white {
+  color: #ffffff !important;
+}
+
+/* Force price to be blue in light mode on product pages */
+html.light .text-primary-400 {
+  color: #60a5fa !important;
+}
+html.light p.text-primary-400,
+html.light span.text-primary-400,
+html.light h1.text-primary-400,
+html.light h2.text-primary-400,
+html.light h3.text-primary-400,
+html.light h4.text-primary-400,
+html.light div.text-primary-400 {
+  color: #60a5fa !important;
+}
+
+/* Force quantity selector buttons to white background in light mode */
+html.light button.bg-surface:disabled,
+html.light button[class*="bg-surface"] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+html.light button.bg-surface:not(:disabled):hover {
+  background-color: #f9fafb !important;
+  border-color: #60a5fa !important;
+}
+
+/* Force add to cart button text and icon to white in light mode */
+html.light button.bg-primary-500,
+html.light button.bg-primary-600,
+html.light button[class*="bg-primary-"],
+html.light button.from-primary-500,
+html.light button.from-primary-600 {
+  color: #ffffff !important;
+}
+html.light button.bg-primary-500 *,
+html.light button.bg-primary-600 *,
+html.light button[class*="bg-primary-"] *,
+html.light button.from-primary-500 *,
+html.light button.from-primary-600 * {
+  color: #ffffff !important;
+}
+html.light button.bg-success {
+  color: #ffffff !important;
+}
+html.light button.bg-success * {
+  color: #ffffff !important;
+}
+
+/* Ultra-specific rules for add to cart button text */
+html.light button[class*="bg-primary-"] span,
+html.light button[class*="bg-primary-"] svg,
+html.light button[class*="bg-primary-"] text {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+html.light button.bg-success span,
+html.light button.bg-success svg,
+html.light button.bg-success text {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Force arena features section to white background in light mode */
+html.light section[id="services"].bg-black {
+  background-color: #ffffff !important;
+}
+html.light section.bg-black {
+  background-color: #ffffff !important;
+}
+
 /* Section backgrounds in light mode */
 html.light section.bg-gradient-to-b.from-black.to-gray-900,
 html.light section[class*="bg-gradient-to-b"][class*="from-black"] {
@@ -1629,6 +1888,11 @@ html.light section.py-16.md\:py-24.bg-gradient-to-b {
 html.light section.bg-black:not([class*="bg-gradient"]),
 html.light section:not([class*="to-gray-900"])[class*="from-black"] {
   background: #f5f5f5 !important;
+}
+
+/* OVERRIDE: Force sections with bg-black to pure white in light mode */
+html.light section.bg-black {
+  background-color: #ffffff !important;
 }
 
 /* Target from-black + to-gray-900 combination directly */
@@ -2015,4 +2279,15 @@ html.light a[href="/arena"] .lucide-arrow-right {
 /* Light mode - Arena button text should be black */
 html.light a[href="/arena"] span {
   color: #000000 !important;
+}
+
+/* FINAL OVERRIDE: Force arena services section to pure white */
+html.light section#services.bg-black {
+  background-color: #ffffff !important;
+}
+html.light section[id="services"].bg-black {
+  background-color: #ffffff !important;
+}
+html.light section[id="services"][class*="bg-black"] {
+  background-color: #ffffff !important;
 }

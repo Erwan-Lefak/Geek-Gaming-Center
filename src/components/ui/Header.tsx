@@ -69,7 +69,7 @@ export default function Header() {
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-surface transition-colors duration-200"
+                className="p-2 rounded-lg transition-colors duration-200"
                 aria-label={theme === 'dark' ? 'Passer en mode jour' : 'Passer en mode nuit'}
               >
                 {theme === 'dark' ? (
@@ -80,12 +80,12 @@ export default function Header() {
               </button>
 
               {/* Search */}
-              <button className="p-2 rounded-lg hover:bg-surface transition-colors duration-200">
+              <button className="p-2 rounded-lg transition-colors duration-200">
                 <Search className="w-5 h-5 text-white" />
               </button>
 
               {/* Cart */}
-              <Link href="/cart" className="p-2 rounded-lg hover:bg-surface transition-colors duration-200 relative">
+              <Link href="/cart" className="p-2 rounded-lg transition-colors duration-200 relative">
                 <ShoppingCart className="w-5 h-5 text-white" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                   0
@@ -93,13 +93,13 @@ export default function Header() {
               </Link>
 
               {/* User */}
-              <Link href="/account" className="hidden sm:flex p-2 rounded-lg hover:bg-surface transition-colors duration-200">
+              <Link href="/account" className="hidden sm:flex p-2 rounded-lg transition-colors duration-200">
                 <User className="w-5 h-5 text-white" />
               </Link>
 
               {/* Mobile Menu Toggle */}
               <button
-                className="md:hidden p-2 rounded-lg hover:bg-surface transition-colors duration-200 relative z-[10001]"
+                className="md:hidden p-2 rounded-lg transition-colors duration-200 relative z-[10001]"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
                 style={{ zIndex: 10001 }}
