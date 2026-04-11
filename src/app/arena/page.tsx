@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { ArrowRight, Clock, MapPin, Users, Gamepad2, Monitor, Zap, Cpu, Calendar, Trophy, ChevronRight, Quote } from 'lucide-react';
+import { ArrowRight, Clock, MapPin, Users, Gamepad2, Monitor, Zap, Cpu, Calendar, Trophy, ChevronRight, Quote, Gauge, Eye } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ArenaPage() {
@@ -21,7 +21,7 @@ export default function ArenaPage() {
       title: 'Consoles',
       description: 'PS4, PS5, Xbox Series X/S, Nintendo Switch',
       count: '12+',
-      color: 'from-primary-500/20 to-primary-600/20',
+      color: '',
     },
     {
       icon: <Cpu className="w-8 h-8 text-warning" />,
@@ -31,14 +31,14 @@ export default function ArenaPage() {
       color: 'from-warning-500/20 to-warning-600/20',
     },
     {
-      icon: <Monitor className="w-8 h-8 text-accent-400" />,
+      icon: <Eye className="w-8 h-8 text-accent-400" />,
       title: 'Réalité Virtuelle',
       description: 'Casques Meta Quest, expériences immersifs',
       count: '4+',
-      color: 'from-accent-500/20 to-accent-600/20',
+      color: '',
     },
     {
-      icon: <Zap className="w-8 h-8 text-success" />,
+      icon: <Gauge className="w-8 h-8 text-success" />,
       title: 'Simulation Auto',
       description: 'Volants et pédales professionnels',
       count: '6',
@@ -72,7 +72,7 @@ export default function ArenaPage() {
       name: 'Simulation Auto',
       description: 'Simulateurs de course professionnels avec volants, pédales et écrans incurvés',
       price: '25 000 FCFA/heure',
-      icon: <Zap className="w-12 h-12 text-warning" />,
+      icon: <Gauge className="w-12 h-12 text-warning" />,
       color: 'from-warning-500/20 to-warning-600/20',
     },
     {
@@ -190,9 +190,7 @@ export default function ArenaPage() {
       </section>
 
       {/* Features Overview */}
-      <section id="services" className="py-8 md:py-16 bg-black" style={{
-        backgroundColor: theme === 'light' ? '#ffffff !important' : '#000000 !important'
-      } as any}>
+      <section id="services" className={`py-8 md:py-16 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-white text-center -mt-4">
             Pourquoi choisir notre <span className="gradient-text">Salle de Jeux</span> ?
