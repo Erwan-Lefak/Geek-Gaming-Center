@@ -438,50 +438,6 @@ export default function ArenaPage() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-16 md:py-24 bg-black">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex items-center justify-between mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
-              Nos Services
-            </h2>
-            <div className="flex gap-3">
-              <div className="flex items-center gap-2 text-white/80">
-                <Users className="w-5 h-5" />
-                <span className="font-semibold gradient-text">Postes</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <Clock className="w-5 h-5" />
-                <span className="font-semibold gradient-text">Horaires</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service, index) => (
-              <Link
-                key={index}
-                href="/arena/booking"
-                className="bento-item group cursor-pointer overflow-hidden"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-start justify-between w-full">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-                      {service.icon}
-                    </div>
-                    <span className="text-lg md:text-xl font-bold gradient-text">{service.price}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{service.name}</h3>
-                    <p className="text-base text-white/80">{service.description}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Booking CTA Section */}
       <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24 bg-gradient-to-br from-primary-600 to-accent-600">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
