@@ -180,7 +180,7 @@ export default function RestaurantPage() {
       <Header />
 
       {/* Info Bar */}
-      <section className="bg-black py-6 border-b border-border mt-[96px]">
+      <section className="bg-black py-6 border-b border-border mt-[8.5rem] md:mt-[6rem]">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
@@ -214,10 +214,10 @@ export default function RestaurantPage() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id as any)}
-                className={`px-8 py-4 rounded-xl font-bold uppercase transition-all duration-300 ${
+                className={`px-8 py-4 rounded-xl font-bold uppercase transition-all duration-300 restaurant-category-button ${
                   activeCategory === category.id
                     ? 'bg-gradient-to-r from-red-600 to-orange-500 !text-white shadow-lg scale-105'
-                    : 'bg-surface !text-white hover:bg-elevated'
+                    : 'bg-surface hover:bg-elevated'
                 }`}
               >
                 {category.label}
@@ -262,11 +262,11 @@ export default function RestaurantPage() {
                   Envie de commander ?
                 </h2>
                 <p className="text-white/80 text-lg">
-                  Profitez de notre cuisine sur place ou à emporter. Les commandes sont disponibles directement à l\'accueil du Geek Gaming Center.
+                  Profitez de notre cuisine sur place ou à emporter. Les commandes sont disponibles directement à l'accueil du Geek Gaming Center.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
-                <button className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold uppercase rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap">
+                <button className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-500 font-bold uppercase rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap restaurant-cta-button">
                   Commander sur place
                 </button>
                 <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold uppercase rounded-xl hover:bg-white hover:text-black transition-all whitespace-nowrap">

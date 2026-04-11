@@ -2281,6 +2281,31 @@ html.light a[href="/arena"] span {
   color: #000000 !important;
 }
 
+/* ============================================
+   ARENA BOOKING BUTTON - FINAL FIX
+   Must be at the very end of CSS file
+   ============================================ */
+
+/* Light mode - force black text on white button */
+html.light a[href="/arena/booking"].bg-white,
+html.light a[href="/arena/booking"].bg-white *,
+html.light a[href="/arena/booking"].bg-white span,
+html.light a[href="/arena/booking"].bg-white svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  fill: none !important;
+}
+
+/* Dark mode - force white text on black button */
+html:not(.light) a[href="/arena/booking"].bg-black,
+html:not(.light) a[href="/arena/booking"].bg-black *,
+html:not(.light) a[href="/arena/booking"].bg-black span,
+html:not(.light) a[href="/arena/booking"].bg-black svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
 /* FINAL OVERRIDE: Force arena services section to pure white */
 html.light section#services.bg-black {
   background-color: #ffffff !important;
@@ -2290,4 +2315,148 @@ html.light section[id="services"].bg-black {
 }
 html.light section[id="services"][class*="bg-black"] {
   background-color: #ffffff !important;
+}
+
+/* ============================================
+   ARENA BOOKING BUTTON - ARROW ICON FIX
+   Force arrow stroke color based on theme
+   ============================================ */
+
+/* Light mode - force black arrow stroke */
+html.light section[class*="from-red-600"] a[href="/arena/booking"].bg-white svg,
+html.light section[class*="from-red-600"] a[href="/arena/booking"].bg-white svg *,
+html.light section[class*="from-red-600"] a[href="/arena/booking"].bg-white .lucide-arrow-right {
+  stroke: #000000 !important;
+  color: #000000 !important;
+}
+
+/* Dark mode - force white arrow stroke */
+html:not(.light) section[class*="from-red-600"] a[href="/arena/booking"].bg-black svg,
+html:not(.light) section[class*="from-red-600"] a[href="/arena/booking"].bg-black svg *,
+html:not(.light) section[class*="from-red-600"] a[href="/arena/booking"].bg-black .lucide-arrow-right {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* ============================================
+   CINEMA PAGE - INFO BAR TEXT
+   Force text color in light mode
+   ============================================ */
+
+html.light section.bg-black .cinema-info-text,
+html.light section.bg-black .cinema-info-text p {
+  color: #000000 !important;
+}
+
+html:not(.light) section.bg-black .cinema-info-text,
+html:not(.light) section.bg-black .cinema-info-text p {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   CINEMA PAGE - DATE BUTTONS
+   Force date text color in light mode (except selected)
+   ============================================ */
+
+html.light section.bg-black .cinema-date-button:not(.bg-gradient-to-r),
+html.light section.bg-black .cinema-date-button:not(.bg-gradient-to-r) p {
+  color: #000000 !important;
+}
+
+/* ============================================
+   CINEMA PAGE - RATING BADGES
+   Force rating badges to stay white in all modes
+   ============================================ */
+
+.cinema-rating-badge,
+span.cinema-rating-badge,
+span.cinema-rating-badge[class*="text-"] {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   CINEMA PAGE - STATUS BADGES
+   Force status badges to stay white in all modes
+   ============================================ */
+
+.cinema-status-badge,
+span.cinema-status-badge,
+span.cinema-status-badge[class*="bg-"],
+span.cinema-status-badge.bg-green-500,
+span.cinema-status-badge.bg-yellow-500,
+span.cinema-status-badge.bg-red-500,
+span.cinema-status-badge.bg-gray-500 {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   CINEMA PAGE - SESSION BUTTONS
+   Force white background with gray border in light mode
+   ============================================ */
+
+html.light button.cinema-session-button.bg-black\/40,
+html.light button.cinema-session-button[class*="bg-black"] {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important; /* gray-300 */
+}
+
+html.light button.cinema-session-button.bg-black\/40:hover,
+html.light button.cinema-session-button[class*="bg-black"]:hover {
+  background-color: #f9fafb !important; /* gray-50 */
+  border-color: #9ca3af !important; /* gray-400 */
+}
+
+/* ============================================
+   RESTAURANT PAGE - CATEGORY BUTTONS
+   Force category buttons text to black in light mode (except selected)
+   Add gray border to non-selected buttons
+   ============================================ */
+
+html.light button.restaurant-category-button.bg-surface,
+html.light button.restaurant-category-button:not(.bg-gradient-to-r) {
+  color: #000000 !important;
+  border: 1px solid #4b5563 !important; /* gray-600 */
+  box-shadow: 0 0 0 1px #4b5563 !important; /* Force border with box-shadow fallback */
+}
+
+/* ============================================
+   RESTAURANT PAGE - CTA BUTTONS
+   Force CTA button text to white in all modes
+   ============================================ */
+
+button.restaurant-cta-button,
+button.restaurant-cta-button[class*="from-red-"],
+button.restaurant-cta-button.bg-gradient-to-r {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   ARENA PAGE - PRÊT À JOUER BUTTON
+   Force text color based on theme
+   ============================================ */
+
+/* Light mode - white button with black text */
+html.light section.from-red-600 .booking-cta-light,
+html.light section.from-red-600 .booking-cta-light *,
+html.light section.from-red-600 .booking-cta-light .booking-cta-text,
+html.light section.from-red-600 .booking-cta-light .booking-cta-icon,
+html.light section[class*="from-red-600"] .booking-cta-light,
+html.light section[class*="from-red-600"] .booking-cta-light *,
+html.light section[class*="from-red-600"] .booking-cta-light .booking-cta-text,
+html.light section[class*="from-red-600"] .booking-cta-light .booking-cta-icon {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Dark mode - black button with white text */
+html:not(.light) section.from-red-600 .booking-cta-dark,
+html:not(.light) section.from-red-600 .booking-cta-dark *,
+html:not(.light) section.from-red-600 .booking-cta-dark .booking-cta-text,
+html:not(.light) section.from-red-600 .booking-cta-dark .booking-cta-icon,
+html:not(.light) section[class*="from-red-600"] .booking-cta-dark,
+html:not(.light) section[class*="from-red-600"] .booking-cta-dark *,
+html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-text,
+html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-icon {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }

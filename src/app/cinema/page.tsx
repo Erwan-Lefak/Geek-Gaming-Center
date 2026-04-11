@@ -112,13 +112,13 @@ export default function CinemaPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
-        return 'bg-green-500 text-white';
+        return 'bg-green-500';
       case 'limited':
-        return 'bg-yellow-500 text-black';
+        return 'bg-yellow-500';
       case 'full':
-        return 'bg-red-500 text-white opacity-60 cursor-not-allowed';
+        return 'bg-red-500 opacity-60 cursor-not-allowed';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-gray-500';
     }
   };
 
@@ -140,21 +140,21 @@ export default function CinemaPage() {
       <Header />
 
       {/* Info Bar */}
-      <section className="bg-black py-6 border-b border-border mt-[96px]">
+      <section className="bg-black py-6 border-b border-border mt-[8.5rem] md:mt-[6rem]">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
               <Clock className="w-6 h-6 text-purple-500" />
-              <div>
-                <p className="text-white font-semibold">Horaires</p>
-                <p className="text-white/70 text-sm">Tous les soirs: 21h - Minuit</p>
+              <div className="cinema-info-text">
+                <p className="font-semibold">Horaires</p>
+                <p className="text-sm">Tous les soirs: 21h - Minuit</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6 text-pink-500" />
-              <div>
-                <p className="text-white font-semibold">Réservation</p>
-                <p className="text-white/70 text-sm">Sur place ou par téléphone</p>
+              <div className="cinema-info-text">
+                <p className="font-semibold">Réservation</p>
+                <p className="text-sm">Sur place ou par téléphone</p>
               </div>
             </div>
           </div>
@@ -175,10 +175,10 @@ export default function CinemaPage() {
                 <button
                   key={index}
                   onClick={() => setActiveDate(index)}
-                  className={`flex-shrink-0 px-6 py-4 rounded-xl font-bold transition-all duration-300 ${
+                  className={`flex-shrink-0 px-6 py-4 rounded-xl font-bold transition-all duration-300 cinema-date-button ${
                     isActive
                       ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white scale-105 shadow-lg'
-                      : 'bg-surface text-white hover:bg-elevated'
+                      : 'bg-surface hover:bg-elevated'
                   }`}
                 >
                   <div className="text-center">
@@ -216,11 +216,17 @@ export default function CinemaPage() {
                   />
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300" />
                   <div className="absolute top-4 left-4 flex gap-2">
-                    <span className="px-3 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-bold rounded-full uppercase">
+                    <span
+                      className="px-3 py-1 bg-black/60 backdrop-blur-sm text-xs font-bold rounded-full uppercase cinema-rating-badge"
+                      style={{ color: '#ffffff !important' } as any}
+                    >
                       {show.rating}
                     </span>
                     {show.type === 'series' && (
-                      <span className="px-3 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-bold rounded-full uppercase">
+                      <span
+                        className="px-3 py-1 bg-black/60 backdrop-blur-sm text-xs font-bold rounded-full uppercase cinema-rating-badge"
+                        style={{ color: '#ffffff !important' } as any}
+                      >
                         Série
                       </span>
                     )}
@@ -262,14 +268,16 @@ export default function CinemaPage() {
                         <button
                           key={idx}
                           disabled={session.status === 'full'}
-                          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all ${
+                          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all cinema-session-button ${
                             session.status === 'full'
                               ? 'opacity-50 cursor-not-allowed'
                               : 'bg-black/40 hover:bg-purple-500/20'
                           }`}
                         >
                           <span className="text-white font-bold">{session.time}</span>
-                          <span className={`px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(session.status)}`}>
+                          <span
+                            className={`px-3 py-1 text-xs font-bold rounded-full cinema-status-badge !text-white ${getStatusColor(session.status)}`}
+                          >
                             {getStatusText(session.status)}
                           </span>
                         </button>
@@ -316,7 +324,10 @@ export default function CinemaPage() {
                     <span className="px-3 py-1 bg-white/10 text-white/60 rounded-full text-sm">
                       {show.duration}
                     </span>
-                    <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm">
+                    <span
+                      className="px-3 py-1 bg-red-500/20 rounded-full text-sm cinema-rating-badge"
+                      style={{ color: '#ffffff !important' } as any}
+                    >
                       {show.rating}
                     </span>
                   </div>

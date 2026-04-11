@@ -439,7 +439,7 @@ export default function ArenaPage() {
       </section>
 
       {/* Booking CTA Section */}
-      <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24 bg-gradient-to-br from-primary-600 to-accent-600">
+      <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24 bg-gradient-to-br from-red-600 to-red-700">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left side - Text content */}
@@ -460,16 +460,32 @@ export default function ArenaPage() {
 
               {/* CTA */}
               <div className="space-y-2">
-                <p className="text-lg sm:text-xl text-white/90 mb-4 uppercase">
+                <p className={`text-lg sm:text-xl mb-4 uppercase ${theme === 'light' ? '!text-black' : 'text-white/90'}`}>
                   Profitez de notre salle de jeux immersive
                 </p>
-                <Link
-                  href="/arena/booking"
-                  className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-600 font-semibold text-xl sm:text-2xl md:text-3xl shadow-glow hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase"
-                >
-                  Réserver un créneau
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
+                {theme === 'light' ? (
+                  <Link
+                    href="/arena/booking"
+                    className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 font-semibold text-xl sm:text-2xl md:text-3xl shadow-glow hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase bg-white !text-black hover:!text-black"
+                  >
+                    <span className="!text-black hover:!text-black">Réserver un créneau</span>
+                    <ArrowRight
+                      className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 !text-black hover:!text-black"
+                      style={{ stroke: '#000000', fill: 'none' }}
+                    />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/arena/booking"
+                    className="jelly-button group relative inline-flex items-center gap-3 px-8 py-4 font-semibold text-xl sm:text-2xl md:text-3xl shadow-glow hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase bg-black !text-white hover:!text-white"
+                  >
+                    <span className="!text-white hover:!text-white">Réserver un créneau</span>
+                    <ArrowRight
+                      className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200 !text-white hover:!text-white"
+                      style={{ stroke: '#ffffff', fill: 'none' }}
+                    />
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -487,40 +503,17 @@ export default function ArenaPage() {
       {/* Info Section */}
       <section className="py-16 md:py-24 bg-black">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bento-item">
-              <div className="flex items-center gap-4 mb-4">
-                <MapPin className="w-8 h-8 text-primary-400" />
-                <h3 className="text-xl md:text-2xl font-bold text-white">Emplacement</h3>
-              </div>
-              <p className="text-base text-white/80">
-                Nous sommes situés au cœur de Yaoundé, à Mvog Ada. Facile d'accès en transport ou en voiture.
-              </p>
-            </div>
-
+          <div className="grid grid-cols-1 gap-8">
             <div className="bento-item">
               <div className="flex items-center gap-4 mb-4">
                 <Clock className="w-8 h-8 text-accent-400" />
                 <h3 className="text-xl md:text-2xl font-bold text-white">Horaires d'ouverture</h3>
               </div>
               <p className="text-base text-white/80 mb-2">
-                Lundi - Vendredi: 10h - 23h
-              </p>
-              <p className="text-base text-white/80 mb-2">
-                Samedi: 12h - 00h
+                Lundi - Samedi: 9h30 - 21h
               </p>
               <p className="text-base text-white/80">
-                Dimanche: 14h - 22h
-              </p>
-            </div>
-
-            <div className="bento-item">
-              <div className="flex items-center gap-4 mb-4">
-                <Users className="w-8 h-8 text-success" />
-                <h3 className="text-xl md:text-2xl font-bold text-white">Capacité</h3>
-              </div>
-              <p className="text-base text-white/80">
-                Notre salle peut accueillir jusqu'à 50 personnes simultanément, idéale pour les événements de groupe.
+                Dimanche: 12h00 - 21h
               </p>
             </div>
           </div>
