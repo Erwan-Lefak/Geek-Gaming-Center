@@ -88,20 +88,20 @@ export default function EquipmentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
+      <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 flex items-center justify-center">
+        <div className="text-slate-900 dark:text-white dark:text-slate-100-500">Chargement...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50">
+    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-slate-800 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Équipements</h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Équipements</h1>
+            <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
               Gestion et maintenance du parc matériel
             </p>
           </div>
@@ -115,8 +115,8 @@ export default function EquipmentPage() {
           <Card>
             <CardContent className="p-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{equipment.length}</div>
-                <div className="text-sm text-gray-600">Total</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">{equipment.length}</div>
+                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">Total</div>
               </div>
             </CardContent>
           </Card>
@@ -124,7 +124,7 @@ export default function EquipmentPage() {
             <CardContent className="p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{statusCounts.AVAILABLE || 0}</div>
-                <div className="text-sm text-gray-600">Disponibles</div>
+                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">Disponibles</div>
               </div>
             </CardContent>
           </Card>
@@ -132,7 +132,7 @@ export default function EquipmentPage() {
             <CardContent className="p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{statusCounts.IN_USE || 0}</div>
-                <div className="text-sm text-gray-600">En cours</div>
+                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">En cours</div>
               </div>
             </CardContent>
           </Card>
@@ -140,7 +140,7 @@ export default function EquipmentPage() {
             <CardContent className="p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">{statusCounts.MAINTENANCE || 0}</div>
-                <div className="text-sm text-gray-600">Maintenance</div>
+                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">Maintenance</div>
               </div>
             </CardContent>
           </Card>
@@ -148,7 +148,7 @@ export default function EquipmentPage() {
             <CardContent className="p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-red-600">{statusCounts.BROKEN || 0}</div>
-                <div className="text-sm text-gray-600">En panne</div>
+                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">En panne</div>
               </div>
             </CardContent>
           </Card>
@@ -201,7 +201,7 @@ export default function EquipmentPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-lg">{eq.name}</CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">{getEquipmentTypeLabel(eq.type)}</p>
+                    <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">{getEquipmentTypeLabel(eq.type)}</p>
                   </div>
                   {getStatusBadge(eq.status)}
                 </div>
@@ -209,19 +209,19 @@ export default function EquipmentPage() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Code</span>
+                    <span className="text-slate-900 dark:text-white dark:text-slate-100-600">Code</span>
                     <span className="font-medium">{eq.code}</span>
                   </div>
 
                   {eq.location && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Emplacement</span>
+                      <span className="text-slate-900 dark:text-white dark:text-slate-100-600">Emplacement</span>
                       <span className="font-medium">{eq.location}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Santé</span>
+                    <span className="text-slate-900 dark:text-white dark:text-slate-100-600">Santé</span>
                     <span className={`font-bold ${getHealthScoreColor(eq.healthScore)}`}>
                       {eq.healthScore}%
                     </span>
@@ -229,8 +229,8 @@ export default function EquipmentPage() {
 
                   {eq.lastMaintenance && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Dernière maintenance</span>
-                      <span className="text-gray-900">
+                      <span className="text-slate-900 dark:text-white dark:text-slate-100-600">Dernière maintenance</span>
+                      <span className="text-slate-900 dark:text-white dark:text-slate-100-900">
                         {new Date(eq.lastMaintenance).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
@@ -250,7 +250,7 @@ export default function EquipmentPage() {
 
         {filteredEquipment.length === 0 && (
           <Card>
-            <CardContent className="text-center py-12 text-gray-500">
+            <CardContent className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
               Aucun équipement trouvé
             </CardContent>
           </Card>

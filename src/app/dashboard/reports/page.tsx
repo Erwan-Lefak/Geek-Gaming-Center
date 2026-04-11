@@ -115,28 +115,28 @@ export default function ReportsPage() {
 
   if (loading || !data) {
     return (
-      <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
+      <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 flex items-center justify-center">
+        <div className="text-slate-900 dark:text-white dark:text-slate-100-500">Chargement...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50">
+    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-slate-800 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Tableau de Bord</h1>
+              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
                 Rapports et statistiques du Geek Gaming Center
               </p>
             </div>
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="h-10 px-3 rounded-md border border-gray-300 bg-white text-sm"
+              className="h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
             >
               <option value="week">Cette semaine</option>
               <option value="month">Ce mois</option>
@@ -155,8 +155,8 @@ export default function ReportsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">CA Aujourd'hui</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white dark:text-slate-100-600">CA Aujourd'hui</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900 mt-2">
                     {data.todayRevenue.toLocaleString('fr-FR')} FCFA
                   </p>
                 </div>
@@ -171,11 +171,11 @@ export default function ReportsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">CA Mensuel</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white dark:text-slate-100-600">CA Mensuel</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900 mt-2">
                     {(data.monthRevenue / 1000).toFixed(0)}k FCFA
                   </p>
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
                     Objectif: {(data.monthTarget / 1000).toFixed(0)}k FCFA
                   </p>
                 </div>
@@ -185,8 +185,8 @@ export default function ReportsPage() {
               </div>
               <div className="mt-3">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-gray-600">Progression</span>
-                  <span className="font-medium text-gray-900">{achievementRate}%</span>
+                  <span className="text-slate-900 dark:text-white dark:text-slate-100-600">Progression</span>
+                  <span className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">{achievementRate}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -202,11 +202,11 @@ export default function ReportsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Sessions</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white dark:text-slate-100-600">Sessions</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900 mt-2">
                     {data.sessionCount}
                   </p>
-                  <p className="text-xs text-gray-600 mt-1">Aujourd'hui</p>
+                  <p className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">Aujourd'hui</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                   <span className="text-2xl">🎮</span>
@@ -219,11 +219,11 @@ export default function ReportsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Clients</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white dark:text-slate-100-600">Clients</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900 mt-2">
                     {data.customerCount}
                   </p>
-                  <p className="text-xs text-gray-600 mt-1">Ce mois</p>
+                  <p className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">Ce mois</p>
                 </div>
                 <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
                   <span className="text-2xl">👥</span>
@@ -297,18 +297,18 @@ export default function ReportsPage() {
             <CardContent>
               <div className="space-y-4">
                 {data.topCustomers.map((customer, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{customer.name}</p>
-                        <p className="text-xs text-gray-600">{customer.visits} visites</p>
+                        <p className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">{customer.name}</p>
+                        <p className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600">{customer.visits} visites</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-slate-900 dark:text-white dark:text-slate-100-900">
                         {customer.spent.toLocaleString('fr-FR')} FCFA
                       </p>
                     </div>

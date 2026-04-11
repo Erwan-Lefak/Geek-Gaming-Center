@@ -140,14 +140,14 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-28 lg:mt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 mt-28 lg:mt-20">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-slate-800 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Clients</h1>
+              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
                 Gestion des clients du Geek Gaming Center
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function CustomersPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900 dark:text-white dark:text-slate-100-400" />
                   <Input
                     placeholder="Rechercher par nom, email, téléphone..."
                     value={search}
@@ -182,7 +182,7 @@ export default function CustomersPage() {
                   setStatusFilter(e.target.value)
                   setPage(1)
                 }}
-                className="h-10 px-3 rounded-md border border-gray-300 bg-white text-sm"
+                className="h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
               >
                 <option value="">Tous les statuts</option>
                 <option value="NEW">Nouveaux</option>
@@ -194,11 +194,11 @@ export default function CustomersPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
                 Chargement des clients...
               </div>
             ) : customers.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
                 Aucun client trouvé
               </div>
             ) : (
@@ -221,11 +221,11 @@ export default function CustomersPage() {
                         <TableRow key={customer.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium text-gray-900">
+                              <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
                                 {customer.firstName} {customer.lastName}
                               </div>
                               {customer.email && (
-                                <div className="text-sm text-gray-600">{customer.email}</div>
+                                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">{customer.email}</div>
                               )}
                             </div>
                           </TableCell>
@@ -235,7 +235,7 @@ export default function CustomersPage() {
                           <TableCell>{getStatusBadge(customer.status)}</TableCell>
                           <TableCell>
                             <div className="text-sm">{customer.visitCount} visite(s)</div>
-                            <div className="text-xs text-gray-600">{Number(customer.totalHours).toFixed(1)}h</div>
+                            <div className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600">{Number(customer.totalHours).toFixed(1)}h</div>
                           </TableCell>
                           <TableCell>
                             <div className="text-sm font-medium">
@@ -248,7 +248,7 @@ export default function CustomersPage() {
                                 {new Date(customer.lastVisit).toLocaleDateString('fr-FR')}
                               </div>
                             ) : (
-                              <div className="text-sm text-gray-400">Jamais</div>
+                              <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-400">Jamais</div>
                             )}
                           </TableCell>
                           <TableCell className="text-right">
@@ -278,7 +278,7 @@ export default function CustomersPage() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between mt-4">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">
                       Page {page} sur {totalPages}
                     </div>
                     <div className="flex gap-2">
@@ -383,7 +383,7 @@ export default function CustomersPage() {
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[80px]"
+              className="flex w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[80px]"
             />
           </div>
 
@@ -393,7 +393,7 @@ export default function CustomersPage() {
               id="acceptCGV"
               checked={formData.acceptCGV}
               onChange={(e) => setFormData({ ...formData, acceptCGV: e.target.checked })}
-              className="rounded border-gray-300"
+              className="rounded border-slate-200 dark:border-slate-700"
             />
             <Label htmlFor="acceptCGV" className="text-sm">
               Le client accepte les conditions générales de vente

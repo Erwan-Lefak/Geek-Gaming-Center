@@ -193,10 +193,10 @@ export default function CaissePage() {
       case 'CONFIRMED': return 'bg-blue-100 text-blue-800'
       case 'CHECKED_IN': return 'bg-purple-100 text-purple-800'
       case 'ACTIVE': return 'bg-green-100 text-green-800'
-      case 'COMPLETED': return 'bg-gray-100 text-gray-800'
+      case 'COMPLETED': return 'bg-gray-100 text-slate-900 dark:text-white dark:text-slate-100-800'
       case 'CANCELLED': return 'bg-red-100 text-red-800'
       case 'NO_SHOW': return 'bg-orange-100 text-orange-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-gray-100 text-slate-900 dark:text-white dark:text-slate-100-800'
     }
   }
 
@@ -220,8 +220,8 @@ export default function CaissePage() {
       {/* Header */}
       <div className="w-full flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Caisse</h1>
-          <p className="text-slate-600 mt-1">Gestion des réservations et sessions du jour</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Caisse</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">Gestion des réservations et sessions du jour</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -240,8 +240,8 @@ export default function CaissePage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Total Réservations</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{reservations.length}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Réservations</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{reservations.length}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-xl">
                 <Calendar className="w-6 h-6 text-purple-600" />
@@ -254,7 +254,7 @@ export default function CaissePage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">En Attente</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">En Attente</p>
                 <p className="text-3xl font-bold text-yellow-600 mt-2">
                   {reservations.filter(r => r.status === 'PENDING').length}
                 </p>
@@ -270,7 +270,7 @@ export default function CaissePage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Équipements Disponibles</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Équipements Disponibles</p>
                 <p className="text-3xl font-bold text-green-600 mt-2">
                   {equipment.filter(e => e.status === 'AVAILABLE').length}
                 </p>
@@ -286,7 +286,7 @@ export default function CaissePage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Sessions Actives</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Sessions Actives</p>
                 <p className="text-3xl font-bold text-blue-600 mt-2">
                   {equipment.filter(e => e.activeSession).length}
                 </p>
@@ -323,13 +323,13 @@ export default function CaissePage() {
                     ? 'border-green-200 bg-green-50 hover:border-green-300'
                     : eq.status === 'IN_USE'
                     ? 'border-blue-200 bg-blue-50'
-                    : 'border-gray-200 bg-gray-50'
+                    : 'border-slate-200 dark:border-slate-700-200 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900'
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h4 className="font-bold text-slate-900">{eq.code}</h4>
-                    <p className="text-sm text-slate-600">{eq.name}</p>
+                    <h4 className="font-bold text-slate-900 dark:text-white">{eq.code}</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{eq.name}</p>
                   </div>
                   <Badge className={getStatusColor(eq.status)}>
                     {eq.status === 'AVAILABLE' ? 'Disponible' : eq.status === 'IN_USE' ? 'Occupé' : eq.status}
@@ -342,13 +342,13 @@ export default function CaissePage() {
                       <User className="w-4 h-4" />
                       <span className="font-medium">{eq.activeSession.customer}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                       <Timer className="w-4 h-4" />
                       <span>
                         Reste: {formatTime(eq.activeSession.timeRemaining)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 mt-1">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mt-1">
                       <Phone className="w-4 h-4" />
                       <span>{eq.activeSession.customerPhone}</span>
                     </div>
@@ -357,7 +357,7 @@ export default function CaissePage() {
 
                 <div className="mt-2">
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-slate-600">Santé:</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">Santé:</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
@@ -428,27 +428,27 @@ export default function CaissePage() {
                   <tr key={reservation.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900">
+                        <p className="font-medium text-slate-900 dark:text-white">
                           {reservation.customer.firstName} {reservation.customer.lastName}
                         </p>
-                        <p className="text-sm text-slate-600">{reservation.customer.phone}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{reservation.customer.phone}</p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900">{reservation.equipment.name}</p>
-                        <p className="text-sm text-slate-600">{reservation.equipment.code}</p>
+                        <p className="font-medium text-slate-900 dark:text-white">{reservation.equipment.name}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{reservation.equipment.code}</p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900">
+                        <p className="font-medium text-slate-900 dark:text-white">
                           {new Date(reservation.startTime).toLocaleTimeString('fr-FR', {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}
                         </p>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
                           {new Date(reservation.endTime).toLocaleTimeString('fr-FR', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -457,7 +457,7 @@ export default function CaissePage() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-slate-700">{reservation.duration} min</td>
-                    <td className="py-3 px-4 font-medium text-slate-900">
+                    <td className="py-3 px-4 font-medium text-slate-900 dark:text-white">
                       {Number(reservation.estimatedPrice).toLocaleString()} FCFA
                     </td>
                     <td className="py-3 px-4">

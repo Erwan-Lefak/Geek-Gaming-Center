@@ -106,14 +106,14 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50">
+    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-slate-800 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Maintenance</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Maintenance</h1>
+              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
                 Tickets et diagnostic des équipements
               </p>
             </div>
@@ -129,18 +129,18 @@ export default function MaintenancePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <Card>
-            <CardContent className="text-center py-12 text-gray-500">
+            <CardContent className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
               Chargement...
             </CardContent>
           </Card>
         ) : tickets.length === 0 ? (
           <Card>
             <CardContent className="text-center py-16">
-              <Wrench className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <Wrench className="w-16 h-16 text-slate-900 dark:text-white dark:text-slate-100-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white dark:text-slate-100-900 mb-2">
                 Aucun ticket de maintenance
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-slate-900 dark:text-white dark:text-slate-100-600 mb-6">
                 Créez un ticket pour signaler un problème ou planifier une maintenance
               </p>
               <Button onClick={() => setShowModal(true)}>
@@ -157,16 +157,16 @@ export default function MaintenancePage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white dark:text-slate-100-900">
                           {ticket.ticketNumber} - {ticket.title}
                         </h3>
                         {getPriorityBadge(ticket.priority)}
                         {getStatusBadge(ticket.status)}
                       </div>
 
-                      <p className="text-gray-600 mb-3">{ticket.description}</p>
+                      <p className="text-slate-900 dark:text-white dark:text-slate-100-600 mb-3">{ticket.description}</p>
 
-                      <div className="flex items-center gap-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-6 text-sm text-slate-900 dark:text-white dark:text-slate-100-600">
                         <div className="flex items-center gap-1">
                           <Wrench className="w-4 h-4" />
                           {ticket.equipment.name} ({ticket.equipment.code})
@@ -205,7 +205,7 @@ export default function MaintenancePage() {
               id="equipment"
               value={formData.equipmentId}
               onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
               required
             >
               <option value="">Sélectionner un équipement</option>
@@ -230,7 +230,7 @@ export default function MaintenancePage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Décrivez le problème en détail..."
-              className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
+              className="flex w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
             />
           </div>
 
@@ -240,7 +240,7 @@ export default function MaintenancePage() {
               id="priority"
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
             >
               <option value="LOW">Faible</option>
               <option value="MEDIUM">Moyen</option>
