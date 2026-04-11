@@ -307,7 +307,7 @@ export default function CaissePage() {
               <Gamepad2 className="w-5 h-5" />
               État des Équipements
             </CardTitle>
-            <Button variant="outline" size="sm" onClick={fetchData}>
+            <Button variant="ghost" size="sm" onClick={fetchData}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Actualiser
             </Button>
@@ -470,7 +470,7 @@ export default function CaissePage() {
                         {reservation.status === 'PENDING' && (
                           <Button
                             size="sm"
-                            variant="outline"
+                            variant="ghost"
                             onClick={() => handleReservationAction(reservation.id, 'confirm')}
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
@@ -625,7 +625,7 @@ export default function CaissePage() {
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={() => setShowWalkInModal(false)}
               className="flex-1"
             >

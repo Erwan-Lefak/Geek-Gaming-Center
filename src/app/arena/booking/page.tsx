@@ -365,36 +365,42 @@ export default function BookingPage() {
                   const isSelected = selectedSlot === slot.time
 
                   return (
-                    <button
-                      key={index}
-                      onClick={() => slot.available && setSelectedSlot(slot.time)}
-                      disabled={!slot.available}
-                      className={`
-                        w-full p-3 rounded-xl font-semibold transition-all duration-200 text-left
-                        ${isSelected
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                          : slot.available
-                          ? 'bg-white/10 text-white hover:bg-white/20'
-                          : 'bg-gray-800/50 text-gray-500 cursor-not-allowed line-through'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{slot.time}</span>
-                        {!slot.available && <span className="text-xs">Indisponible</span>}
-                      </div>
-                    </button>
+                    <div key={index} className="space-y-1">
+                      <button
+                        onClick={() => slot.available && setSelectedSlot(slot.time)}
+                        disabled={!slot.available}
+                        className={`
+                          w-full p-3 rounded-xl font-semibold transition-all duration-200 text-left
+                          ${isSelected
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                            : slot.available
+                            ? 'bg-white/10 text-white hover:bg-white/20'
+                            : 'bg-gray-800/50 text-gray-500 cursor-not-allowed line-through'
+                          }
+                        `}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{slot.time}</span>
+                          {!slot.available && <span className="text-xs">Indisponible</span>}
+                        </div>
+                      </button>
+
+                      {/* Waitlist Button - Only for unavailable slots */}
+                      {!slot.available && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleWaitlist()
+                          }}
+                          className="w-full p-2 rounded-lg font-semibold text-xs bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-300 transition-colors border border-yellow-600/50"
+                        >
+                          Liste d'attente
+                        </button>
+                      )}
+                    </div>
                   )
                 })}
               </div>
-
-              {/* Waitlist Button */}
-              <button
-                onClick={handleWaitlist}
-                className="w-full mt-4 p-3 rounded-xl font-semibold bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-300 transition-colors border border-yellow-600/50"
-              >
-                Liste d'attente
-              </button>
             </div>
 
             {/* Pricing Info */}

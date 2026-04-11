@@ -94,21 +94,26 @@ export async function POST(request: NextRequest) {
     const scheduledEndAt = new Date(now.getTime() + validatedData.duration * 60000)
 
     // Créer la session
+    const sessionData: any = {
+      sessionNumber,
+      customerId: customer.id,
+      equipmentId: equipment.id,
+      pricingId: pricing.id,
+      duration: validatedData.duration,
+      price,
+      status: validatedData.isPaid ? 'ACTIVE' : 'PENDING',
+      scheduledEndAt,
+      notes: validatedData.notes,
+      createdById: user.id,
+    }
+
+    if (validatedData.isPaid) {
+      sessionData.paidAt = now
+      sessionData.startedAt = now
+    }
+
     const session = await prisma.gamingSession.create({
-      data: {
-        sessionNumber,
-        customerId: customer.id,
-        equipmentId: equipment.id,
-        pricingId: pricing.id,
-        duration: validatedData.duration,
-        price,
-        status: validatedData.isPaid ? 'ACTIVE' : 'PENDING',
-        paidAt: validatedData.isPaid ? now : undefined,
-        startedAt: validatedData.isPaid ? now : undefined,
-        scheduledEndAt,
-        notes: validatedData.notes,
-        createdById: user.id,
-      },
+      data: sessionData,
       include: {
         customer: {
           select: {

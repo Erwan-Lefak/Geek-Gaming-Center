@@ -6,7 +6,7 @@ import { z } from 'zod'
 // PUT /api/dashboard/sessions/[id] - Gestionnaire de sessions
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -18,8 +18,10 @@ export async function PUT(
     const body = await request.json()
     const { action } = body
 
+    const { id } = await params
+
     const session = await prisma.gamingSession.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         equipment: true,
         customer: true,
@@ -44,7 +46,7 @@ export async function PUT(
         const now = new Date()
 
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             status: 'ACTIVE',
             startedAt: now,
@@ -80,7 +82,7 @@ export async function PUT(
         const now = new Date()
 
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             status: 'ACTIVE',
             startedAt: now,
@@ -116,7 +118,7 @@ export async function PUT(
         const now = new Date()
 
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             status: 'COMPLETED',
             actualEndAt: now,
@@ -171,7 +173,7 @@ export async function PUT(
 
         // Attribuer le nouvel équipement
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             equipmentId: newEquipmentId,
           },
@@ -209,7 +211,7 @@ export async function PUT(
         const newEnd = new Date(currentEnd.getTime() + additionalMinutes * 60000)
 
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             scheduledEndAt: newEnd,
             duration: { increment: additionalMinutes },
@@ -249,7 +251,7 @@ export async function PUT(
         const now = new Date()
 
         const updatedSession = await prisma.gamingSession.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             paidAt: now,
           },

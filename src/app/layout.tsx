@@ -33,6 +33,15 @@ export const metadata: Metadata = {
   authors: [{ name: 'Geek Gaming Center' }],
   creator: 'Geek Gaming Center',
   publisher: 'Geek Gaming Center',
+  icons: {
+    icon: [
+      { url: '/logo.png', sizes: '787x787', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' }
+    ],
+    apple: [
+      { url: '/logo.png', sizes: '787x787', type: 'image/png' }
+    ],
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -93,9 +102,9 @@ export default function RootLayout({
             <main className="flex-1 dashboard-hidden pt-0">{children}</main>
             <footer className="border-t border-border bg-surface dashboard-hidden">
           <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Brand */}
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2 lg:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="relative w-10 h-10 rounded-lg overflow-hidden">
                     <Image
@@ -104,10 +113,6 @@ export default function RootLayout({
                       fill
                       className="object-contain"
                     />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-lg font-bold gradient-text">GEEK</span>
-                    <span className="text-xs text-sm opacity-80">Gaming Center</span>
                   </div>
                 </div>
                 <p className="text-sm text-white">

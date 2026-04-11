@@ -5,11 +5,16 @@ import { requireAuth, hasRole } from '@/lib/auth/utils'
 // GET /api/equipment - Liste des équipements
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuth()
-
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const type = searchParams.get('type')
+    const withPricing = searchParams.get('withPricing')
+
+    // Allow public access when withPricing is true (for booking page)
+    // Otherwise require authentication
+    if (!withPricing) {
+      await requireAuth()
+    }
 
     const where: any = {}
 
