@@ -28,7 +28,7 @@ export default function LoginPage() {
   // Afficher un état de chargement pendant la vérification de la session
   if (status === 'loading') {
     return (
-      <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center pt-40 sm:pt-44 lg:pt-48">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-purple-200 font-medium">Chargement...</p>
@@ -65,37 +65,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8 pt-40 sm:pt-44 lg:pt-48">
       <div className="w-full max-w-6xl mx-auto">
         {/* Container principal unifié */}
         <div className="w-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-          {/* Section branding - Header unifié */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-8 sm:p-12 lg:p-16">
-            {/* Formes décoratives d'arrière-plan */}
-            <div className="absolute top-10 right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-
-            {/* Contenu centré */}
-            <div className="relative z-10 text-center">
-              {/* Logo */}
-              <div className="inline-flex items-center justify-center gap-3 mb-8">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl">
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Message de bienvenue */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white whitespace-nowrap">
-                Connexion Geek Gaming Center 🎮
-              </h1>
-              <p className="text-xl text-purple-200 mt-4">
-                Connectez-vous pour accéder à votre espace
-              </p>
-            </div>
-          </div>
-
           {/* Section formulaire */}
           <div className="p-8 sm:p-12 lg:p-16">
             <div className="w-full">
@@ -153,6 +126,21 @@ export default function LoginPage() {
                   </div>
                 </div>
 
+                <div className="flex items-center justify-between text-sm">
+                  <a
+                    href="/register"
+                    className="text-purple-300 hover:text-purple-200 transition-colors"
+                  >
+                    Pas encore inscrit ? S'inscrire
+                  </a>
+                  <a
+                    href="/forgot-password"
+                    className="text-purple-300 hover:text-purple-200 transition-colors"
+                  >
+                    Mot de passe oublié ?
+                  </a>
+                </div>
+
                 <Button
                   type="submit"
                   disabled={loading}
@@ -171,12 +159,6 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-purple-300">
-                  Vous serez redirigé automatiquement selon votre compte
-                </p>
-              </div>
 
               {/* Comptes de démonstration */}
               <div className="mt-10 pt-8 border-t border-white/20">
@@ -210,25 +192,6 @@ export default function LoginPage() {
                         {account.email}
                       </p>
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Features en bas */}
-              <div className="mt-10 pt-8 border-t border-white/20">
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
-                  {[
-                    { icon: '👥', text: 'Clients' },
-                    { icon: '🎮', text: 'Sessions' },
-                    { icon: '💰', text: 'Factures' },
-                    { icon: '📊', text: 'Rapports' },
-                    { icon: '📦', text: 'Stock' },
-                    { icon: '🔧', text: 'Maintenance' },
-                  ].map((feature, idx) => (
-                    <div key={idx} className="text-center">
-                      <span className="text-3xl">{feature.icon}</span>
-                      <p className="text-sm text-purple-300 mt-2">{feature.text}</p>
-                    </div>
                   ))}
                 </div>
               </div>
