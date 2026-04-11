@@ -216,7 +216,7 @@ export default function CaissePage() {
   const equipmentTypes = ['PS5', 'PS4', 'XBOX_SERIES_X', 'PC_GAMING', 'OCULUS_VR', 'VR_PS4', 'SIMU_RACING']
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 mt-28 lg:mt-20">
       {/* Header */}
       <div className="w-full flex items-center justify-between">
         <div>
