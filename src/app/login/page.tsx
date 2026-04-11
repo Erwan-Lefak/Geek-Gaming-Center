@@ -1,16 +1,41 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Redirection automatique si déjà connecté
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      const userRole = (session.user as any).role
+      if (userRole === 'CUSTOMER') {
+        router.push('/account')
+      } else {
+        router.push('/dashboard')
+      }
+    }
+  }, [status, session, router])
+
+  // Afficher un état de chargement pendant la vérification de la session
+  if (status === 'loading') {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-purple-200 font-medium">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,8 +52,10 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Email ou mot de passe incorrect')
       } else {
-        router.push('/dashboard')
-        router.refresh()
+        // Attendre que la session soit chargée puis rediriger selon le rôle
+        setTimeout(() => {
+          router.refresh()
+        }, 100)
       }
     } catch (err) {
       setError('Une erreur est survenue')
@@ -38,7 +65,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8 pt-24 sm:pt-28 lg:pt-32">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-6xl mx-auto">
         {/* Container principal unifié */}
         <div className="w-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
@@ -61,8 +88,11 @@ export default function LoginPage() {
 
               {/* Message de bienvenue */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white whitespace-nowrap">
-                Bienvenue sur le CRM ! 👋
+                Connexion Geek Gaming Center 🎮
               </h1>
+              <p className="text-xl text-purple-200 mt-4">
+                Connectez-vous pour accéder à votre espace
+              </p>
             </div>
           </div>
 
@@ -81,7 +111,7 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-semibold text-purple-200 mb-3">
-                    Email professionnel
+                    Email
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
@@ -123,34 +153,30 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 text-purple-300 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500" />
-                    <span>Se souvenir de moi</span>
-                  </label>
-                  <a href="#" className="text-purple-300 hover:text-purple-200 transition-colors">
-                    Mot de passe oublié ?
-                  </a>
-                </div>
-
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4.5 text-lg rounded-xl transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="w-full py-5 text-lg font-bold bg-white text-purple-900 hover:bg-purple-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <span className="flex items-center justify-center gap-3">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Connexion en cours...
+                      Connexion...
                     </span>
                   ) : (
                     'Se connecter'
                   )}
                 </Button>
               </form>
+
+              <div className="mt-8 text-center">
+                <p className="text-sm text-purple-300">
+                  Vous serez redirigé automatiquement selon votre compte
+                </p>
+              </div>
 
               {/* Comptes de démonstration */}
               <div className="mt-10 pt-8 border-t border-white/20">

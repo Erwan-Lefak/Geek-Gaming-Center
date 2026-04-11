@@ -8,6 +8,7 @@ import { useSession, signOut } from 'next-auth/react'
 
 const navigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: '📊', roles: ['CASHIER', 'TECHNICIAN', 'MANAGER', 'SHAREHOLDER', 'ADMIN'] },
+  { name: 'Caisse', href: '/dashboard/caisse', icon: '💰', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
   { name: 'Clients', href: '/dashboard/customers', icon: '👥', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
   { name: 'Sessions', href: '/dashboard/sessions', icon: '🎮', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
   { name: 'Factures', href: '/dashboard/invoices', icon: '📄', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
@@ -52,6 +53,13 @@ export default function DashboardLayout({
       }
     : null
 
+  // Rediriger vers /login si pas authentifié
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
   // Afficher un état de chargement si la session n'est pas encore chargée
   if (status === 'loading') {
     return (
@@ -66,7 +74,7 @@ export default function DashboardLayout({
 
   // Rediriger si pas de session
   if (status === 'unauthenticated') {
-    return null // Le middleware va gérer la redirection
+    return null
   }
 
   const handleLogout = async () => {
@@ -223,9 +231,9 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen pt-24">
-        {/* Top Bar */}
-        <header className="sticky top-24 z-40 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen pt-34 lg:pt-24">
+        {/* Top Bar - Fixed below the top margin */}
+        <header className="fixed top-34 lg:top-24 right-0 left-0 lg:left-72 z-40 bg-white/80 backdrop-blur-lg border-b border-slate-200">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">

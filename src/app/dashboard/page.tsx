@@ -1,77 +1,64 @@
-import { getCurrentUser } from '@/lib/auth/utils'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma/client'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function DashboardPage() {
-  const user = await getCurrentUser()
+export default function DashboardPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const [dashboardStats, setDashboardStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!user) {
-    redirect('/login')
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      fetchStats()
+    }
+  }, [status, session])
+
+  const fetchStats = async () => {
+    try {
+      // Pour l'instant, mettre des stats factices
+      setDashboardStats({
+        todayRevenue: { _sum: { total: 0 } },
+        activeSessions: 0,
+        totalCustomers: 0,
+        lowStockProducts: 0,
+        upcomingEvents: [],
+      })
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // Récupérer les statistiques
-  const [
-    todayRevenue,
-    activeSessions,
-    totalCustomers,
-    lowStockProducts,
-    upcomingEvents,
-  ] = await Promise.all([
-    // CA du jour
-    prisma.invoice.aggregate({
-      where: {
-        invoiceDate: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        },
-        paymentStatus: 'PAID',
-      },
-      _sum: { total: true },
-    }),
+  if (status === 'loading' || loading) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
 
-    // Sessions actives
-    prisma.gamingSession.count({
-      where: {
-        status: { in: ['PENDING', 'ACTIVE'] },
-      },
-    }),
+  if (!session?.user) {
+    return null
+  }
 
-    // Clients uniques ce mois
-    prisma.customer.count({
-      where: {
-        lastVisit: {
-          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-        },
-      },
-    }),
+  const user = {
+    name: session.user.name || '',
+    role: (session.user as any).role || 'CASHIER',
+  }
 
-    // Produits en stock faible
-    prisma.product.count({
-      where: {
-        currentStock: {
-          lte: prisma.product.fields.minStock,
-        },
-      },
-    }),
-
-    // Événements bientôt complets ou complets (7 prochains jours)
-    prisma.event.findMany({
-      where: {
-        isActive: true,
-        isPublished: true,
-        eventDate: {
-          gte: new Date().toISOString().split('T')[0],
-          lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-        }
-      },
-      orderBy: { eventDate: 'asc' }
-    }),
-  ])
-
+  // Données factices pour l'instant - à remplacer par des appels API
   const stats = [
     {
       name: 'CA Aujourd\'hui',
-      value: `${todayRevenue._sum.total?.toLocaleString() || '0'} FCFA`,
+      value: `${dashboardStats?.todayRevenue?._sum?.total?.toLocaleString() || '0'} FCFA`,
       color: 'from-green-500 to-emerald-500',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +70,7 @@ export default async function DashboardPage() {
     },
     {
       name: 'Sessions Actives',
-      value: activeSessions.toString(),
+      value: `${dashboardStats?.activeSessions || 0}`,
       color: 'from-blue-500 to-cyan-500',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +83,7 @@ export default async function DashboardPage() {
     },
     {
       name: 'Clients ce Mois',
-      value: totalCustomers.toString(),
+      value: `${dashboardStats?.totalCustomers || 0}`,
       color: 'from-purple-500 to-pink-500',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +95,7 @@ export default async function DashboardPage() {
     },
     {
       name: 'Alertes Stock',
-      value: lowStockProducts.toString(),
+      value: `${dashboardStats?.lowStockProducts || 0}`,
       color: 'from-orange-500 to-red-500',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +121,7 @@ export default async function DashboardPage() {
   )
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 mt-28 lg:mt-20">
       {/* Welcome Banner */}
       <div className="w-full relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-2xl shadow-2xl p-8 md:p-12">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yIDItNCAyLTRzLTItMi00LTJoLTRzLTIgMi0yIDRjMCAyIDIgNCAyIDRzLTIgMi00IDJoLTRzLTItMi0yLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
@@ -170,7 +157,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Event Alerts */}
-      {upcomingEvents.length > 0 && (
+      {dashboardStats?.upcomingEvents && dashboardStats.upcomingEvents.length > 0 && (
         <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg">
@@ -182,12 +169,12 @@ export default async function DashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingEvents
-              .filter(event => {
+            {dashboardStats.upcomingEvents
+              .filter((event: any) => {
                 const availableSlots = event.maxCapacity - event.bookedCount
                 return availableSlots <= 10
               })
-              .map((event) => {
+              .map((event: any) => {
                 const availableSlots = event.maxCapacity - event.bookedCount
                 const isFull = availableSlots === 0
                 const almostFull = availableSlots <= 10 && availableSlots > 0
@@ -241,7 +228,7 @@ export default async function DashboardPage() {
               })}
           </div>
 
-          {upcomingEvents.filter(e => (e.maxCapacity - e.bookedCount) <= 10).length === 0 && (
+          {dashboardStats.upcomingEvents.filter((e: any) => (e.maxCapacity - e.bookedCount) <= 10).length === 0 && (
             <div className="text-center text-slate-500 py-8">
               <p>Aucune alerte d'événement pour les 7 prochains jours</p>
             </div>
