@@ -191,9 +191,8 @@ export default function ArenaPage() {
 
       {/* Features Overview */}
       <section id="services" className="py-8 md:py-16 bg-black" style={{
-        backgroundColor: theme === 'light' ? '#ffffff' : '#000000',
-        cssText: theme === 'light' ? 'background-color: #ffffff !important' : 'background-color: #000000 !important'
-      }}>
+        backgroundColor: theme === 'light' ? '#ffffff !important' : '#000000 !important'
+      } as any}>
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 md:mb-16 text-white text-center -mt-4">
             Pourquoi choisir notre <span className="gradient-text">Salle de Jeux</span> ?

@@ -173,12 +173,12 @@ export default function StorePage() {
               </h1>
 
               {/* Tagline */}
-              <div className="flex items-center gap-2 mb-6" style={{ color: '#3b82f6 !important', cssText: 'color: #3b82f6 !important' }}>
-                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6 !important', stroke: '#3b82f6 !important', fill: 'none !important', cssText: 'color: #3b82f6 !important; stroke: #3b82f6 !important; fill: none !important' }} />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#3b82f6 !important', cssText: 'color: #3b82f6 !important' }}>
+              <div className="flex items-center gap-2 mb-6" style={{ color: '#3b82f6 !important' } as any}>
+                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6', stroke: '#3b82f6', fill: 'none' } as any} />
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wide" style={{ color: '#3b82f6' } as any}>
                   TOUT POUR LES GAMERS À YAOUNDÉ
                 </p>
-                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6 !important', stroke: '#3b82f6 !important', fill: 'none !important', cssText: 'color: #3b82f6 !important; stroke: #3b82f6 !important; fill: none !important' }} />
+                <ChevronRight className="w-6 h-6" style={{ color: '#3b82f6', stroke: '#3b82f6', fill: 'none' } as any} />
               </div>
 
               {/* CTA */}
