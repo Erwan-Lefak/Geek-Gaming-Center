@@ -106,14 +106,14 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b">
+      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Maintenance</h1>
-              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Maintenance</h1>
+              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
                 Tickets et diagnostic des équipements
               </p>
             </div>
@@ -126,21 +126,21 @@ export default function MaintenancePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
         {loading ? (
           <Card>
-            <CardContent className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
+            <CardContent className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
               Chargement...
             </CardContent>
           </Card>
         ) : tickets.length === 0 ? (
           <Card>
             <CardContent className="text-center py-16">
-              <Wrench className="w-16 h-16 text-slate-900 dark:text-white dark:text-slate-100-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white dark:text-slate-100-900 mb-2">
+              <Wrench className="w-16 h-16 text-slate-900 mx-auto mb-4" style={{ color: 'var(--foreground)' }} />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2" style={{ color: 'var(--foreground)' }}>
                 Aucun ticket de maintenance
               </h3>
-              <p className="text-slate-900 dark:text-white dark:text-slate-100-600 mb-6">
+              <p className="text-slate-900 mb-6" style={{ color: 'var(--foreground)' }}>
                 Créez un ticket pour signaler un problème ou planifier une maintenance
               </p>
               <Button onClick={() => setShowModal(true)}>
@@ -157,16 +157,16 @@ export default function MaintenancePage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white dark:text-slate-100-900">
+                        <h3 className="text-lg font-semibold text-slate-900" style={{ color: 'var(--foreground)' }}>
                           {ticket.ticketNumber} - {ticket.title}
                         </h3>
                         {getPriorityBadge(ticket.priority)}
                         {getStatusBadge(ticket.status)}
                       </div>
 
-                      <p className="text-slate-900 dark:text-white dark:text-slate-100-600 mb-3">{ticket.description}</p>
+                      <p className="text-slate-900 mb-3" style={{ color: 'var(--foreground)' }}>{ticket.description}</p>
 
-                      <div className="flex items-center gap-6 text-sm text-slate-900 dark:text-white dark:text-slate-100-600">
+                      <div className="flex items-center gap-6 text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>
                         <div className="flex items-center gap-1">
                           <Wrench className="w-4 h-4" />
                           {ticket.equipment.name} ({ticket.equipment.code})
@@ -205,7 +205,8 @@ export default function MaintenancePage() {
               id="equipment"
               value={formData.equipmentId}
               onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
               required
             >
               <option value="">Sélectionner un équipement</option>
@@ -230,7 +231,8 @@ export default function MaintenancePage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Décrivez le problème en détail..."
-              className="flex w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
+              className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
             />
           </div>
 
@@ -240,7 +242,8 @@ export default function MaintenancePage() {
               id="priority"
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
             >
               <option value="LOW">Faible</option>
               <option value="MEDIUM">Moyen</option>

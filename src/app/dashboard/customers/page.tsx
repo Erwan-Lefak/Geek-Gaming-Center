@@ -140,19 +140,22 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 mt-28 lg:mt-20">
+    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b">
+      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Clients</h1>
-              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Clients</h1>
+              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
                 Gestion des clients du Geek Gaming Center
               </p>
             </div>
-            <Button onClick={() => { setShowModal(true); setSelectedCustomer(null) }}>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button
+              onClick={() => { setShowModal(true); setSelectedCustomer(null) }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
               Nouveau Client
             </Button>
           </div>
@@ -160,19 +163,24 @@ export default function CustomersPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900 dark:text-white dark:text-slate-100-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900" style={{ color: 'var(--foreground)' }} />
                   <Input
                     placeholder="Rechercher par nom, email, téléphone..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10"
                     onKeyPress={(e) => e.key === 'Enter' && fetchCustomers()}
+                    style={{
+                      backgroundColor: 'var(--background)',
+                      color: 'var(--foreground)',
+                      borderColor: 'var(--border)'
+                    }}
                   />
                 </div>
               </div>
@@ -182,7 +190,8 @@ export default function CustomersPage() {
                   setStatusFilter(e.target.value)
                   setPage(1)
                 }}
-                className="h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+                className="h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
               >
                 <option value="">Tous les statuts</option>
                 <option value="NEW">Nouveaux</option>
@@ -194,11 +203,11 @@ export default function CustomersPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
+              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
                 Chargement des clients...
               </div>
             ) : customers.length === 0 ? (
-              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
+              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
                 Aucun client trouvé
               </div>
             ) : (
@@ -221,11 +230,11 @@ export default function CustomersPage() {
                         <TableRow key={customer.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                                 {customer.firstName} {customer.lastName}
                               </div>
                               {customer.email && (
-                                <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">{customer.email}</div>
+                                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>{customer.email}</div>
                               )}
                             </div>
                           </TableCell>
@@ -235,7 +244,7 @@ export default function CustomersPage() {
                           <TableCell>{getStatusBadge(customer.status)}</TableCell>
                           <TableCell>
                             <div className="text-sm">{customer.visitCount} visite(s)</div>
-                            <div className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600">{Number(customer.totalHours).toFixed(1)}h</div>
+                            <div className="text-xs text-slate-900" style={{ color: 'var(--foreground)' }}>{Number(customer.totalHours).toFixed(1)}h</div>
                           </TableCell>
                           <TableCell>
                             <div className="text-sm font-medium">
@@ -248,7 +257,7 @@ export default function CustomersPage() {
                                 {new Date(customer.lastVisit).toLocaleDateString('fr-FR')}
                               </div>
                             ) : (
-                              <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-400">Jamais</div>
+                              <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Jamais</div>
                             )}
                           </TableCell>
                           <TableCell className="text-right">
@@ -278,7 +287,7 @@ export default function CustomersPage() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between mt-4">
-                    <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">
+                    <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>
                       Page {page} sur {totalPages}
                     </div>
                     <div className="flex gap-2">
@@ -383,7 +392,8 @@ export default function CustomersPage() {
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="flex w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[80px]"
+              className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[80px]"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
             />
           </div>
 
@@ -393,7 +403,8 @@ export default function CustomersPage() {
               id="acceptCGV"
               checked={formData.acceptCGV}
               onChange={(e) => setFormData({ ...formData, acceptCGV: e.target.checked })}
-              className="rounded border-slate-200 dark:border-slate-700"
+              className="rounded border-slate-200"
+              style={{ borderColor: 'var(--border)' }}
             />
             <Label htmlFor="acceptCGV" className="text-sm">
               Le client accepte les conditions générales de vente

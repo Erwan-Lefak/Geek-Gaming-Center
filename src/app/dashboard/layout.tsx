@@ -63,7 +63,7 @@ export default function DashboardLayout({
   // Afficher un état de chargement si la session n'est pas encore chargée
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600 font-medium">Chargement...</p>
@@ -86,7 +86,7 @@ export default function DashboardLayout({
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Sidebar pour mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
@@ -94,17 +94,26 @@ export default function DashboardLayout({
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           ></div>
-          <div className="fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-slate-900 to-slate-800 shadow-2xl">
+          <div
+            className="fixed inset-y-0 left-0 w-72 shadow-2xl"
+            style={{
+              background: 'var(--background)',
+              borderRight: '1px solid var(--border)'
+            }}
+          >
             <div className="flex flex-col h-full">
               {/* Logo */}
-              <div className="p-6 border-b border-white/10">
+              <div
+                className="p-6 border-b"
+                style={{ borderColor: 'var(--border)' }}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                     <span className="text-xl">⚡</span>
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold text-white">GGC CRM</h1>
-                    <p className="text-xs text-slate-400">Geek Gaming Center</p>
+                    <h1 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>GGC CRM</h1>
+                    <p className="text-xs" style={{ color: 'var(--foreground)', opacity: 0.7 }}>Geek Gaming Center</p>
                   </div>
                 </div>
               </div>
@@ -118,11 +127,22 @@ export default function DashboardLayout({
                       key={item.name}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                      style={
                         isActive
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                          : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                      }`}
+                          ? { background: 'linear-gradient(to right, #9333ea, #db2777)', color: 'white' }
+                          : { color: 'var(--foreground)' }
+                      }
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                        }
+                      }}
                     >
                       <span className="text-xl">{item.icon}</span>
                       <span className="font-medium">{item.name}</span>
@@ -133,8 +153,8 @@ export default function DashboardLayout({
 
               {/* User info */}
               {user && (
-                <div className="p-4 border-t border-white/10">
-                  <div className="bg-white/5 rounded-xl p-4">
+                <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+                  <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${roleColors[user.role]} flex items-center justify-center`}>
                         <span className="text-white font-bold">
@@ -142,13 +162,20 @@ export default function DashboardLayout({
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                        <p className="text-xs text-slate-400 truncate">{roleLabels[user.role]}</p>
+                        <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{user.name}</p>
+                        <p className="text-xs truncate" style={{ color: 'var(--foreground)', opacity: 0.7 }}>{roleLabels[user.role]}</p>
                       </div>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--foreground)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                      }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -165,16 +192,22 @@ export default function DashboardLayout({
 
       {/* Sidebar Desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:top-24 lg:flex lg:w-72 lg:flex-col lg:h-[calc(100vh-6rem)]">
-        <div className="flex flex-col flex-grow bg-gradient-to-b from-slate-900 to-slate-800 shadow-2xl overflow-y-auto">
+        <div
+          className="flex flex-col flex-grow shadow-2xl overflow-y-auto"
+          style={{
+            background: 'var(--background)',
+            borderRight: '1px solid var(--border)'
+          }}
+        >
           {/* Logo */}
-          <div className="p-6 border-b border-white/10">
+          <div className="p-6 border-b" style={{ borderColor: 'var(--border)' }}>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-2xl">⚡</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">GGC CRM</h1>
-                <p className="text-sm text-slate-400">Geek Gaming Center</p>
+                <h1 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>GGC CRM</h1>
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>Geek Gaming Center</p>
               </div>
             </div>
           </div>
@@ -187,11 +220,22 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                  style={
                     isActive
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                  }`}
+                      ? { background: 'linear-gradient(to right, #9333ea, #db2777)', color: 'white' }
+                      : { color: 'var(--foreground)' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }
+                  }}
                 >
                   <span className="text-xl">{item.icon}</span>
                   <span className="font-medium">{item.name}</span>
@@ -202,8 +246,8 @@ export default function DashboardLayout({
 
           {/* User info */}
           {user && (
-            <div className="p-4 border-t border-white/10">
-              <div className="bg-white/5 rounded-xl p-4">
+            <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+              <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${roleColors[user.role]} flex items-center justify-center`}>
                     <span className="text-white font-bold text-lg">
@@ -211,13 +255,20 @@ export default function DashboardLayout({
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{roleLabels[user.role]}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{user.name}</p>
+                    <p className="text-xs truncate" style={{ color: 'var(--foreground)', opacity: 0.7 }}>{roleLabels[user.role]}</p>
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--foreground)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                  }}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -231,25 +282,47 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen pt-34 lg:pt-24">
+      <div
+        className="lg:pl-72 flex-1 flex flex-col min-h-screen pt-34 lg:pt-24"
+        style={{
+          backgroundColor: 'var(--background)'
+        }}
+      >
         {/* Top Bar - Fixed below the top margin */}
-        <header className="fixed top-34 lg:top-24 right-0 left-0 lg:left-72 z-40 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+        <header
+          className="fixed top-34 lg:top-24 right-0 left-0 lg:left-72 z-40 border-b border-slate-200 dark:border-slate-700"
+          style={{
+            backgroundColor: 'var(--background)',
+            color: 'var(--foreground)'
+          }}
+        >
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {/* Mobile menu button */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                  className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
-                  <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-6 h-6"
+                    style={{ color: 'var(--foreground)' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
 
                 {/* Page title */}
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">
+                  <h2
+                    className="text-xl font-bold"
+                    style={{
+                      color: 'var(--foreground)'
+                    }}
+                  >
                     {navigation.find(n => n.href === pathname)?.name || 'Tableau de bord'}
                   </h2>
                 </div>
@@ -258,8 +331,14 @@ export default function DashboardLayout({
               {/* Right side */}
               <div className="flex items-center gap-4">
                 {/* Notifications */}
-                <button className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
-                  <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                  <svg
+                    className="w-6 h-6"
+                    style={{ color: 'var(--foreground)' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -286,8 +365,8 @@ export default function DashboardLayout({
         </main>
 
         {/* Footer */}
-        <footer className="w-full px-4 sm:px-6 lg:px-8 py-6 border-t border-slate-200">
-          <div className="text-center text-sm text-slate-500">
+        <footer className="w-full px-4 sm:px-6 lg:px-8 py-6 border-t border-slate-200 dark:border-slate-700">
+          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
             <p>© 2026 Geek Gaming Center - Système de Gestion CRM</p>
             <p className="mt-1">Yaoundé, Cameroun 🇨🇲</p>
           </div>

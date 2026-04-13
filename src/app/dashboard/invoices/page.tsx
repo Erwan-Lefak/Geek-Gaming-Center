@@ -82,13 +82,13 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b">
+      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Factures</h1>
-            <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
+            <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Factures</h1>
+            <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
               Historique des factures et paiements
             </p>
           </div>
@@ -96,18 +96,23 @@ export default function InvoicesPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900 dark:text-white dark:text-slate-100-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900" style={{ color: 'var(--foreground)' }} />
                   <Input
                     placeholder="Rechercher une facture..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10"
+                    style={{
+                      backgroundColor: 'var(--background)',
+                      color: 'var(--foreground)',
+                      borderColor: 'var(--border)'
+                    }}
                   />
                 </div>
               </div>
@@ -117,7 +122,8 @@ export default function InvoicesPage() {
                   setStatusFilter(e.target.value)
                   setPage(1)
                 }}
-                className="h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+                className="h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
               >
                 <option value="">Tous les statuts</option>
                 <option value="PAID">Payées</option>
@@ -128,11 +134,11 @@ export default function InvoicesPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
+              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
                 Chargement des factures...
               </div>
             ) : invoices.length === 0 ? (
-              <div className="text-center py-12 text-slate-900 dark:text-white dark:text-slate-100-500">
+              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
                 Aucune facture trouvée
               </div>
             ) : (
@@ -154,7 +160,7 @@ export default function InvoicesPage() {
                     {invoices.map((invoice) => (
                       <TableRow key={invoice.id}>
                         <TableCell>
-                          <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                          <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                             {invoice.invoiceNumber}
                           </div>
                         </TableCell>
@@ -163,20 +169,20 @@ export default function InvoicesPage() {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                            <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                               {invoice.customer.firstName} {invoice.customer.lastName}
                             </div>
-                            <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">{invoice.customer.phone}</div>
+                            <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>{invoice.customer.phone}</div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="default">{invoice.type}</Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="font-semibold text-slate-900 dark:text-white dark:text-slate-100-900">
+                          <div className="font-semibold text-slate-900" style={{ color: 'var(--foreground)' }}>
                             {invoice.total.toLocaleString('fr-FR')} FCFA
                           </div>
-                          <div className="text-xs text-slate-900 dark:text-white dark:text-slate-100-600">
+                          <div className="text-xs text-slate-900" style={{ color: 'var(--foreground)' }}>
                             dont TVA: {invoice.taxAmount.toLocaleString('fr-FR')} FCFA
                           </div>
                         </TableCell>

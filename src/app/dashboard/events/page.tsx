@@ -159,8 +159,13 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Gestion des Événements</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">Créez et gérez vos événements Otaku</p>
+          <h1
+            className="text-3xl font-bold text-slate-800"
+            style={{ color: 'var(--foreground)' }}
+          >
+            Gestion des Événements
+          </h1>
+          <p className="text-slate-600 mt-1" style={{ color: 'var(--foreground)' }}>Créez et gérez vos événements Otaku</p>
         </div>
         <button
           onClick={() => {
@@ -176,9 +181,9 @@ export default function EventsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4">
+      <div className="bg-white rounded-xl shadow-sm p-4" style={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)' }}>
         <div className="flex flex-wrap gap-4 items-center">
-          <label className="text-slate-700 font-medium">Filtrer par:</label>
+          <label className="text-slate-700 font-medium" style={{ color: 'var(--foreground)' }}>Filtrer par:</label>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value as EventFilter)}
@@ -189,7 +194,7 @@ export default function EventsPage() {
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
-          <span className="text-slate-600 dark:text-slate-400 ml-auto">
+          <span className="text-slate-600 ml-auto" style={{ color: 'var(--foreground)' }}>
             {filteredEvents.length} événement{filteredEvents.length > 1 ? 's' : ''}
           </span>
         </div>
@@ -205,9 +210,10 @@ export default function EventsPage() {
           return (
             <div
               key={event.id}
-              className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border-2 transition-all ${
+              className={`bg-white rounded-xl shadow-sm overflow-hidden border-2 transition-all ${
                 isFull ? 'border-red-300' : almostFull ? 'border-orange-300' : 'border-transparent hover:border-purple-200'
               }`}
+              style={{ backgroundColor: 'var(--background)' }}
             >
               {/* Image */}
               {event.imageUrl && (
@@ -245,18 +251,18 @@ export default function EventsPage() {
               {/* Content */}
               <div className="p-6">
                 <h3 className="text-xl font-bold text-slate-800 mb-2">{event.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">{event.description}</p>
+                <p className="text-slate-600 text-sm mb-4 line-clamp-2" style={{ color: 'var(--foreground)' }}>{event.description}</p>
 
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>
                     <Calendar className="w-4 h-4 text-purple-500" />
                     {new Date(event.eventDate).toLocaleDateString('fr-FR')}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>
                     <Clock className="w-4 h-4 text-purple-500" />
                     {event.startTime} {event.endTime && `- ${event.endTime}`}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>
                     <Users className="w-4 h-4 text-purple-500" />
                     {availableSlots} places / {event.maxCapacity}
                   </div>
@@ -298,8 +304,8 @@ export default function EventsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--background)' }}>
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)' }}>
               <h2 className="text-2xl font-bold text-slate-800">
                 {editingEvent ? 'Modifier' : 'Créer'} un Événement
               </h2>
@@ -309,7 +315,8 @@ export default function EventsPage() {
                   setEditingEvent(null)
                   resetForm()
                 }}
-                className="text-slate-400 hover:text-slate-600 dark:text-slate-400"
+                className="text-slate-400 hover:text-slate-600"
+                style={{ color: 'var(--foreground)' }}
               >
                 <X className="w-6 h-6" />
               </button>
@@ -486,12 +493,12 @@ export default function EventsPage() {
             </div>
             <div className="p-6">
               <h3 className="text-xl font-bold text-slate-800 mb-4">{viewingBookings.title}</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">
+              <p className="text-slate-600 mb-6" style={{ color: 'var(--foreground)' }}>
                 {viewingBookings.bookedCount} / {viewingBookings.maxCapacity} places réservées
               </p>
 
               <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-slate-600 dark:text-slate-400 text-center">
+                <p className="text-slate-600 text-center" style={{ color: 'var(--foreground)' }}>
                   Fonctionnalité de visualisation des réservations à venir...
                 </p>
               </div>

@@ -126,10 +126,16 @@ export default function DashboardPage() {
       <div className="w-full relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-2xl shadow-2xl p-8 md:p-12">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yIDItNCAyLTRzLTItMi00LTJoLTRzLTIgMi0yIDRjMCAyIDIgNCAyIDRzLTIgMi00IDJoLTRzLTItMi0yLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+          <h1
+            className="text-3xl md:text-4xl font-bold mb-2"
+            style={{ color: 'white !important' }}
+          >
             Bienvenue, {user.name} ! 👋
           </h1>
-          <p className="text-purple-100 text-lg md:text-xl">
+          <p
+            className="text-lg md:text-xl"
+            style={{ color: 'rgba(255, 255, 255, 0.9) !important' }}
+          >
             Voici un aperçu de l'activité du jour
           </p>
         </div>
@@ -141,6 +147,10 @@ export default function DashboardPage() {
           <div
             key={stat.name}
             className="w-full group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 border border-slate-100 hover:border-slate-200"
+            style={{
+              backgroundColor: 'var(--background)',
+              borderColor: 'var(--border)'
+            }}
           >
             <div className="flex items-start justify-between mb-4">
               <div className={`p-3 rounded-xl ${stat.bgColor}`}>
@@ -150,8 +160,8 @@ export default function DashboardPage() {
               </div>
               <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${stat.color}`}></div>
             </div>
-            <p className="text-sm font-medium text-slate-600 mb-1">{stat.name}</p>
-            <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+            <p className="text-sm font-medium text-slate-600 mb-1" style={{ color: 'var(--foreground)' }}>{stat.name}</p>
+            <p className="text-3xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>{stat.value}</p>
           </div>
         ))}
       </div>
@@ -237,14 +247,20 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+      <div
+        className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8"
+        style={{
+          backgroundColor: 'var(--background)',
+          borderColor: 'var(--border)'
+        }}
+      >
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Actions Rapides</h2>
+          <h2 className="text-xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Actions Rapides</h2>
         </div>
 
         <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -252,12 +268,16 @@ export default function DashboardPage() {
             <Link
               key={action.name}
               href={action.href}
-              className={`w-full group flex flex-col items-center justify-center p-6 ${action.bgColor} hover:opacity-80 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-lg`}
+              className="w-full group flex flex-col items-center justify-center p-6 hover:opacity-80 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-lg border border-slate-200"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderColor: 'var(--border)'
+              }}
             >
               <span className="text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-200">
                 {action.icon}
               </span>
-              <span className="text-sm font-semibold text-slate-900 text-center">
+              <span className="text-sm font-semibold text-slate-900 text-center" style={{ color: 'var(--foreground)' }}>
                 {action.name}
               </span>
             </Link>
@@ -268,14 +288,20 @@ export default function DashboardPage() {
       {/* Recent Activity & Quick Stats */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+        <div
+          className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8"
+          style={{
+            backgroundColor: 'var(--background)',
+            borderColor: 'var(--border)'
+          }}
+        >
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-slate-900">Activité Récente</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Activité Récente</h2>
           </div>
           <div className="text-center py-12">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -283,36 +309,8 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
             </div>
-            <p className="text-slate-600 font-medium">Aucune activité récente</p>
-            <p className="text-sm text-slate-500 mt-1">Les dernières sessions et factures apparaîtront ici</p>
-          </div>
-        </div>
-
-        {/* System Status */}
-        <div className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-slate-900">État du Système</h2>
-          </div>
-          <div className="space-y-4">
-            {[
-              { name: 'Base de données', status: 'Opérationnel', color: 'green' },
-              { name: 'Serveur Next.js', status: 'Opérationnel', color: 'green' },
-              { name: 'Service d\'authentification', status: 'Opérationnel', color: 'green' },
-              { name: 'Mode hors-ligne', status: 'Activé', color: 'blue' },
-            ].map((item) => (
-              <div key={item.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                <span className="text-sm font-medium text-slate-700">{item.name}</span>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full bg-${item.color}-500`}></div>
-                  <span className={`text-sm font-medium text-${item.color}-700`}>{item.status}</span>
-                </div>
-              </div>
-            ))}
+            <p className="text-slate-600 font-medium" style={{ color: 'var(--foreground)' }}>Aucune activité récente</p>
+            <p className="text-sm text-slate-500 mt-1" style={{ color: 'var(--foreground)' }}>Les dernières sessions et factures apparaîtront ici</p>
           </div>
         </div>
       </div>

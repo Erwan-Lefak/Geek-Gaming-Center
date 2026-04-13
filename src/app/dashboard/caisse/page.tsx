@@ -220,162 +220,21 @@ export default function CaissePage() {
       {/* Header */}
       <div className="w-full flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Caisse</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">Gestion des réservations et sessions du jour</p>
+          <h1 className="text-3xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Caisse</h1>
+          <p className="text-slate-600 mt-1" style={{ color: 'var(--foreground)' }}>Gestion des réservations et sessions du jour</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={() => setShowWalkInModal(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Client Walk-in
+            <Plus className="w-5 h-5" />
+            Client de Passage
           </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Réservations</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{reservations.length}</p>
-              </div>
-              <div className="p-3 bg-purple-100 rounded-xl">
-                <Calendar className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">En Attente</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  {reservations.filter(r => r.status === 'PENDING').length}
-                </p>
-              </div>
-              <div className="p-3 bg-yellow-100 rounded-xl">
-                <Clock className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Équipements Disponibles</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">
-                  {equipment.filter(e => e.status === 'AVAILABLE').length}
-                </p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Gamepad2 className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Sessions Actives</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">
-                  {equipment.filter(e => e.activeSession).length}
-                </p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Play className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Equipment Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Gamepad2 className="w-5 h-5" />
-              État des Équipements
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={fetchData}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Actualiser
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {equipment.map((eq) => (
-              <div
-                key={eq.id}
-                className={`border-2 rounded-xl p-4 transition-all ${
-                  eq.status === 'AVAILABLE'
-                    ? 'border-green-200 bg-green-50 hover:border-green-300'
-                    : eq.status === 'IN_USE'
-                    ? 'border-blue-200 bg-blue-50'
-                    : 'border-slate-200 dark:border-slate-700-200 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white">{eq.code}</h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{eq.name}</p>
-                  </div>
-                  <Badge className={getStatusColor(eq.status)}>
-                    {eq.status === 'AVAILABLE' ? 'Disponible' : eq.status === 'IN_USE' ? 'Occupé' : eq.status}
-                  </Badge>
-                </div>
-
-                {eq.activeSession && (
-                  <div className="mt-3 pt-3 border-t border-blue-200">
-                    <div className="flex items-center gap-2 text-sm text-slate-700 mb-1">
-                      <User className="w-4 h-4" />
-                      <span className="font-medium">{eq.activeSession.customer}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <Timer className="w-4 h-4" />
-                      <span>
-                        Reste: {formatTime(eq.activeSession.timeRemaining)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mt-1">
-                      <Phone className="w-4 h-4" />
-                      <span>{eq.activeSession.customerPhone}</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-2">
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Santé:</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          eq.healthScore >= 80 ? 'bg-green-500' : eq.healthScore >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                        }`}
-                        style={{ width: `${eq.healthScore}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-slate-700">{eq.healthScore}%</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Reservations Table */}
+      {/* Reservations Table - MOVED TO TOP */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -394,11 +253,21 @@ export default function CaissePage() {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 className="w-auto"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 border border-slate-300 rounded-lg"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               >
                 <option value="all">Tous les statuts</option>
                 <option value="PENDING">En attente</option>
@@ -428,27 +297,27 @@ export default function CaissePage() {
                   <tr key={reservation.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900 dark:text-white">
+                        <p className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                           {reservation.customer.firstName} {reservation.customer.lastName}
                         </p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{reservation.customer.phone}</p>
+                        <p className="text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>{reservation.customer.phone}</p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900 dark:text-white">{reservation.equipment.name}</p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{reservation.equipment.code}</p>
+                        <p className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>{reservation.equipment.name}</p>
+                        <p className="text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>{reservation.equipment.code}</p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-slate-900 dark:text-white">
+                        <p className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                           {new Date(reservation.startTime).toLocaleTimeString('fr-FR', {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}
                         </p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>
                           {new Date(reservation.endTime).toLocaleTimeString('fr-FR', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -457,7 +326,7 @@ export default function CaissePage() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-slate-700">{reservation.duration} min</td>
-                    <td className="py-3 px-4 font-medium text-slate-900 dark:text-white">
+                    <td className="py-3 px-4 font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                       {Number(reservation.estimatedPrice).toLocaleString()} FCFA
                     </td>
                     <td className="py-3 px-4">
@@ -465,7 +334,7 @@ export default function CaissePage() {
                         {getStatusLabel(reservation.status)}
                       </Badge>
                     </td>
-                                                    <td className="py-3 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex gap-2">
                         {reservation.status === 'PENDING' && (
                           <Button
@@ -503,11 +372,164 @@ export default function CaissePage() {
         </CardContent>
       </Card>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600" style={{ color: 'var(--foreground)' }}>Total Réservations</p>
+                <p className="text-3xl font-bold text-slate-900 mt-2" style={{ color: 'var(--foreground)' }}>{reservations.length}</p>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-xl">
+                <Calendar className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600" style={{ color: 'var(--foreground)' }}>En Attente</p>
+                <p className="text-3xl font-bold text-yellow-600 mt-2">
+                  {reservations.filter(r => r.status === 'PENDING').length}
+                </p>
+              </div>
+              <div className="p-3 bg-yellow-100 rounded-xl">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600" style={{ color: 'var(--foreground)' }}>Équipements Disponibles</p>
+                <p className="text-3xl font-bold text-green-600 mt-2" style={{ color: 'var(--foreground)' }}>
+                  {equipment.filter(e => e.status === 'AVAILABLE').length}
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-xl">
+                <Gamepad2 className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600" style={{ color: 'var(--foreground)' }}>Sessions Actives</p>
+                <p className="text-3xl font-bold text-blue-600 mt-2">
+                  {equipment.filter(e => e.activeSession).length}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <Play className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Equipment Status */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5" />
+              État des Équipements
+            </CardTitle>
+            <Button variant="ghost" size="sm" onClick={fetchData}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Actualiser
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {equipment.map((eq) => (
+              <div
+                key={eq.id}
+                className={`border-2 rounded-xl p-4 transition-all ${
+                  eq.status === 'AVAILABLE'
+                    ? 'border-green-200 bg-green-50 hover:border-green-300'
+                    : eq.status === 'IN_USE'
+                    ? 'border-blue-200 bg-blue-50'
+                    : 'border-slate-200'
+                }`}
+                style={{
+                  backgroundColor: eq.status !== 'AVAILABLE' && eq.status !== 'IN_USE' ? 'var(--background)' : undefined,
+                  borderColor: eq.status !== 'AVAILABLE' && eq.status !== 'IN_USE' ? 'var(--border)' : undefined
+                }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>{eq.code}</h4>
+                    <p className="text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>{eq.name}</p>
+                  </div>
+                  <Badge
+                    className={getStatusColor(eq.status)}
+                    style={{
+                      backgroundColor: eq.status === 'AVAILABLE' ? 'rgba(34, 197, 94, 0.2)' :
+                                     eq.status === 'IN_USE' ? 'rgba(59, 130, 246, 0.2)' :
+                                     undefined,
+                      color: 'var(--foreground)'
+                    }}
+                  >
+                    {eq.status === 'AVAILABLE' ? 'Disponible' : eq.status === 'IN_USE' ? 'Occupé' : eq.status}
+                  </Badge>
+                </div>
+
+                {eq.activeSession && (
+                  <div className="mt-3 pt-3 border-t border-blue-200">
+                    <div className="flex items-center gap-2 text-sm text-slate-700 mb-1">
+                      <User className="w-4 h-4" />
+                      <span className="font-medium">{eq.activeSession.customer}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600" style={{ color: 'var(--foreground)' }}>
+                      <Timer className="w-4 h-4" />
+                      <span>
+                        Reste: {formatTime(eq.activeSession.timeRemaining)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600 mt-1" style={{ color: 'var(--foreground)' }}>
+                      <Phone className="w-4 h-4" />
+                      <span>{eq.activeSession.customerPhone}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-2">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-slate-600" style={{ color: 'var(--foreground)' }}>Santé:</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          eq.healthScore >= 80 ? 'bg-green-500' : eq.healthScore >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${eq.healthScore}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700" style={{ color: 'var(--foreground)' }}>{eq.healthScore}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Walk-in Modal */}
       <Modal
         isOpen={showWalkInModal}
         onClose={() => setShowWalkInModal(false)}
-        title="Nouveau Client Walk-in"
+        title="Nouveau Client de Passage"
       >
         <form onSubmit={handleWalkInSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -518,6 +540,11 @@ export default function CaissePage() {
                 value={walkInForm.firstName}
                 onChange={(e) => setWalkInForm({ ...walkInForm, firstName: e.target.value })}
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               />
             </div>
             <div>
@@ -527,6 +554,11 @@ export default function CaissePage() {
                 value={walkInForm.lastName}
                 onChange={(e) => setWalkInForm({ ...walkInForm, lastName: e.target.value })}
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               />
             </div>
           </div>
@@ -539,6 +571,11 @@ export default function CaissePage() {
                 type="email"
                 value={walkInForm.email}
                 onChange={(e) => setWalkInForm({ ...walkInForm, email: e.target.value })}
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               />
             </div>
             <div>
@@ -548,6 +585,11 @@ export default function CaissePage() {
                 value={walkInForm.phone}
                 onChange={(e) => setWalkInForm({ ...walkInForm, phone: e.target.value })}
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               />
             </div>
           </div>
@@ -561,6 +603,11 @@ export default function CaissePage() {
                 onChange={(e) => setWalkInForm({ ...walkInForm, equipmentType: e.target.value })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               >
                 {equipmentTypes.map(type => (
                   <option key={type} value={type}>{type}</option>
@@ -575,6 +622,11 @@ export default function CaissePage() {
                 onChange={(e) => setWalkInForm({ ...walkInForm, duration: parseInt(e.target.value) })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               >
                 <option value={60}>1 heure</option>
                 <option value={120}>2 heures</option>
@@ -593,6 +645,11 @@ export default function CaissePage() {
                 onChange={(e) => setWalkInForm({ ...walkInForm, paymentMethod: e.target.value })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                 required
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
               >
                 <option value="CASH">Espèces</option>
                 <option value="MOBILE_MONEY_ORANGE">Orange Money</option>
@@ -619,6 +676,11 @@ export default function CaissePage() {
               value={walkInForm.notes}
               onChange={(e) => setWalkInForm({ ...walkInForm, notes: e.target.value })}
               placeholder="Notes optionnelles..."
+              style={{
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--border)'
+              }}
             />
           </div>
 

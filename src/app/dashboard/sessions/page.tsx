@@ -173,26 +173,29 @@ export default function SessionsPage() {
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b">
+      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white dark:text-slate-100-900">Sessions de Gaming</h1>
-              <p className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600 mt-1">
+              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Sessions de Gaming</h1>
+              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
                 Gestion des sessions en cours et à venir
               </p>
             </div>
             <div className="flex gap-3">
               <Button
-                variant={activeOnly ? 'default' : 'ghost'}
                 onClick={() => setActiveOnly(!activeOnly)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
               >
                 {activeOnly ? 'Actives uniquement' : 'Toutes les sessions'}
               </Button>
-              <Button onClick={() => setShowModal(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
                 Nouvelle Session
               </Button>
             </div>
@@ -201,13 +204,13 @@ export default function SessionsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
         <div className="grid gap-6">
           {/* Active Sessions */}
           {sessions.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
-                <div className="text-slate-900 dark:text-white dark:text-slate-100-500">
+                <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>
                   {activeOnly ? 'Aucune session active' : 'Aucune session'}
                 </div>
               </CardContent>
@@ -216,12 +219,12 @@ export default function SessionsPage() {
             sessions.map((session) => (
               <Card key={session.id} className="overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="border-l-4 border-l-blue-500 bg-white dark:bg-slate-800">
+                  <div className="border-l-4 border-l-blue-500 bg-white" style={{ backgroundColor: 'var(--background)' }}>
                     <div className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white dark:text-slate-100-900">
+                            <h3 className="text-lg font-semibold text-slate-900" style={{ color: 'var(--foreground)' }}>
                               {session.customer.firstName} {session.customer.lastName}
                             </h3>
                             {getStatusBadge(session.status)}
@@ -229,22 +232,22 @@ export default function SessionsPage() {
 
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
-                              <div className="text-slate-900 dark:text-white dark:text-slate-100-600">Équipement</div>
-                              <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Équipement</div>
+                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                                 {getEquipmentLabel(session.equipment.type)} - {session.equipment.code}
                               </div>
                             </div>
 
                             <div>
-                              <div className="text-slate-900 dark:text-white dark:text-slate-100-600">Durée / Prix</div>
-                              <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Durée / Prix</div>
+                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                                 {formatTime(session.duration)} / {session.price.toLocaleString('fr-FR')} FCFA
                               </div>
                             </div>
 
                             <div>
-                              <div className="text-slate-900 dark:text-white dark:text-slate-100-600">Fin prévue</div>
-                              <div className="font-medium text-slate-900 dark:text-white dark:text-slate-100-900">
+                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Fin prévue</div>
+                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
                                 {new Date(session.scheduledEndAt).toLocaleTimeString('fr-FR', {
                                   hour: '2-digit',
                                   minute: '2-digit',
@@ -255,7 +258,7 @@ export default function SessionsPage() {
 
                           {session.timeRemaining !== undefined && session.status === 'ACTIVE' && (
                             <div className="mt-3">
-                              <div className="text-sm text-slate-900 dark:text-white dark:text-slate-100-600">Temps restant</div>
+                              <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Temps restant</div>
                               <div className="text-lg font-bold text-blue-600">
                                 {Math.floor(session.timeRemaining / 60000)} min
                               </div>
@@ -348,7 +351,8 @@ export default function SessionsPage() {
                 {customers.map((customer) => (
                   <div
                     key={customer.id}
-                    className="p-2 hover:bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 cursor-pointer text-sm"
+                    className="p-2 cursor-pointer text-sm"
+                    style={{ backgroundColor: 'var(--background)' }}
                     onClick={() => {
                       setFormData({ ...formData, customerId: customer.id })
                       setCustomers([])
@@ -372,7 +376,8 @@ export default function SessionsPage() {
               id="equipment"
               value={formData.equipmentId}
               onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
               required
             >
               <option value="">Sélectionner un équipement</option>
@@ -390,7 +395,8 @@ export default function SessionsPage() {
               id="duration"
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
               required
             >
               <option value="30">30 minutes</option>
