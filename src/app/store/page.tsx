@@ -269,7 +269,15 @@ export default function StorePage() {
                   <Link
                     key={product.id}
                     href={`/store/products/${product.slug}`}
-                    className="w-72 flex-shrink-0 bento-item group overflow-hidden flex flex-col"
+                    className="flex-shrink-0 group overflow-hidden flex flex-col w-72"
+                    style={{
+                      boxSizing: 'border-box',
+                      background: 'transparent',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: '0.75rem',
+                      transition: 'all 300ms',
+                      padding: '1.5rem'
+                    }}
                   >
                     {/* Product Image/Icon */}
                     <div className={`aspect-square bg-gradient-to-br ${getCategoryColor(product.category)} flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-105 overflow-hidden`}>
