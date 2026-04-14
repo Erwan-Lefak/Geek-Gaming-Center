@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email and phone are verified
-    if (!customer.emailVerified) {
+    if (!customer.email_verified) {
       return NextResponse.json(
         { error: 'Veuillez d\'abord vérifier ton email avant de créer ton mot de passe' },
         { status: 400 }
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Données invalides', details: error.errors },
+        { error: 'Données invalides', details: error.issues },
         { status: 400 }
       )
     }

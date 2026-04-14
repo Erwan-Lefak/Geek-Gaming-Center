@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email is also verified
-    const emailVerified = !!customer.emailVerified
+    const emailVerified = !!customer.email_verified
     const bothVerified = emailVerified
 
     let nextStep = ''

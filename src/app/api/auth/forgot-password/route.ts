@@ -55,11 +55,13 @@ export async function POST(request: NextRequest) {
       const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`
 
       // Send reset email
-      await MailService.sendPasswordReset(
-        customer.email,
-        `${customer.firstName} ${customer.lastName}`,
-        resetUrl
-      )
+      if (customer.email) {
+        await MailService.sendPasswordReset(
+          customer.email,
+          `${customer.firstName} ${customer.lastName}`,
+          resetUrl
+        )
+      }
 
       console.log(`✅ Password reset email sent to ${email}`)
     }

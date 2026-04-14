@@ -102,11 +102,14 @@ export async function POST(request: NextRequest) {
     const phoneVerificationUrl = `${baseUrl}/verify-phone?customer=${customer.id}`
 
     // Send verification email
-    const emailSent = await MailService.sendEmailVerification(
-      customer.email,
-      `${customer.firstName} ${customer.lastName}`,
-      emailVerificationUrl
-    )
+    let emailSent = false
+    if (customer.email) {
+      emailSent = await MailService.sendEmailVerification(
+        customer.email,
+        `${customer.firstName} ${customer.lastName}`,
+        emailVerificationUrl
+      )
+    }
 
     // Send verification SMS
     const smsResult = await SmsService.sendPhoneVerificationCode(
@@ -119,7 +122,7 @@ export async function POST(request: NextRequest) {
     await MailService.sendAdminNotification('new_customer', {
       first_name: customer.firstName,
       last_name: customer.lastName,
-      email: customer.email,
+      email: customer.email || 'Non renseigné',
       phone: formattedPhone,
       how_did_you_find_us: customer.howDidYouFindUs || 'Inconnu',
       created_at: new Date().toLocaleString('fr-FR')
@@ -150,7 +153,7 @@ export async function POST(request: NextRequest) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Données invalides', details: error.errors },
+        { error: 'Données invalides', details: error.issues },
         { status: 400 }
       )
     }

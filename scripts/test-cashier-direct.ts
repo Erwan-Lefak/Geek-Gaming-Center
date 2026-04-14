@@ -99,17 +99,22 @@ async function testDirectCustomerCreation() {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const setupUrl = `${baseUrl}/setup-password?token=${setupToken}`
 
-    const emailSent = await MailService.sendPasswordSetup(
-      customer.email,
-      `${customer.firstName} ${customer.lastName}`,
-      setupUrl
-    )
+    // Only send email if customer has an email
+    if (customer.email) {
+      const emailSent = await MailService.sendPasswordSetup(
+        customer.email,
+        `${customer.firstName} ${customer.lastName}`,
+        setupUrl
+      )
 
-    if (emailSent) {
-      console.log('✅ Setup password email sent successfully!')
-      console.log('   Setup URL:', setupUrl)
+      if (emailSent) {
+        console.log('✅ Setup password email sent successfully!')
+        console.log('   Setup URL:', setupUrl)
+      } else {
+        console.log('❌ Email failed')
+      }
     } else {
-      console.log('❌ Email failed')
+      console.log('⚠️ No email address for customer')
     }
 
     // Step 4: Verify data in database
@@ -120,13 +125,13 @@ async function testDirectCustomerCreation() {
       select: {
         password_reset_token: true,
         password_reset_expires: true,
-        emailVerified: true
+        email_verified: true
       }
     })
 
     console.log('SMS Code in DB:', updatedCustomer?.password_reset_token)
     console.log('Token expires:', updatedCustomer?.password_reset_expires)
-    console.log('Email verified:', updatedCustomer?.emailVerified)
+    console.log('Email verified:', updatedCustomer?.email_verified)
 
     console.log('\n' + '='.repeat(60))
     console.log('✅ Test completed successfully!')
