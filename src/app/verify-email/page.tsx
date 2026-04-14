@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -70,9 +70,9 @@ export default function VerifyEmailPage() {
           </div>
 
           <div className="bg-blue-50 rounded-lg p-4 mb-6">
-            <p className="text-sm font-medium text-blue-900 mb-1">📱 Prochaine étape :</p>
+            <p className="text-sm font-medium text-blue-900 mb-1">✉️ Prochaine étape :</p>
             <p className="text-xs text-gray-700">
-              Entre le code SMS reçu sur ton téléphone pour finaliser l'inscription.
+              Vérifie maintenant ton téléphone avec le code qui t'a été envoyé par SMS.
             </p>
           </div>
 
@@ -97,28 +97,41 @@ export default function VerifyEmailPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur de vérification</h1>
             <p className="text-gray-600 text-sm">{message}</p>
           </div>
 
-          <div className="space-y-3">
-            <button
-              onClick={() => router.push('/register')}
-              className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
-            >
-              Retour à l'inscription
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-            >
-              Réessayer
-            </button>
+          <div className="bg-red-50 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-800">
+              Le lien de vérification est peut-être expiré (24h) ou invalide.
+            </p>
           </div>
+
+          <button
+            onClick={() => router.push('/register')}
+            className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
+          >
+            Retour à l'inscription
+          </button>
         </div>
       </div>
     )
   }
 
   return null
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
+  )
 }
