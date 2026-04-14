@@ -99,7 +99,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/customers/[id] - Supprimer un client (soft delete)
+// DELETE /api/customers/[id] - Supprimer un client
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -107,18 +107,36 @@ export async function DELETE(
   try {
     const user = await requireAuth()
 
+    // Seuls MANAGER et ADMIN peuvent supprimer des clients
     if (!hasRole(user, ['MANAGER', 'ADMIN'])) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 } as any)
     }
 
     const { id } = await params
-    // Soft delete - marquer comme BLOCKED
-    const customer = await prisma.customer.update({
-      where: { id },
-      data: { status: 'BLOCKED' },
-    } as any)
 
-    return NextResponse.json({ message: 'Customer blocked successfully', customer } as any)
+    // Vérifier que le client existe
+    const customer = await prisma.customer.findUnique({
+      where: { id }
+    })
+
+    if (!customer) {
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 } as any)
+    }
+
+    // Supprimer le client (cascade delete supprimera aussi les sessions et factures liées)
+    await prisma.customer.delete({
+      where: { id }
+    })
+
+    console.log(`✅ Customer deleted: ${customer.firstName} ${customer.lastName} (${id})`)
+
+    return NextResponse.json({
+      message: 'Customer deleted successfully',
+      deletedCustomer: {
+        id: customer.id,
+        name: `${customer.firstName} ${customer.lastName}`
+      }
+    } as any)
   } catch (error: any) {
     console.error('Error deleting customer:', error)
     return NextResponse.json(

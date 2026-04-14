@@ -156,8 +156,8 @@ export async function requestPasswordReset(email: string) {
 export async function resetPassword(token: string, newPassword: string) {
   const customer = await prisma.customer.findFirst({
     where: {
-      passwordResetToken: token,
-      passwordResetExpires: {
+      password_reset_token: token,
+      password_reset_expires: {
         gte: new Date(),
       },
     },
@@ -173,8 +173,8 @@ export async function resetPassword(token: string, newPassword: string) {
     where: { id: customer.id },
     data: {
       password: hashedPassword,
-      passwordResetToken: null,
-      passwordResetExpires: null,
+      password_reset_token: null,
+      password_reset_expires: null,
     },
   } as any)
 

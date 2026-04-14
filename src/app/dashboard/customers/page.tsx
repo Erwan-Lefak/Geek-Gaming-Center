@@ -8,8 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
+import { CustomerForm } from '@/components/forms/CustomerForm'
 import { Search, Plus, Edit, Eye, Trash2 } from 'lucide-react'
 
 interface Customer {
@@ -37,17 +36,11 @@ export default function CustomersPage() {
 
   // Modal state
   const [showModal, setShowModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    notes: '',
-    acceptCGV: false,
-  })
+  const [formError, setFormError] = useState('')
+  const [customerFormError, setCustomerFormError] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     fetchCustomers()
@@ -75,8 +68,8 @@ export default function CustomersPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (formData: any) => {
+    setCustomerFormError('')
 
     try {
       const url = selectedCustomer
@@ -88,42 +81,64 @@ export default function CustomersPage() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          acceptCGV: formData.acceptTerms,
+        }),
       })
 
       if (response.ok) {
         setShowModal(false)
         setSelectedCustomer(null)
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          address: '',
-          city: '',
-          notes: '',
-          acceptCGV: false,
-        })
+        setCustomerFormError('')
         fetchCustomers()
+      } else {
+        const data = await response.json()
+        setCustomerFormError(data.error || 'Erreur lors de la création du client')
+        throw new Error(data.error || 'Erreur lors de la création du client')
       }
     } catch (error) {
       console.error('Error saving customer:', error)
+      setCustomerFormError('Erreur de connexion au serveur')
+      throw error
     }
   }
 
   const handleEdit = (customer: Customer) => {
     setSelectedCustomer(customer)
-    setFormData({
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email || '',
-      phone: customer.phone,
-      address: '',
-      city: '',
-      notes: '',
-      acceptCGV: false,
-    })
+    setCustomerFormError('')
     setShowModal(true)
+  }
+
+  const handleDeleteClick = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setShowDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedCustomer) return
+
+    setIsDeleting(true)
+
+    try {
+      const response = await fetch(`/api/customers/${selectedCustomer.id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setShowDeleteModal(false)
+        setSelectedCustomer(null)
+        fetchCustomers()
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors de la suppression')
+      }
+    } catch (error) {
+      console.error('Error deleting customer:', error)
+      alert('Erreur de connexion au serveur')
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -152,7 +167,11 @@ export default function CustomersPage() {
               </p>
             </div>
             <Button
-              onClick={() => { setShowModal(true); setSelectedCustomer(null) }}
+              onClick={() => {
+                setShowModal(true)
+                setSelectedCustomer(null)
+                setCustomerFormError('')
+              }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
             >
               <Plus className="w-5 h-5" />
@@ -266,6 +285,7 @@ export default function CustomersPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => router.push(`/dashboard/customers/${customer.id}`)}
+                                title="Voir"
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -273,8 +293,18 @@ export default function CustomersPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEdit(customer)}
+                                title="Modifier"
                               >
                                 <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteClick(customer)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                title="Supprimer"
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
                           </TableCell>
@@ -322,108 +352,85 @@ export default function CustomersPage() {
         onClose={() => {
           setShowModal(false)
           setSelectedCustomer(null)
+          setCustomerFormError('')
         }}
         title={selectedCustomer ? 'Modifier le Client' : 'Nouveau Client'}
-        size="lg"
+        size="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">Prénom *</Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Nom *</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-              />
-            </div>
+        <CustomerForm
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowModal(false)
+            setSelectedCustomer(null)
+            setCustomerFormError('')
+          }}
+          initialData={selectedCustomer ? {
+            firstName: selectedCustomer.firstName,
+            lastName: selectedCustomer.lastName,
+            email: selectedCustomer.email,
+            phone: selectedCustomer.phone,
+          } : undefined}
+          submitLabel={selectedCustomer ? 'Mettre à jour' : 'Créer le Client'}
+          includePassword={false}
+          error={customerFormError}
+        />
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setSelectedCustomer(null)
+        }}
+        title="Confirmer la suppression"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
+            <p className="text-red-800 text-sm">
+              Vous êtes sur le point de supprimer le client :
+            </p>
+            <p className="text-red-900 font-bold mt-2">
+              {selectedCustomer?.firstName} {selectedCustomer?.lastName}
+            </p>
+            {selectedCustomer?.email && (
+              <p className="text-red-700 text-sm mt-1">{selectedCustomer.email}</p>
+            )}
           </div>
 
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
+          <p className="text-gray-600 text-sm">
+            Cette action est irréversible. Toutes les données associées à ce client seront définitivement supprimées.
+          </p>
 
-          <div>
-            <Label htmlFor="phone">Téléphone *</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="address">Adresse</Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="city">Ville</Label>
-            <Input
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="notes">Notes</Label>
-            <textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[80px]"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="acceptCGV"
-              checked={formData.acceptCGV}
-              onChange={(e) => setFormData({ ...formData, acceptCGV: e.target.checked })}
-              className="rounded border-slate-200"
-              style={{ borderColor: 'var(--border)' }}
-            />
-            <Label htmlFor="acceptCGV" className="text-sm">
-              Le client accepte les conditions générales de vente
-            </Label>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowModal(false)}
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              onClick={() => {
+                setShowDeleteModal(false)
+                setSelectedCustomer(null)
+              }}
+              disabled={isDeleting}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Annuler
-            </Button>
-            <Button type="submit">
-              {selectedCustomer ? 'Mettre à jour' : 'Créer le Client'}
-            </Button>
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Suppression...
+                </>
+              ) : (
+                'Supprimer définitivement'
+              )}
+            </button>
           </div>
-        </form>
+        </div>
       </Modal>
     </div>
   )
