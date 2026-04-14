@@ -1,11 +1,7 @@
 {
-  "name": "geek-gaming-center",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["cdg1"],
-  "buildEnv": {
-    "NEXT_PRIVATE_NODE_VERSION": "22"
-  }
+  "regions": ["cdg1"]
 }

@@ -20,8 +20,17 @@ export interface SendEmailOptions {
   from?: string
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY || '')
+// Initialize Resend (only if API key is available)
+const getResend = () => {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    console.warn('⚠️ RESEND_API_KEY not found - Email service disabled')
+    return null
+  }
+  return new Resend(apiKey)
+}
+
+const resend = getResend()
 
 // Default sender
 const DEFAULT_FROM = process.env.EMAIL_FROM || 'Geek Gaming Center <noreply@geekgamingcenter.cm>'
@@ -136,6 +145,12 @@ export class MailService {
 
       // Wrap HTML with proper DOCTYPE
       const finalHtml = this.wrapHtml(htmlBody)
+
+      // Check if Resend is available
+      if (!resend) {
+        console.warn('⚠️ Email service not available - skipping send')
+        return false
+      }
 
       // Send via Resend
       const { data: resendData, error } = await resend.emails.send({
