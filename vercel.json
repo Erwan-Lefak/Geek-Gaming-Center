@@ -4,5 +4,8 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["cdg1"]
+  "regions": ["cdg1"],
+  "buildEnv": {
+    "NEXT_PRIVATE_NODE_VERSION": "22"
+  }
 }
