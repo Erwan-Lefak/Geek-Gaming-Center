@@ -9,6 +9,8 @@ const loginSchema = z.object({
   password: z.string().min(6),
 })
 
+console.log('🔧 [AUTH] auth config module loaded')
+
 export const authConfig: NextAuthConfig = {
   pages: {
     signIn: '/login',
@@ -64,6 +66,9 @@ export const authConfig: NextAuthConfig = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('🚀 [AUTH] Authorize function called')
+        console.log('📥 [AUTH] Credentials received:', JSON.stringify(credentials))
+
         try {
           console.log('🔐 [AUTH] Raw credentials received:', {
             hasEmail: !!credentials?.email,
@@ -72,8 +77,16 @@ export const authConfig: NextAuthConfig = {
             passwordType: typeof credentials?.password
           })
 
-          const { email, password } = loginSchema.parse(credentials)
+          let validatedData
+          try {
+            validatedData = loginSchema.parse(credentials)
+            console.log('✅ [AUTH] Zod validation passed')
+          } catch (zodError) {
+            console.log('❌ [AUTH] Zod validation failed:', zodError.errors)
+            return null
+          }
 
+          const { email, password } = validatedData
           console.log('🔐 [AUTH] Attempting login for:', email)
 
           // Try to authenticate as User (staff/admin)
