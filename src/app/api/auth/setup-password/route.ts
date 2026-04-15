@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma/client'
 import { MailService } from '@/lib/email/mail-service'
+import { encrypt } from '@/lib/crypto'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 
@@ -73,11 +74,15 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
+    // Encrypt plain password for staff viewing
+    const encryptedPassword = encrypt(validatedData.password)
+
     // Update customer with password and activate account
     await prisma.customer.update({
       where: { id: customer.id },
       data: {
         password: hashedPassword,
+        password_plain: encryptedPassword, // Store encrypted plain password
         is_active: true, // Activate account
         status: 'ACTIVE', // Change status to ACTIVE
         password_reset_token: null, // Clear setup token

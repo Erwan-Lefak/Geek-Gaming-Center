@@ -43,6 +43,7 @@ model Customer {
   createdAt              DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt              DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   password               String?        @map("password")
+  password_plain         String?        @map("password_plain")
   is_active              Boolean?       @default(true) @map("is_active")
   email_verified         DateTime?      @map("email_verified") @db.Timestamp(6)
   password_reset_token   String?        @unique @map("password_reset_token")

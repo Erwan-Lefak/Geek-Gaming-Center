@@ -38,6 +38,8 @@ export default function CustomerDetailPage() {
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [plainPassword, setPlainPassword] = useState<string | null>(null)
+  const [loadingPassword, setLoadingPassword] = useState(false)
 
   useEffect(() => {
     if (customerId) {
@@ -60,6 +62,26 @@ export default function CustomerDetailPage() {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchPassword = async () => {
+    if (!customer) return
+
+    try {
+      setLoadingPassword(true)
+      const response = await fetch(`/api/customers/${customer.id}/password`)
+
+      if (!response.ok) {
+        throw new Error('Impossible de récupérer le mot de passe')
+      }
+
+      const data = await response.json()
+      setPlainPassword(data.password)
+    } catch (err: any) {
+      console.error('Error fetching password:', err)
+    } finally {
+      setLoadingPassword(false)
     }
   }
 
@@ -187,21 +209,36 @@ export default function CustomerDetailPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Lock className="w-5 h-5 text-slate-600" />
-                <div>
+                <div className="flex-1">
                   <div className="text-sm text-slate-600">Mot de passe</div>
-                  <div className="font-medium">
-                    {customer.password ? (
-                      <span className="flex items-center gap-2">
+                  {customer.password ? (
+                    <div className="space-y-2">
+                      <div className="font-medium flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-green-600" />
                         Défini
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4 text-red-600" />
-                        Non défini
-                      </span>
-                    )}
-                  </div>
+                      </div>
+                      {plainPassword && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                          <div className="text-xs text-purple-700 mb-1">Mot de passe (en clair)</div>
+                          <div className="font-mono font-bold text-lg">{plainPassword}</div>
+                        </div>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={fetchPassword}
+                        disabled={loadingPassword || !customer.password}
+                        className="mt-2"
+                      >
+                        {loadingPassword ? 'Chargement...' : plainPassword ? 'Actualiser' : 'Voir le mot de passe'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-red-600" />
+                      Non défini
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -228,8 +265,11 @@ export default function CustomerDetailPage() {
             {customer.email && (
               <div className="pt-4 border-t">
                 <div className="text-sm text-slate-600 mb-2">Connexion client</div>
-                <div className="bg-slate-50 p-3 rounded text-sm">
+                <div className="bg-slate-50 p-3 rounded text-sm space-y-1">
                   <p><strong>Email:</strong> {customer.email}</p>
+                  {plainPassword && (
+                    <p><strong>Mot de passe:</strong> {plainPassword}</p>
+                  )}
                   <p className="text-slate-600 mt-1">
                     {customer.password
                       ? 'Le client peut se connecter avec son email et son mot de passe'
