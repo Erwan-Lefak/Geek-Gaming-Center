@@ -187,14 +187,22 @@ export default function ProductsPage() {
   }).length
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50">
+    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Gestion des Stocks</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1
+                className="text-2xl font-bold text-gray-900 dark:text-white"
+                style={{ color: 'var(--foreground)' }}
+              >
+                Gestion des Stocks
+              </h1>
+              <p
+                className="text-sm text-gray-600 dark:text-gray-300 mt-1"
+                style={{ color: 'var(--foreground)' }}
+              >
                 Catalogue produits et inventaire boutique
               </p>
             </div>
@@ -216,29 +224,29 @@ export default function ProductsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-0">
             {loading ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
                 Chargement des produits...
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
                 Aucun produit trouvé
               </div>
             ) : (
-              <div className="rounded-md border">
+              <div className="rounded-md border dark:border-gray-700">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Image</TableHead>
-                      <TableHead>Produit</TableHead>
-                      <TableHead>Catégorie</TableHead>
-                      <TableHead>Stock</TableHead>
-                      <TableHead>Prix Achat</TableHead>
-                      <TableHead>Prix Vente</TableHead>
-                      <TableHead>Marge</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="dark:border-gray-700 dark:bg-gray-800">
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Image</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Produit</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Catégorie</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Stock</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Prix Achat</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Prix Vente</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Marge</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white text-right" style={{ color: 'var(--foreground)' }}>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -252,49 +260,51 @@ export default function ProductsPage() {
 
                       const margin = costPrice > 0 ? ((sellingPrice - costPrice) / costPrice * 100).toFixed(0) : '0'
                       const isLowStock = currentStock <= minStock
+                      const isValidThumbnail = thumbnail && thumbnail !== 'N/A' && thumbnail !== '' && typeof thumbnail === 'string'
 
                       return (
-                        <TableRow key={product.id}>
-                          <TableCell>
-                            {thumbnail ? (
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <TableRow key={product.id} className="dark:border-gray-700 dark:bg-gray-800">
+                          <TableCell className="dark:bg-gray-800">
+                            {isValidThumbnail ? (
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
                                 <Image
                                   src={thumbnail}
                                   alt={product.name}
                                   fill
                                   className="object-cover"
+                                  unoptimized
                                 />
                               </div>
                             ) : (
-                              <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                                <Package className="w-6 h-6 text-gray-400" />
+                              <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <Package className="w-6 h-6 text-gray-400 dark:text-gray-300" />
                               </div>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="dark:bg-gray-800">
                             <div className="flex items-center gap-2">
                               <div>
-                                <div className="font-medium text-gray-900">{product.name}</div>
+                                <div className="font-medium text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>{product.name}</div>
                                 {product.sku && (
-                                  <div className="text-xs text-gray-600">SKU: {product.sku}</div>
+                                  <div className="text-xs text-gray-600 dark:text-gray-300">SKU: {product.sku}</div>
                                 )}
                                 {product.brand && (
-                                  <div className="text-xs text-gray-500">Marque: {product.brand}</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">Marque: {product.brand}</div>
                                 )}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="dark:bg-gray-800">
                             <div>
-                              <Badge variant="default">{product.category}</Badge>
+                              <Badge variant="default" style={{ color: 'var(--foreground)', backgroundColor: 'rgba(255,255,255,0.1)' }}>{product.category}</Badge>
                               {product.subcategory && (
-                                <div className="text-xs text-gray-600 mt-1">{product.subcategory}</div>
+                                <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">{product.subcategory}</div>
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="dark:bg-gray-800">
                             <div className="flex items-center gap-2">
-                              <span className={`font-medium ${isLowStock ? 'text-red-600' : 'text-gray-900'}`}>
+                              <span className={`font-medium ${isLowStock ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`} style={{ color: isLowStock ? '' : 'var(--foreground)' }}>
                                 {currentStock}
                               </span>
                               {isLowStock && (
@@ -303,17 +313,17 @@ export default function ProductsPage() {
                                 </Badge>
                               )}
                             </div>
-                            <div className="text-xs text-gray-600">
+                            <div className="text-xs text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
                               Min: {minStock}
                             </div>
                           </TableCell>
-                          <TableCell>
-                            {costPrice > 0 ? Number(costPrice).toLocaleString('fr-FR') : '-'} FCFA
+                          <TableCell className="dark:bg-gray-800">
+                            <span className="text-gray-900 dark:text-white" style={{ color: costPrice > 0 ? 'var(--foreground)' : 'var(--foreground)' }}>{costPrice > 0 ? Number(costPrice).toLocaleString('fr-FR') : '-'}</span> <span className="text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>FCFA</span>
                           </TableCell>
-                          <TableCell>
-                            {Number(sellingPrice).toLocaleString('fr-FR')} FCFA
+                          <TableCell className="dark:bg-gray-800">
+                            <span className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>{Number(sellingPrice).toLocaleString('fr-FR')}</span> <span className="text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>FCFA</span>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="dark:bg-gray-800">
                             {costPrice > 0 ? (
                               <Badge variant={parseFloat(margin) > 30 ? 'success' : 'warning'}>
                                 {margin}%
@@ -322,11 +332,13 @@ export default function ProductsPage() {
                               <Badge variant="secondary">-</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right dark:bg-gray-800">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleEdit(product)}
+                              className="dark:text-white dark:hover:bg-gray-700"
+                              style={{ color: 'var(--foreground)' }}
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -477,25 +489,30 @@ export default function ProductsPage() {
               {/* Thumbnail selection */}
               {formData.images.length > 0 && (
                 <div>
-                  <Label className="text-sm text-gray-600">Image principale (miniature)</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-300">Image principale (miniature)</Label>
                   <div className="mt-2 grid grid-cols-4 gap-2">
-                    {formData.images.map((image, index) => (
-                      <div
-                        key={index}
-                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          formData.thumbnail === image
-                            ? 'border-primary-500 ring-2 ring-primary-200'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setFormData({ ...formData, thumbnail: image })}
-                      >
-                        <div className="relative w-full aspect-square">
-                          <Image
-                            src={image}
-                            alt={`Produit ${index + 1}`}
-                            fill
-                            className="object-cover"
-                          />
+                    {formData.images.map((image, index) => {
+                      const isValidImage = image && image !== 'N/A' && image !== '' && typeof image === 'string'
+                      if (!isValidImage) return null
+
+                      return (
+                        <div
+                          key={index}
+                          className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                            formData.thumbnail === image
+                              ? 'border-primary-500 ring-2 ring-primary-200'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => setFormData({ ...formData, thumbnail: image })}
+                        >
+                          <div className="relative w-full aspect-square">
+                            <Image
+                              src={image}
+                              alt={`Produit ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
                         </div>
                         <button
                           type="button"
@@ -513,7 +530,8 @@ export default function ProductsPage() {
                           </div>
                         )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}

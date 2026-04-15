@@ -49,11 +49,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b shrink-0" style={{ backgroundColor: 'var(--background)' }}>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900" style={{ color: 'var(--foreground)' }}>{title}</h2>
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b dark:border-gray-700 shrink-0" style={{ backgroundColor: 'var(--background)' }}>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
