@@ -76,7 +76,8 @@ export default function CustomerDetailPage() {
       const response = await fetch(`/api/customers/${customer.id}/password`)
 
       if (!response.ok) {
-        throw new Error('Impossible de récupérer le mot de passe')
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }))
+        throw new Error(errorData.error || 'Impossible de récupérer le mot de passe')
       }
 
       const data = await response.json()
@@ -90,7 +91,7 @@ export default function CustomerDetailPage() {
       }
     } catch (err: any) {
       console.error('Error fetching password:', err)
-      setPasswordMessage('Erreur lors de la récupération du mot de passe')
+      setPasswordMessage(`Erreur: ${err.message}`)
     } finally {
       setLoadingPassword(false)
     }
