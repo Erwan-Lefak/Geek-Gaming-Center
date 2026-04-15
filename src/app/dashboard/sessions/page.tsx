@@ -8,8 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
-import { Play, Pause, Square, Plus, Clock, Euro } from 'lucide-react'
+import { Play, Pause, Square, Plus, Clock, Euro, Calendar, Filter, Search, TrendingUp, Users, Activity } from 'lucide-react'
 
 interface Equipment {
   id: string
@@ -34,6 +33,7 @@ interface GamingSession {
   price: number
   paidAt: string
   scheduledEndAt: string
+  createdAt: string
   timeRemaining?: number
   customer: Customer
   equipment: Equipment
@@ -44,7 +44,6 @@ export default function SessionsPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [activeOnly, setActiveOnly] = useState(true)
 
   const [formData, setFormData] = useState({
     customerId: '',
@@ -54,19 +53,27 @@ export default function SessionsPage() {
 
   const [customers, setCustomers] = useState<Customer[]>([])
 
+  // Date filter states
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month' | 'year' | 'custom'>('all')
+  const [customStartDate, setCustomStartDate] = useState('')
+  const [customEndDate, setCustomEndDate] = useState('')
+
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
   useEffect(() => {
     fetchSessions()
     fetchEquipment()
     const interval = setInterval(fetchSessions, 30000) // Refresh every 30s
     return () => clearInterval(interval)
-  }, [activeOnly])
+  }, [])
 
   const fetchSessions = async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
-        limit: '50',
-        ...(activeOnly && { active: 'true' }),
+        limit: '100', // Increased limit for history
       })
 
       const response = await fetch(`/api/sessions?${params}`)
@@ -159,6 +166,17 @@ export default function SessionsPage() {
     return hours > 0 ? `${hours}h ${mins}min` : `${mins}min`
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   const getEquipmentLabel = (type: string) => {
     const labels: Record<string, string> = {
       PS5: 'PlayStation 5',
@@ -172,254 +190,423 @@ export default function SessionsPage() {
     return labels[type] || type
   }
 
+  // Filter sessions by date
+  const filterSessionsByDate = (sessions: GamingSession[]) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+    return sessions.filter(session => {
+      const sessionDate = new Date(session.paidAt)
+
+      switch (dateFilter) {
+        case 'today':
+          return sessionDate >= today
+        case 'week':
+          const weekAgo = new Date(today)
+          weekAgo.setDate(weekAgo.getDate() - 7)
+          return sessionDate >= weekAgo
+        case 'month':
+          const monthAgo = new Date(today)
+          monthAgo.setMonth(monthAgo.getMonth() - 1)
+          return sessionDate >= monthAgo
+        case 'year':
+          const yearAgo = new Date(today)
+          yearAgo.setFullYear(yearAgo.getFullYear() - 1)
+          return sessionDate >= yearAgo
+        case 'custom':
+          if (!customStartDate || !customEndDate) return true
+          const start = new Date(customStartDate)
+          const end = new Date(customEndDate)
+          end.setHours(23, 59, 59)
+          return sessionDate >= start && sessionDate <= end
+        default:
+          return true
+      }
+    })
+  }
+
+  // Filter sessions by search and status
+  const filteredSessions = sessions.filter(session => {
+    // Search filter
+    const matchesSearch = searchQuery === '' ||
+      session.customer?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      session.customer?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      session.customer?.phone?.includes(searchQuery) ||
+      session.sessionNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      session.equipment?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || session.status === statusFilter
+
+    // Date filter
+    const dateFilteredSessions = filterSessionsByDate([session])
+    const matchesDate = dateFilteredSessions.length > 0
+
+    return matchesSearch && matchesStatus && matchesDate
+  })
+
+  // Statistics
+  const stats = {
+    total: sessions.length,
+    active: sessions.filter(s => s.status === 'ACTIVE').length,
+    completed: sessions.filter(s => s.status === 'COMPLETED').length,
+    revenue: sessions.reduce((sum, s) => sum + s.price, 0),
+    todayRevenue: sessions
+      .filter(s => {
+        const sessionDate = new Date(s.paidAt)
+        const today = new Date()
+        return sessionDate.toDateString() === today.toDateString()
+      })
+      .reduce((sum, s) => sum + s.price, 0),
+  }
+
   return (
-    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Sessions de Gaming</h1>
-              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
-                Gestion des sessions en cours et à venir
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                Sessions de Gaming
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1" style={{ color: 'var(--foreground)' }}>
+                Historique complet et gestion des sessions
               </p>
             </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={() => setActiveOnly(!activeOnly)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            <Button onClick={() => setShowModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvelle Session
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Sessions</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1" style={{ color: 'var(--foreground)' }}>
+                    {stats.total}
+                  </p>
+                </div>
+                <Users className="w-8 h-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Sessions Actives</p>
+                  <p className="text-2xl font-bold text-green-500 mt-1">{stats.active}</p>
+                </div>
+                <Activity className="w-8 h-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Terminées</p>
+                  <p className="text-2xl font-bold text-gray-500 mt-1">{stats.completed}</p>
+                </div>
+                <Clock className="w-8 h-8 text-gray-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Revenu Aujourd'hui</p>
+                  <p className="text-2xl font-bold text-blue-500 mt-1">
+                    {stats.todayRevenue.toLocaleString('fr-FR')} FCFA
+                  </p>
+                </div>
+                <Euro className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Rechercher par client, session ou équipement..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10"
+              />
+            </div>
+
+            {/* Date Filter */}
+            <div className="w-full md:w-48">
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value as any)}
+                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {activeOnly ? 'Actives uniquement' : 'Toutes les sessions'}
-              </Button>
-              <Button
-                onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+                <option value="all">Toutes les dates</option>
+                <option value="today">Aujourd'hui</option>
+                <option value="week">7 derniers jours</option>
+                <option value="month">30 derniers jours</option>
+                <option value="year">Cette année</option>
+                <option value="custom">Personnalisé</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="w-full md:w-48">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <Plus className="w-5 h-5" />
-                Nouvelle Session
-              </Button>
+                <option value="all">Tous les statuts</option>
+                <option value="ACTIVE">En cours</option>
+                <option value="COMPLETED">Terminé</option>
+                <option value="PAUSED">En pause</option>
+                <option value="EXPIRED">Expiré</option>
+              </select>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="grid gap-6">
-          {/* Active Sessions */}
-          {sessions.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12">
-                <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>
-                  {activeOnly ? 'Aucune session active' : 'Aucune session'}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            sessions.map((session) => (
-              <Card key={session.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="border-l-4 border-l-blue-500 bg-white" style={{ backgroundColor: 'var(--background)' }}>
-                    <div className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-slate-900" style={{ color: 'var(--foreground)' }}>
-                              {session.customer.firstName} {session.customer.lastName}
-                            </h3>
-                            {getStatusBadge(session.status)}
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Équipement</div>
-                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
-                                {getEquipmentLabel(session.equipment.type)} - {session.equipment.code}
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Durée / Prix</div>
-                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
-                                {formatTime(session.duration)} / {session.price.toLocaleString('fr-FR')} FCFA
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Fin prévue</div>
-                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
-                                {new Date(session.scheduledEndAt).toLocaleTimeString('fr-FR', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </div>
-                            </div>
-                          </div>
-
-                          {session.timeRemaining !== undefined && session.status === 'ACTIVE' && (
-                            <div className="mt-3">
-                              <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Temps restant</div>
-                              <div className="text-lg font-bold text-blue-600">
-                                {Math.floor(session.timeRemaining / 60000)} min
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex flex-col gap-2 ml-4">
-                          {session.status === 'PENDING' && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSessionAction(session.id, 'START')}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <Play className="w-4 h-4 mr-1" />
-                              Démarrer
-                            </Button>
-                          )}
-
-                          {session.status === 'ACTIVE' && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleSessionAction(session.id, 'PAUSE')}
-                                variant="secondary"
-                              >
-                                <Pause className="w-4 h-4 mr-1" />
-                                Pause
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => handleSessionAction(session.id, 'END')}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                <Square className="w-4 h-4 mr-1" />
-                                Terminer
-                              </Button>
-                            </>
-                          )}
-
-                          {session.status === 'PAUSED' && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSessionAction(session.id, 'RESUME')}
-                              className="bg-blue-600 hover:bg-blue-700"
-                            >
-                              <Play className="w-4 h-4 mr-1" />
-                              Reprendre
-                            </Button>
-                          )}
-
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleSessionAction(session.id, 'EXTEND')}
-                            disabled={session.status !== 'ACTIVE'}
-                          >
-                            <Clock className="w-4 h-4 mr-1" />
-                            +30 min
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+          {/* Custom Date Range */}
+          {dateFilter === 'custom' && (
+            <div className="mt-4 flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <Label>Date de début</Label>
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex-1">
+                <Label>Date de fin</Label>
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
           )}
+
+          {/* Results count */}
+          <div className="mt-3 text-sm text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
+            {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} trouvée{filteredSessions.length !== 1 ? 's' : ''}
+          </div>
         </div>
       </div>
 
-      {/* Modal Create Session */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title="Nouvelle Session de Gaming"
-        size="md"
-      >
-        <form onSubmit={handleCreateSession} className="space-y-4">
-          <div>
-            <Label htmlFor="customerSearch">Rechercher un client *</Label>
-            <Input
-              id="customerSearch"
-              placeholder="Nom, téléphone..."
-              onChange={(e) => searchCustomers(e.target.value)}
-            />
-            {customers.length > 0 && (
-              <div className="mt-2 border rounded-md max-h-40 overflow-y-auto">
-                {customers.map((customer) => (
-                  <div
-                    key={customer.id}
-                    className="p-2 cursor-pointer text-sm"
-                    style={{ backgroundColor: 'var(--background)' }}
-                    onClick={() => {
-                      setFormData({ ...formData, customerId: customer.id })
-                      setCustomers([])
-                    }}
-                  >
-                    {customer.firstName} {customer.lastName} - {customer.phone}
-                  </div>
+      {/* Main Content - Table */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
+                Chargement des sessions...
+              </div>
+            ) : filteredSessions.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
+                {searchQuery || dateFilter !== 'all' || statusFilter !== 'all'
+                  ? 'Aucune session ne correspond à votre recherche'
+                  : 'Aucune session trouvée'}
+              </div>
+            ) : (
+              <div className="rounded-md border dark:border-gray-700 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="dark:border-gray-700 dark:bg-gray-800">
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>N° Session</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Client</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Équipement</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Statut</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Durée</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Prix</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Date</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white text-right" style={{ color: 'var(--foreground)' }}>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredSessions.map((session) => (
+                      <TableRow key={session.id} className="dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <TableCell className="dark:bg-gray-800">
+                          <span className="font-medium text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {session.sessionNumber}
+                          </span>
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          <div className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {session.customer.firstName} {session.customer.lastName}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {session.customer.phone}
+                          </div>
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          <div className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {getEquipmentLabel(session.equipment.type)}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {session.equipment.code}
+                          </div>
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          {getStatusBadge(session.status)}
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          <span className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {formatTime(session.duration)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          <span className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {session.price.toLocaleString('fr-FR')} FCFA
+                          </span>
+                        </TableCell>
+                        <TableCell className="dark:bg-gray-800">
+                          <div className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                            {formatDate(session.paidAt)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right dark:bg-gray-800">
+                          {session.status === 'ACTIVE' && (
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSessionAction(session.id, 'pause')}
+                                className="dark:text-white dark:hover:bg-gray-700"
+                              >
+                                <Pause className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSessionAction(session.id, 'stop')}
+                                className="dark:text-white dark:hover:bg-gray-700 text-red-500"
+                              >
+                                <Square className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                          {session.status === 'PAUSED' && (
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSessionAction(session.id, 'start')}
+                                className="dark:text-white dark:hover:bg-gray-700"
+                              >
+                                <Play className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSessionAction(session.id, 'stop')}
+                                className="dark:text-white dark:hover:bg-gray-700 text-red-500"
+                              >
+                                <Square className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Create Session Modal */}
+      {showModal && (
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Nouvelle Session" size="md">
+          <form onSubmit={handleCreateSession} className="space-y-4">
+            <div>
+              <Label>Client</Label>
+              <Input
+                type="text"
+                placeholder="Rechercher un client..."
+                onChange={(e) => searchCustomers(e.target.value)}
+                className="mt-1"
+              />
+              {customers.length > 0 && (
+                <div className="mt-2 max-h-40 overflow-y-auto border rounded-md">
+                  {customers.map((customer) => (
+                    <div
+                      key={customer.id}
+                      onClick={() => setFormData({ ...formData, customerId: customer.id })}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      style={{ color: 'var(--foreground)' }}
+                    >
+                      {customer.firstName} {customer.lastName} - {customer.phone}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label>Équipement</Label>
+              <select
+                value={formData.equipmentId}
+                onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
+                required
+                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Sélectionner un équipement</option>
+                {equipment.map((eq) => (
+                  <option key={eq.id} value={eq.id}>
+                    {getEquipmentLabel(eq.type)} - {eq.code}
+                  </option>
                 ))}
-              </div>
-            )}
-            {formData.customerId && (
-              <div className="mt-2 text-sm text-green-600">
-                Client sélectionné: {customers.find(c => c.id === formData.customerId)?.firstName} {customers.find(c => c.id === formData.customerId)?.lastName}
-              </div>
-            )}
-          </div>
+              </select>
+            </div>
 
-          <div>
-            <Label htmlFor="equipment">Équipement *</Label>
-            <select
-              id="equipment"
-              value={formData.equipmentId}
-              onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-              required
-            >
-              <option value="">Sélectionner un équipement</option>
-              {equipment.map((eq) => (
-                <option key={eq.id} value={eq.id}>
-                  {getEquipmentLabel(eq.type)} - {eq.code}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div>
+              <Label>Durée (minutes)</Label>
+              <Input
+                type="number"
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                min="15"
+                step="15"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="duration">Durée *</Label>
-            <select
-              id="duration"
-              value={formData.duration}
-              onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-              required
-            >
-              <option value="30">30 minutes</option>
-              <option value="60">1 heure</option>
-              <option value="120">2 heures</option>
-              <option value="180">3 heures</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowModal(false)}
-            >
-              Annuler
-            </Button>
-            <Button type="submit">
-              Créer la Session
-            </Button>
-          </div>
-        </form>
-      </Modal>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>
+                Annuler
+              </Button>
+              <Button type="submit">Créer Session</Button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   )
 }
