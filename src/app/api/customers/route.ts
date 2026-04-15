@@ -184,10 +184,21 @@ export async function POST(request: NextRequest) {
         })
 
         // Generate setup URL
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        let baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+        // Force production URL if on Vercel and localhost detected
+        if (baseUrl.includes('localhost') && process.env.VERCEL === '1') {
+          baseUrl = 'https://geek-gaming-center.cam'
+          console.log('🔧 Forcing production URL:', baseUrl)
+        }
+
         const setupUrl = `${baseUrl}/setup-password?token=${setupToken}`
 
         // Send setup password email
+        console.log('📧 Envoi email de setup password à:', customer.email)
+        console.log('📧 Setup URL:', setupUrl)
+        console.log('📧 Base URL:', baseUrl)
+
         await MailService.sendPasswordSetup(
           customer.email,
           `${customer.firstName} ${customer.lastName}`,
