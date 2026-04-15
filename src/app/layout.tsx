@@ -116,10 +116,11 @@ export default function RootLayout({
                   </div>
                 </div>
                 <p
-                  className="text-sm text-white footer-expanded-spacing"
+                  className="text-sm text-white"
                   style={{
-                    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    letterSpacing: '0.15em',
+                    letterSpacing: '0.07em',
+                    fontFeatureSettings: '"kern" 0, "liga" 0',
+                    fontVariant: 'no-kerning',
                     textRendering: 'optimizeLegibility',
                     WebkitFontSmoothing: 'antialiased',
                     MozOsxFontSmoothing: 'grayscale'
