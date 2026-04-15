@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Calendar, Clock, Gamepad2, User, LogOut, X, Check, ChevronRight, Package, ShoppingBag, UserCircle, Key, Trash2, Edit3 } from 'lucide-react'
-import Modal from '@/components/ui/modal'
+import { Modal } from '@/components/ui/modal'
 
 interface Reservation {
   id: string
