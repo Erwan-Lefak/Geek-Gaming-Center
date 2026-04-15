@@ -113,7 +113,16 @@ export default function HomePage() {
 
         {/* Description text positioned at bottom */}
         <div className="absolute bottom-[42px] left-0 right-0 z-10 px-4">
-          <p className="text-base sm:text-base md:text-lg text-white text-center">
+          <p
+            className="text-base sm:text-base md:text-lg text-white text-center hero-expanded-spacing"
+            style={{
+              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              letterSpacing: '0.15em',
+              textRendering: 'optimizeLegibility',
+              WebkitFontSmoothing: 'antialiased',
+              MozOsxFontSmoothing: 'grayscale'
+            }}
+          >
             Boutique de composants électroniques premium et salle de jeux immersive. PS5, Xbox, VR et simulation automobile.
           </p>
         </div>
