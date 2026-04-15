@@ -67,6 +67,8 @@ export const authConfig: NextAuthConfig = {
         try {
           const { email, password } = loginSchema.parse(credentials)
 
+          console.log('🔐 [AUTH] Attempting login for:', email)
+
           // Try to authenticate as User (staff/admin)
           let user = await prisma.user.findUnique({
             where: { email },
@@ -81,9 +83,11 @@ export const authConfig: NextAuthConfig = {
           })
 
           if (user && user.isActive) {
+            console.log('👤 [AUTH] User found, testing password...')
             const isValidPassword = await compare(password, user.password)
 
             if (isValidPassword) {
+              console.log('✅ [AUTH] User authenticated successfully')
               // Update last login
               await prisma.user.update({
                 where: { id: user.id },
@@ -97,9 +101,11 @@ export const authConfig: NextAuthConfig = {
                 role: user.role,
               }
             }
+            console.log('❌ [AUTH] User password mismatch')
           }
 
           // Try to authenticate as Customer
+          console.log('👤 [AUTH] Trying customer authentication...')
           const customer = await prisma.customer.findUnique({
             where: { email },
             select: {
@@ -112,10 +118,23 @@ export const authConfig: NextAuthConfig = {
             },
           })
 
+          console.log('🔍 [AUTH] Customer search result:', customer ? 'Found' : 'Not found')
+
+          if (customer) {
+            console.log('📋 [AUTH] Customer details:', {
+              id: customer.id,
+              email: customer.email,
+              is_active: customer.is_active,
+              has_password: !!customer.password
+            })
+          }
+
           if (customer && customer.is_active && customer.password) {
+            console.log('🔐 [AUTH] Testing customer password...')
             const isValidPassword = await compare(password, customer.password)
 
             if (isValidPassword) {
+              console.log('✅ [AUTH] Customer authenticated successfully')
               return {
                 id: customer.id,
                 email: customer.email,
@@ -123,11 +142,15 @@ export const authConfig: NextAuthConfig = {
                 role: 'CUSTOMER',
               }
             }
+            console.log('❌ [AUTH] Customer password mismatch')
+          } else {
+            console.log('❌ [AUTH] Customer not found or inactive or no password')
           }
 
+          console.log('❌ [AUTH] Authentication failed - returning null')
           return null
         } catch (error) {
-          console.error('Auth error:', error)
+          console.error('❌ [AUTH] Exception:', error)
           return null
         }
       },
