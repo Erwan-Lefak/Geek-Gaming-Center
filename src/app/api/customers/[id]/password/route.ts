@@ -28,7 +28,6 @@ export async function GET(
         firstName: true,
         lastName: true,
         email: true,
-        password_plain: true,
         password: true,
       }
     })
@@ -37,15 +36,25 @@ export async function GET(
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
-    if (!customer.password_plain) {
+    // Check if password_plain exists (newer customers)
+    // If not, return a message that password cannot be shown for legacy accounts
+    const customerWithPlain = await prisma.customer.findUnique({
+      where: { id },
+      select: {
+        password_plain: true,
+      }
+    })
+
+    if (!customerWithPlain?.password_plain) {
       return NextResponse.json({
         password: null,
-        message: 'No password set'
+        message: 'Mot de passe non disponible pour les comptes créés avant le 15 avril 2026. Le client doit réinitialiser son mot de passe.',
+        hasPassword: !!customer.password
       })
     }
 
     // Decrypt password
-    const plainPassword = decrypt(customer.password_plain)
+    const plainPassword = decrypt(customerWithPlain.password_plain)
 
     return NextResponse.json({
       customer: {

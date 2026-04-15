@@ -39,6 +39,7 @@ export default function CustomerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [plainPassword, setPlainPassword] = useState<string | null>(null)
+  const [passwordMessage, setPasswordMessage] = useState<string>('')
   const [loadingPassword, setLoadingPassword] = useState(false)
 
   useEffect(() => {
@@ -70,6 +71,8 @@ export default function CustomerDetailPage() {
 
     try {
       setLoadingPassword(true)
+      setPasswordMessage('')
+
       const response = await fetch(`/api/customers/${customer.id}/password`)
 
       if (!response.ok) {
@@ -77,9 +80,17 @@ export default function CustomerDetailPage() {
       }
 
       const data = await response.json()
-      setPlainPassword(data.password)
+
+      if (data.message) {
+        setPasswordMessage(data.message)
+        setPlainPassword(null)
+      } else {
+        setPlainPassword(data.password)
+        setPasswordMessage('')
+      }
     } catch (err: any) {
       console.error('Error fetching password:', err)
+      setPasswordMessage('Erreur lors de la récupération du mot de passe')
     } finally {
       setLoadingPassword(false)
     }
@@ -223,6 +234,11 @@ export default function CustomerDetailPage() {
                           <div className="font-mono font-bold text-lg">{plainPassword}</div>
                         </div>
                       )}
+                      {passwordMessage && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                          <div className="text-xs text-amber-800">{passwordMessage}</div>
+                        </div>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"
@@ -230,7 +246,7 @@ export default function CustomerDetailPage() {
                         disabled={loadingPassword || !customer.password}
                         className="mt-2"
                       >
-                        {loadingPassword ? 'Chargement...' : plainPassword ? 'Actualiser' : 'Voir le mot de passe'}
+                        {loadingPassword ? 'Chargement...' : plainPassword || passwordMessage ? 'Actualiser' : 'Voir le mot de passe'}
                       </Button>
                     </div>
                   ) : (
