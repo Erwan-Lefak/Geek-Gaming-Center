@@ -2477,7 +2477,7 @@ html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-i
 }
 
 .nav-letter-spacing {
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.07em !important;
   font-feature-settings: "kern" 0, "liga" 0 !important;
   font-variant: no-kerning !important;
   text-rendering: optimizeLegibility !important;
