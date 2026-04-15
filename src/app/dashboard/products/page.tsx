@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Modal } from '@/components/ui/modal'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Edit, Package, AlertTriangle, X, Upload } from 'lucide-react'
+import { Plus, Edit, Package, AlertTriangle, X, Upload, Search } from 'lucide-react'
 import Image from 'next/image'
 
 interface Product {
@@ -54,6 +54,11 @@ export default function ProductsPage() {
     thumbnail: '',
     images: [] as string[],
   })
+
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [stockFilter, setStockFilter] = useState('all')
 
   useEffect(() => {
     fetchProducts()
@@ -186,6 +191,34 @@ export default function ProductsPage() {
     return currentStock <= minStock
   }).length
 
+  // Get unique categories
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))]
+
+  // Filter products
+  const filteredProducts = products.filter(product => {
+    // Search query filter
+    const matchesSearch = searchQuery === '' ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Category filter
+    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter
+
+    // Stock filter
+    const currentStock = product.currentStock || product.stock || 0
+    const minStock = product.minStock || 5
+    let matchesStock = true
+
+    if (stockFilter === 'low') {
+      matchesStock = currentStock <= minStock
+    } else if (stockFilter === 'out') {
+      matchesStock = currentStock === 0
+    }
+
+    return matchesSearch && matchesCategory && matchesStock
+  })
+
   return (
     <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -222,6 +255,57 @@ export default function ProductsPage() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Rechercher par nom, SKU ou catégorie..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="w-full md:w-48">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">Toutes catégories</option>
+                {categories.filter(c => c !== 'all').map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Stock Filter */}
+            <div className="w-full md:w-48">
+              <select
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value)}
+                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">Tous les stocks</option>
+                <option value="low">Stock bas</option>
+                <option value="out">Rupture de stock</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Results count */}
+          <div className="mt-3 text-sm text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
+            {filteredProducts.length} produit{filteredProducts.length !== 1 ? 's' : ''} trouvé{filteredProducts.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
         <Card className="dark:bg-gray-800 dark:border-gray-700">
@@ -230,9 +314,11 @@ export default function ProductsPage() {
               <div className="text-center py-12 text-gray-500 dark:text-gray-300">
                 Chargement des produits...
               </div>
-            ) : products.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-                Aucun produit trouvé
+                {searchQuery || categoryFilter !== 'all' || stockFilter !== 'all'
+                  ? 'Aucun produit ne correspond à votre recherche'
+                  : 'Aucun produit trouvé'}
               </div>
             ) : (
               <div className="rounded-md border dark:border-gray-700">
@@ -250,7 +336,7 @@ export default function ProductsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {products.map((product) => {
+                    {filteredProducts.map((product) => {
                       // Handle both old (price, stock) and new (sellingPrice, currentStock, costPrice) field names
                       const sellingPrice = product.sellingPrice || product.price || 0
                       const costPrice = product.costPrice || 0
