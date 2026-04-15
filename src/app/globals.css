@@ -2462,11 +2462,25 @@ html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-i
 }
 
 /* ============================================
-   LETTER SPACING FIX
-   Override MisterBelvedere font for hero description and footer tagline text
-   Hero title and nav links disable kerning to allow letter-spacing with MisterBelvedere
+   GLOBAL LETTER SPACING
+   Apply letter-spacing to all text elements site-wide
+   Disables kerning on MisterBelvedere font to allow letter-spacing
    ============================================ */
 
+/* Apply to all text elements globally (except h1 which are handled individually) */
+h2, h3, h4, h5, h6,
+p, span, a, button, input, textarea, select, label,
+.text-base, .text-lg, .text-xl, .text-2xl, .text-3xl,
+.font-bold, .font-semibold, .uppercase {
+  letter-spacing: 0.07em !important;
+  font-feature-settings: "kern" 0, "liga" 0 !important;
+  font-variant: no-kerning !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Specific overrides for elements that need different spacing */
 .hero-title-spacing {
   letter-spacing: 0.03em !important;
   font-feature-settings: "kern" 0, "liga" 0 !important;
@@ -2476,21 +2490,7 @@ html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-i
   -moz-osx-font-smoothing: grayscale !important;
 }
 
-.nav-letter-spacing {
-  letter-spacing: 0.07em !important;
-  font-feature-settings: "kern" 0, "liga" 0 !important;
-  font-variant: no-kerning !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-}
-
-.hero-expanded-spacing,
 .footer-expanded-spacing {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   letter-spacing: 0.15em !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  font-variant-ligatures: none !important;
 }

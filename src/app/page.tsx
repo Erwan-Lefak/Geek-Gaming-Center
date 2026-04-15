@@ -134,10 +134,11 @@ export default function HomePage() {
         {/* Description text positioned at bottom */}
         <div className="absolute bottom-[42px] left-0 right-0 z-10 px-4">
           <p
-            className="text-base sm:text-base md:text-lg text-white text-center hero-expanded-spacing"
+            className="text-base sm:text-base md:text-lg text-white text-center"
             style={{
-              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              letterSpacing: '0.15em',
+              letterSpacing: '0.07em',
+              fontFeatureSettings: '"kern" 0, "liga" 0',
+              fontVariant: 'no-kerning',
               textRendering: 'optimizeLegibility',
               WebkitFontSmoothing: 'antialiased',
               MozOsxFontSmoothing: 'grayscale'
