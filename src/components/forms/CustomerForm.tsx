@@ -55,6 +55,9 @@ export function CustomerForm({
 
   // Mettre à jour le formulaire quand initialData change
   useEffect(() => {
+    // Vérifier si initialData est vide (nouveau client)
+    const isEmpty = Object.keys(initialData).length === 0
+
     setFormData({
       firstName: initialData.firstName || '',
       lastName: initialData.lastName || '',
@@ -68,9 +71,10 @@ export function CustomerForm({
       howDidYouFindUsDetails: initialData.howDidYouFindUsDetails || '',
       notes: initialData.notes || '',
       dateOfBirth: initialData.dateOfBirth ? new Date(initialData.dateOfBirth).toISOString().split('T')[0] : '',
-      acceptTerms: !!initialData.firstName, // Auto-accept if editing
+      acceptTerms: !isEmpty, // Auto-accept only if editing
     })
-  }, [initialData])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData?.firstName, initialData?.lastName, initialData?.email, initialData?.phone])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
