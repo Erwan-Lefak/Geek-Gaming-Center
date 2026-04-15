@@ -70,8 +70,9 @@ export default function HomePage() {
               <h1
                 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic hero-title-spacing"
                 style={{
-                  fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.03em',
+                  fontFeatureSettings: '"kern" 0, "liga" 0',
+                  fontVariant: 'no-kerning',
                   textRendering: 'optimizeLegibility',
                   WebkitFontSmoothing: 'antialiased',
                   MozOsxFontSmoothing: 'grayscale'
