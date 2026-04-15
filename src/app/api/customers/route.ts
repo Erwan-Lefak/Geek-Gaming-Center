@@ -128,7 +128,6 @@ export async function POST(request: NextRequest) {
       email: data.email || null,
       email_verified: data.email ? new Date() : null, // Auto-verify email when created by staff
       phone: data.phone,
-      phone_verified: null, // Phone still needs verification
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth as string) : null,
       address: data.address || null,
       city: data.city || null,
