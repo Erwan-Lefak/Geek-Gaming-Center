@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { hash, compare } from 'bcryptjs'
+import crypto from 'crypto'
 
 const prisma = new PrismaClient()
 
@@ -57,7 +58,8 @@ export async function registerCustomer(data: CustomerData) {
       howDidYouFindUsDetails: data.howDidYouFindUsDetails,
       acceptCGV: true,
       cgvAcceptedAt: new Date(),
-      isActive: true,
+      is_active: true,
+      password: hashedPassword,
       createdById: defaultUser.id,
     },
   } as any)
@@ -83,11 +85,18 @@ export async function loginCustomer(email: string, password: string) {
     throw new Error('Email ou mot de passe incorrect')
   }
 
-  if (customer.status === 'BLOCKED') {
-    throw new Error('Ce compte a été bloqué')
+  if (customer.status === 'BLOCKED' || customer.is_active === false) {
+    throw new Error('Ce compte a été bloqué ou désactivé')
   }
 
-  // Password authentication not supported for customers
+  // Check password if exists
+  if (customer.password) {
+    const passwordMatch = await compare(password, customer.password)
+    if (!passwordMatch) {
+      throw new Error('Email ou mot de passe incorrect')
+    }
+  }
+
   return {
     id: customer!.id,
     firstName: customer!.firstName,
@@ -138,16 +147,54 @@ export async function updateCustomerPassword(
     throw new Error('Client non trouvé')
   }
 
-  // Password changes not supported for customers
-  throw new Error('Changement de mot de passe non disponible pour les clients')
+  // Check old password if exists
+  if (customer.password) {
+    const passwordMatch = await compare(oldPassword, customer.password)
+    if (!passwordMatch) {
+      throw new Error('Ancien mot de passe incorrect')
+    }
+  }
+
+  const hashedPassword = await hash(newPassword, 12)
+
+  await prisma.customer.update({
+    where: { id: customerId },
+    data: {
+      password: hashedPassword,
+    },
+  } as any)
+
+  return { success: true }
 }
 
 /**
  * Request password reset
  */
 export async function requestPasswordReset(email: string) {
-  // Password reset not supported for customers
-  throw new Error('Réinitialisation de mot de passe non disponible pour les clients')
+  const customer = await prisma.customer.findUnique({
+    where: { email },
+  })
+
+  if (!customer) {
+    throw new Error('Aucun compte trouvé avec cet email')
+  }
+
+  // Generate reset token
+  const resetToken = crypto.randomBytes(32).toString('hex')
+  const resetExpires = new Date(Date.now() + 3600000) // 1 hour
+
+  await prisma.customer.update({
+    where: { id: customer.id },
+    data: {
+      password_reset_token: resetToken,
+      password_reset_expires: resetExpires,
+    },
+  } as any)
+
+  return {
+    success: true,
+    token: resetToken,
+  }
 }
 
 /**
