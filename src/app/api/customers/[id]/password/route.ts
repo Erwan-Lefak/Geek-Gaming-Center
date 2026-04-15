@@ -14,8 +14,8 @@ export async function GET(
   try {
     const user = await requireAuth()
 
-    // Only staff can view passwords
-    if (!hasRole(user, ['MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
+    // Staff can view passwords (including cashiers)
+    if (!hasRole(user, ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'])) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
