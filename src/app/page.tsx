@@ -86,6 +86,11 @@ export default function HomePage() {
               <Link
                   href="/store"
                   className="jelly-button group relative px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 font-semibold text-base sm:text-xl md:text-3xl text-white shadow-glow hover:shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 uppercase"
+                  style={{
+                    letterSpacing: '0.07em',
+                    fontFeatureSettings: '"kern" 0, "liga" 0',
+                    fontVariant: 'no-kerning'
+                  }}
                 >
                   <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   <span>Explorer la Boutique</span>
@@ -99,6 +104,11 @@ export default function HomePage() {
                       ? '!bg-white !text-black border-black'
                       : 'bg-surface border-border text-white hover:bg-elevated'
                   }`}
+                  style={{
+                    letterSpacing: '0.07em',
+                    fontFeatureSettings: '"kern" 0, "liga" 0',
+                    fontVariant: 'no-kerning'
+                  }}
                 >
                   <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: theme === 'light' ? '#000000' : '#ffffff' }} />
                   <span className={theme === 'light' ? '!text-black' : 'text-white'}>Salle de Jeux</span>
