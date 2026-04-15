@@ -67,7 +67,16 @@ export default function HomePage() {
             {/* Left Column - Title and Buttons (70% on tablet and desktop) */}
             <div className="w-full sm:col-span-7">
               {/* Main Headline */}
-              <h1 className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic">
+              <h1
+                className="!text-[4rem] md:!text-[4.7rem] lg:!text-[5.3rem] xl:!text-[6.7rem] font-bold mb-4 leading-[0.8] kinetic-text text-white uppercase italic hero-title-spacing"
+                style={{
+                  fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  letterSpacing: '0.08em',
+                  textRendering: 'optimizeLegibility',
+                  WebkitFontSmoothing: 'antialiased',
+                  MozOsxFontSmoothing: 'grayscale'
+                }}
+              >
                 <span className="text-black">Votre Destination</span> <span className="gradient-text block">Gaming Ultime</span>
               </h1>
 
