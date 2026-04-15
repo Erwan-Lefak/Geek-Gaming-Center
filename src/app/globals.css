@@ -2467,9 +2467,17 @@ html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-i
    Hero title and nav links disable kerning to allow letter-spacing with MisterBelvedere
    ============================================ */
 
-.hero-title-spacing,
-.nav-letter-spacing {
+.hero-title-spacing {
   letter-spacing: 0.03em !important;
+  font-feature-settings: "kern" 0, "liga" 0 !important;
+  font-variant: no-kerning !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+.nav-letter-spacing {
+  letter-spacing: 0.05em !important;
   font-feature-settings: "kern" 0, "liga" 0 !important;
   font-variant: no-kerning !important;
   text-rendering: optimizeLegibility !important;

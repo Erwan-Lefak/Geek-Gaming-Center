@@ -58,7 +58,7 @@ export default function Header() {
                   href={link.href}
                   className="nav-link nav-letter-spacing text-lg md:text-xl lg:text-2xl font-bold uppercase text-white hover:text-white transition-colors duration-200 relative group"
                   style={{
-                    letterSpacing: '0.03em',
+                    letterSpacing: '0.05em',
                     fontFeatureSettings: '"kern" 0, "liga" 0',
                     fontVariant: 'no-kerning'
                   }}
@@ -139,7 +139,7 @@ export default function Header() {
                 href={link.href}
                 className="nav-letter-spacing text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
                 style={{
-                  letterSpacing: '0.03em',
+                  letterSpacing: '0.05em',
                   fontFeatureSettings: '"kern" 0, "liga" 0',
                   fontVariant: 'no-kerning'
                 }}
@@ -153,7 +153,7 @@ export default function Header() {
               href="/account"
               className="nav-letter-spacing text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
               style={{
-                letterSpacing: '0.03em',
+                letterSpacing: '0.05em',
                 fontFeatureSettings: '"kern" 0, "liga" 0',
                 fontVariant: 'no-kerning'
               }}
