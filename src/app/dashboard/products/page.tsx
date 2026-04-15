@@ -8,17 +8,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
 import { Label } from '@/components/ui/label'
-import { Plus, Edit, Package, AlertTriangle } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
+import { Plus, Edit, Package, AlertTriangle, X, Upload } from 'lucide-react'
+import Image from 'next/image'
 
 interface Product {
   id: string
   name: string
-  sku: string
+  sku?: string
   category: string
-  currentStock: number
-  minStock: number
-  sellingPrice: number
-  costPrice: number
+  subcategory?: string
+  brand?: string
+  description?: string
+  stock?: number
+  currentStock?: number
+  minStock?: number
+  price?: number
+  sellingPrice?: number
+  costPrice?: number
+  image?: string
+  thumbnail?: string
+  images?: string[]
+  featured?: boolean
   supplier?: {
     name: string
   }
@@ -33,10 +44,15 @@ export default function ProductsPage() {
     name: '',
     sku: '',
     category: '',
+    subcategory: '',
+    brand: '',
+    description: '',
     costPrice: 0,
     sellingPrice: 0,
     currentStock: 0,
     minStock: 5,
+    thumbnail: '',
+    images: [] as string[],
   })
 
   useEffect(() => {
@@ -48,11 +64,60 @@ export default function ProductsPage() {
       setLoading(true)
       const response = await fetch('/api/products?limit=100')
       const data = await response.json()
-      setProducts(data.products || [])
+      setProducts(data.data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    try {
+      const formData = new FormData()
+
+      // Upload each file
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i])
+      }
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const newImages = data.files.map((f: any) => f.url)
+
+        // Set first image as thumbnail if not set
+        if (!formData.thumbnail && newImages.length > 0) {
+          setFormData(prev => ({ ...prev, thumbnail: newImages[0] }))
+        }
+
+        // Add to images array
+        setFormData(prev => ({ ...prev, images: [...prev.images, ...newImages] }))
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error)
+    }
+  }
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }))
+
+    // Update thumbnail if it was the removed image
+    if (formData.thumbnail === formData.images[index]) {
+      setFormData(prev => ({
+        ...prev,
+        thumbnail: formData.images[0] || ''
+      }))
     }
   }
 
@@ -79,10 +144,15 @@ export default function ProductsPage() {
           name: '',
           sku: '',
           category: '',
+          subcategory: '',
+          brand: '',
+          description: '',
           costPrice: 0,
           sellingPrice: 0,
           currentStock: 0,
           minStock: 5,
+          thumbnail: '',
+          images: [],
         })
         fetchProducts()
       }
@@ -95,17 +165,26 @@ export default function ProductsPage() {
     setSelectedProduct(product)
     setFormData({
       name: product.name,
-      sku: product.sku,
+      sku: product.sku || '',
       category: product.category,
-      costPrice: product.costPrice,
-      sellingPrice: product.sellingPrice,
-      currentStock: product.currentStock,
-      minStock: product.minStock,
+      subcategory: product.subcategory || '',
+      brand: product.brand || '',
+      description: product.description || '',
+      costPrice: Number(product.costPrice || 0),
+      sellingPrice: Number(product.sellingPrice || product.price || 0),
+      currentStock: Number(product.currentStock || product.stock || 0),
+      minStock: Number(product.minStock || 5),
+      thumbnail: (product.thumbnail || product.image || ''),
+      images: product.images || (product.image ? [product.image] : []),
     })
     setShowModal(true)
   }
 
-  const lowStockCount = products.filter(p => p.currentStock <= p.minStock).length
+  const lowStockCount = products.filter(p => {
+    const currentStock = p.currentStock || p.stock || 0
+    const minStock = p.minStock || 5
+    return currentStock <= minStock
+  }).length
 
   return (
     <div className="min-h-screen mt-28 lg:mt-20 bg-gray-50">
@@ -152,6 +231,7 @@ export default function ProductsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Image</TableHead>
                       <TableHead>Produit</TableHead>
                       <TableHead>Catégorie</TableHead>
                       <TableHead>Stock</TableHead>
@@ -163,27 +243,59 @@ export default function ProductsPage() {
                   </TableHeader>
                   <TableBody>
                     {products.map((product) => {
-                      const margin = ((product.sellingPrice - product.costPrice) / product.costPrice * 100).toFixed(0)
-                      const isLowStock = product.currentStock <= product.minStock
+                      // Handle both old (price, stock) and new (sellingPrice, currentStock, costPrice) field names
+                      const sellingPrice = product.sellingPrice || product.price || 0
+                      const costPrice = product.costPrice || 0
+                      const currentStock = product.currentStock || product.stock || 0
+                      const minStock = product.minStock || 5
+                      const thumbnail = product.thumbnail || product.image
+
+                      const margin = costPrice > 0 ? ((sellingPrice - costPrice) / costPrice * 100).toFixed(0) : '0'
+                      const isLowStock = currentStock <= minStock
 
                       return (
                         <TableRow key={product.id}>
                           <TableCell>
+                            {thumbnail ? (
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                                <Image
+                                  src={thumbnail}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                <Package className="w-6 h-6 text-gray-400" />
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
                             <div className="flex items-center gap-2">
-                              <Package className="w-4 h-4 text-gray-400" />
                               <div>
                                 <div className="font-medium text-gray-900">{product.name}</div>
-                                <div className="text-xs text-gray-600">SKU: {product.sku}</div>
+                                {product.sku && (
+                                  <div className="text-xs text-gray-600">SKU: {product.sku}</div>
+                                )}
+                                {product.brand && (
+                                  <div className="text-xs text-gray-500">Marque: {product.brand}</div>
+                                )}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="default">{product.category}</Badge>
+                            <div>
+                              <Badge variant="default">{product.category}</Badge>
+                              {product.subcategory && (
+                                <div className="text-xs text-gray-600 mt-1">{product.subcategory}</div>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <span className={`font-medium ${isLowStock ? 'text-red-600' : 'text-gray-900'}`}>
-                                {product.currentStock}
+                                {currentStock}
                               </span>
                               {isLowStock && (
                                 <Badge variant="danger" className="text-xs">
@@ -192,19 +304,23 @@ export default function ProductsPage() {
                               )}
                             </div>
                             <div className="text-xs text-gray-600">
-                              Min: {product.minStock}
+                              Min: {minStock}
                             </div>
                           </TableCell>
                           <TableCell>
-                            {product.costPrice.toLocaleString('fr-FR')} FCFA
+                            {costPrice > 0 ? Number(costPrice).toLocaleString('fr-FR') : '-'} FCFA
                           </TableCell>
                           <TableCell>
-                            {product.sellingPrice.toLocaleString('fr-FR')} FCFA
+                            {Number(sellingPrice).toLocaleString('fr-FR')} FCFA
                           </TableCell>
                           <TableCell>
-                            <Badge variant={parseFloat(margin) > 30 ? 'success' : 'warning'}>
-                              {margin}%
-                            </Badge>
+                            {costPrice > 0 ? (
+                              <Badge variant={parseFloat(margin) > 30 ? 'success' : 'warning'}>
+                                {margin}%
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary">-</Badge>
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button
@@ -234,9 +350,9 @@ export default function ProductsPage() {
           setSelectedProduct(null)
         }}
         title={selectedProduct ? 'Modifier le Produit' : 'Nouveau Produit'}
-        size="lg"
+        size="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto">
           <div>
             <Label htmlFor="name">Nom du produit *</Label>
             <Input
@@ -266,6 +382,35 @@ export default function ProductsPage() {
                 required
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="subcategory">Sous-catégorie</Label>
+              <Input
+                id="subcategory"
+                value={formData.subcategory}
+                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="brand">Marque</Label>
+              <Input
+                id="brand"
+                value={formData.brand}
+                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -312,7 +457,70 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div>
+            <Label>Images du produit</Label>
+            <div className="mt-2 space-y-4">
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <Upload className="w-4 h-4" />
+                  <span>Choisir des images</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                </label>
+              </div>
+
+              {/* Thumbnail selection */}
+              {formData.images.length > 0 && (
+                <div>
+                  <Label className="text-sm text-gray-600">Image principale (miniature)</Label>
+                  <div className="mt-2 grid grid-cols-4 gap-2">
+                    {formData.images.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                          formData.thumbnail === image
+                            ? 'border-primary-500 ring-2 ring-primary-200'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setFormData({ ...formData, thumbnail: image })}
+                      >
+                        <div className="relative w-full aspect-square">
+                          <Image
+                            src={image}
+                            alt={`Produit ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            removeImage(index)
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                        {formData.thumbnail === image && (
+                          <div className="absolute bottom-1 left-1 px-2 py-1 bg-primary-500 text-white text-xs rounded">
+                            Principale
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
               variant="ghost"
