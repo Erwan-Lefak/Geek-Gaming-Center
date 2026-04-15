@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createReservation, getCustomerReservations, generateSessionNumber } from '@/lib/reservations'
 import { z } from 'zod'
+import { auth } from '@/lib/auth'
 
 const createReservationSchema = z.object({
   equipmentId: z.string().min(1, 'L\'équipement est requis'),
@@ -13,16 +14,24 @@ const createReservationSchema = z.object({
 // GET /api/reservations - Récupérer les réservations du client connecté
 export async function GET(request: NextRequest) {
   try {
-    const customerId = request.cookies.get('customer_id')?.value
+    const session = await auth()
 
-    if (!customerId) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non authentifié' },
         { status: 401 }
       )
     }
 
-    const reservations = await getCustomerReservations(customerId)
+    // Vérifier que c'est un customer
+    if ((session.user as any).role !== 'CUSTOMER') {
+      return NextResponse.json(
+        { error: 'Accès réservé aux clients' },
+        { status: 403 }
+      )
+    }
+
+    const reservations = await getCustomerReservations(session.user.id)
 
     return NextResponse.json({
       reservations,
@@ -40,12 +49,20 @@ export async function GET(request: NextRequest) {
 // POST /api/reservations - Créer une nouvelle réservation
 export async function POST(request: NextRequest) {
   try {
-    const customerId = request.cookies.get('customer_id')?.value
+    const session = await auth()
 
-    if (!customerId) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Vous devez être connecté pour effectuer une réservation' },
         { status: 401 }
+      )
+    }
+
+    // Vérifier que c'est un customer
+    if ((session.user as any).role !== 'CUSTOMER') {
+      return NextResponse.json(
+        { error: 'Accès réservé aux clients' },
+        { status: 403 }
       )
     }
 
@@ -57,7 +74,7 @@ export async function POST(request: NextRequest) {
     // Créer la réservation
     const sessionNumber = await generateSessionNumber()
     const reservation = await createReservation({
-      customerId: customerId,
+      customerId: session.user.id,
       equipmentId: validatedData.equipmentId,
       date: new Date(validatedData.date),
       startTime: validatedData.startTime,

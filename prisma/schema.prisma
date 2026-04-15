@@ -51,6 +51,7 @@ model Customer {
   howDidYouFindUs        String?        @map("how_did_you_find_us")
   howDidYouFindUsDetails String?        @map("how_did_you_find_us_details")
   eventBookings          EventBooking[]
+  orders                 Order[]
 
   @@index([password_reset_token], map: "idx_customers_password_reset_token")
   @@map("customers")
@@ -552,6 +553,55 @@ enum InvoiceType {
   CREDIT_NOTE
 
   @@map("invoicetype")
+}
+
+model Order {
+  id              String       @id @default(cuid()) @map("id")
+  customerId      String       @map("customer_id")
+  orderNumber     String       @unique @map("order_number")
+  status          OrderStatus  @default(PENDING) @map("status")
+  totalAmount     Decimal      @map("total_amount") @db.Decimal(10, 2)
+  paymentMethod   PaymentMethod? @map("payment_method")
+  paymentStatus   PaymentStatus @default(PENDING) @map("payment_status")
+  notes           String?      @map("notes")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  customer        Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items           OrderItem[]
+
+  @@index([customerId], map: "idx_orders_customer")
+  @@index([status], map: "idx_orders_status")
+  @@index([createdAt], map: "idx_orders_created")
+  @@map("orders")
+}
+
+model OrderItem {
+  id              String      @id @default(cuid()) @map("id")
+  orderId         String      @map("order_id")
+  productId       String      @map("product_id")
+  productName     String      @map("product_name")
+  quantity        Int         @map("quantity")
+  unitPrice       Decimal     @map("unit_price") @db.Decimal(10, 2)
+  totalPrice      Decimal     @map("total_price") @db.Decimal(10, 2)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+
+  order           Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId], map: "idx_order_items_order")
+  @@index([productId], map: "idx_order_items_product")
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+
+  @@map("orderstatus")
 }
 
 enum PaymentMethod {

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -12,18 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  // Redirection automatique si déjà connecté
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      const userRole = (session.user as any).role
-      if (userRole === 'CUSTOMER') {
-        router.push('/account')
-      } else {
-        router.push('/dashboard')
-      }
-    }
-  }, [status, session, router])
+  const [showPassword, setShowPassword] = useState(false)
 
   // Afficher un état de chargement pendant la vérification de la session
   if (status === 'loading') {
@@ -51,11 +41,27 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError('Email ou mot de passe incorrect')
-      } else {
-        // Attendre que la session soit chargée puis rediriger selon le rôle
-        setTimeout(() => {
-          router.refresh()
-        }, 100)
+      } else if (result?.ok) {
+        // Login successful - wait for session and redirect based on role
+        setLoading(true)
+        // Wait for session to be established
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        // Get the session to determine redirect
+        const response = await fetch('/api/auth/session')
+        if (response.ok) {
+          const sessionData = await response.json()
+          const userRole = sessionData?.user?.role
+
+          if (userRole === 'CUSTOMER') {
+            window.location.href = '/account'
+          } else {
+            window.location.href = '/dashboard'
+          }
+        } else {
+          // Fallback to dashboard if we can't get session
+          window.location.href = '/dashboard'
+        }
       }
     } catch (err) {
       setError('Une erreur est survenue')
@@ -116,13 +122,24 @@ export default function LoginPage() {
                     </div>
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-14 pr-5 py-4 text-lg bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                      className="w-full pl-14 pr-14 py-4 text-lg bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-5 flex items-center text-purple-400 hover:text-purple-300 transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-6 w-6" />
+                      ) : (
+                        <Eye className="h-6 w-6" />
+                      )}
+                    </button>
                   </div>
                 </div>
 

@@ -9,6 +9,8 @@ const loginSchema = z.object({
   password: z.string().min(6),
 })
 
+console.log('🔧 [AUTH] auth module loaded')
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/login',
@@ -41,10 +43,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        try {
-          const { email, password } = loginSchema.parse(credentials)
+        console.log('🚀 [AUTH] Authorize function called')
+        console.log('📥 [AUTH] Credentials received:', JSON.stringify(credentials))
 
-          const user = await prisma.user.findUnique({
+        try {
+          console.log('🔐 [AUTH] Raw credentials received:', {
+            hasEmail: !!credentials?.email,
+            hasPassword: !!credentials?.password,
+            emailType: typeof credentials?.email,
+            passwordType: typeof credentials?.password
+          })
+
+          let validatedData
+          try {
+            validatedData = loginSchema.parse(credentials)
+            console.log('✅ [AUTH] Zod validation passed')
+          } catch (zodError) {
+            console.log('❌ [AUTH] Zod validation failed:', zodError.errors)
+            return null
+          }
+
+          const { email, password } = validatedData
+          console.log('🔐 [AUTH] Attempting login for:', email)
+
+          // Try to authenticate as User (staff/admin)
+          console.log('👤 [AUTH] Trying user authentication...')
+          let user = await prisma.user.findUnique({
             where: { email },
             select: {
               id: true,
@@ -56,30 +80,86 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           })
 
-          if (!user || !user.isActive) {
-            return null
+          if (user) {
+            console.log('👤 [AUTH] User found:', { id: user.id, isActive: user.isActive })
+
+            if (user.isActive) {
+              console.log('🔐 [AUTH] Testing user password...')
+              const isValidPassword = await compare(password, user.password)
+
+              if (isValidPassword) {
+                console.log('✅ [AUTH] User authenticated successfully as:', user.name)
+                // Update last login
+                await prisma.user.update({
+                  where: { id: user.id },
+                  data: { lastLogin: new Date() },
+                })
+
+                return {
+                  id: user.id,
+                  email: user.email,
+                  name: user.name,
+                  role: user.role,
+                }
+              }
+              console.log('❌ [AUTH] User password mismatch')
+            } else {
+              console.log('❌ [AUTH] User is not active')
+            }
+          } else {
+            console.log('👤 [AUTH] User not found')
           }
 
-          const isValidPassword = await compare(password, user.password)
-
-          if (!isValidPassword) {
-            return null
-          }
-
-          // Update last login
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { lastLogin: new Date() },
+          // Try to authenticate as Customer
+          console.log('👤 [AUTH] Trying customer authentication...')
+          const customer = await prisma.customer.findUnique({
+            where: { email },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              firstName: true,
+              lastName: true,
+              is_active: true,
+            },
           })
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
+          console.log('🔍 [AUTH] Customer search result:', customer ? 'Found' : 'Not found')
+
+          if (customer) {
+            console.log('📋 [AUTH] Customer details:', {
+              id: customer.id,
+              email: customer.email,
+              is_active: customer.is_active,
+              has_password: !!customer.password,
+              password_length: customer.password?.length
+            })
+
+            if (customer.is_active && customer.password) {
+              console.log('🔐 [AUTH] Testing customer password...')
+              const isValidPassword = await compare(password, customer.password)
+
+              if (isValidPassword) {
+                console.log('✅ [AUTH] Customer authenticated successfully as:', customer.firstName + ' ' + customer.lastName)
+                return {
+                  id: customer.id,
+                  email: customer.email,
+                  name: `${customer.firstName} ${customer.lastName}`,
+                  role: 'CUSTOMER',
+                }
+              }
+              console.log('❌ [AUTH] Customer password mismatch')
+            } else {
+              console.log('❌ [AUTH] Customer not active or no password')
+            }
           }
+
+          console.log('❌ [AUTH] Authentication failed - returning null')
+          return null
         } catch (error) {
-          console.error('Auth error:', error)
+          console.error('❌ [AUTH] Exception:', error)
+          console.error('❌ [AUTH] Error name:', error.name)
+          console.error('❌ [AUTH] Error message:', error.message)
           return null
         }
       },

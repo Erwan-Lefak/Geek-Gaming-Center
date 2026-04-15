@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Calendar, Clock, Gamepad2, User, LogOut, X, Check, ChevronRight } from 'lucide-react'
+import { Calendar, Clock, Gamepad2, User, LogOut, X, Check, ChevronRight, Package, ShoppingBag, UserCircle, Key, Trash2, Edit3 } from 'lucide-react'
 
 interface Reservation {
   id: string
@@ -19,46 +20,134 @@ interface Reservation {
   price: number
 }
 
+interface OrderItem {
+  id: string
+  productName: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+interface Order {
+  id: string
+  orderNumber: string
+  status: string
+  totalAmount: number
+  paymentMethod: string | null
+  paymentStatus: string
+  createdAt: string
+  items: OrderItem[]
+}
+
+interface CustomerProfile {
+  id: string
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string
+  address: string | null
+  city: string | null
+  dateOfBirth: string | null
+}
+
 export default function AccountPage() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(true)
   const [reservations, setReservations] = useState<Reservation[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [error, setError] = useState('')
-  const [customer, setCustomer] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<'reservations' | 'orders' | 'profile'>('reservations')
+
+  // Profile states
+  const [profile, setProfile] = useState<CustomerProfile | null>(null)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    address: '',
+    city: '',
+  })
+  const [saveMessage, setSaveMessage] = useState('')
+
+  // Password states
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  })
+  const [passwordError, setPasswordError] = useState('')
 
   // Check if user is logged in
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Try to fetch reservations (requires auth)
-        const response = await fetch('/api/reservations')
+    const fetchData = async () => {
+      // Redirect if not authenticated
+      if (status === 'unauthenticated') {
+        router.push('/login')
+        return
+      }
 
-        if (response.status === 401) {
-          // Not authenticated, redirect to login
-          router.push('/login?redirect=/account')
-          return
+      // Wait for session to load
+      if (status !== 'authenticated') {
+        return
+      }
+
+      // Check if user is a customer
+      const userRole = (session?.user as any)?.role
+      if (userRole !== 'CUSTOMER') {
+        router.push('/dashboard')
+        return
+      }
+
+      try {
+        // Fetch reservations, orders and profile in parallel
+        const [reservationsResponse, ordersResponse, profileResponse] = await Promise.all([
+          fetch('/api/reservations'),
+          fetch('/api/orders'),
+          fetch('/api/account'),
+        ])
+
+        if (reservationsResponse.ok) {
+          const data = await reservationsResponse.json()
+          setReservations(data.reservations || [])
+        } else if (reservationsResponse.status === 401) {
+          router.push('/login')
+        } else {
+          setError('Erreur lors de la récupération des données')
         }
 
-        if (response.ok) {
-          const data = await response.json()
-          setReservations(data.reservations || [])
+        if (ordersResponse.ok) {
+          const data = await ordersResponse.json()
+          setOrders(data.orders || [])
+        }
 
-          // Get customer info from a cookie or session
-          // For now, we'll just show reservations
+        if (profileResponse.ok) {
+          const data = await profileResponse.json()
+          setProfile(data.customer)
+          setProfileForm({
+            firstName: data.customer.firstName,
+            lastName: data.customer.lastName,
+            phone: data.customer.phone,
+            address: data.customer.address || '',
+            city: data.customer.city || '',
+          })
         }
       } catch (err) {
-        console.error('Error checking auth:', err)
+        console.error('Error fetching data:', err)
+        setError('Erreur de connexion')
       } finally {
         setIsLoading(false)
       }
     }
 
-    checkAuth()
-  }, [router])
+    fetchData()
+  }, [status, session, router])
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/customer/logout', { method: 'POST' })
+      await fetch('/api/auth/signout', { method: 'POST' })
       router.push('/arena')
     } catch (err) {
       console.error('Logout error:', err)
@@ -86,6 +175,101 @@ export default function AccountPage() {
     } catch (err) {
       console.error('Cancel error:', err)
       alert('Erreur lors de l\'annulation')
+    }
+  }
+
+  const handleSaveProfile = async () => {
+    try {
+      setSaveMessage('')
+
+      const response = await fetch('/api/account', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileForm),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setProfile(data.customer)
+        setSaveMessage('Profil mis à jour avec succès !')
+        setIsEditingProfile(false)
+        setTimeout(() => setSaveMessage(''), 3000)
+      } else {
+        const data = await response.json()
+        setSaveMessage(data.error || 'Erreur lors de la mise à jour')
+      }
+    } catch (err) {
+      console.error('Error saving profile:', err)
+      setSaveMessage('Erreur de connexion')
+    }
+  }
+
+  const handleChangePassword = async () => {
+    setPasswordError('')
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('Les mots de passe ne correspondent pas')
+      return
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('Le mot de passe doit contenir au moins 6 caractères')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/account/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      })
+
+      if (response.ok) {
+        alert('Mot de passe changé avec succès !')
+        setShowPasswordForm(false)
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        })
+      } else {
+        const data = await response.json()
+        setPasswordError(data.error || 'Erreur lors du changement de mot de passe')
+      }
+    } catch (err) {
+      console.error('Error changing password:', err)
+      setPasswordError('Erreur de connexion')
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
+      return
+    }
+
+    if (!confirm('Confirmer la suppression du compte ? Toutes vos données seront perdues.')) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/account', {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        alert('Compte supprimé avec succès')
+        await fetch('/api/auth/signout', { method: 'POST' })
+        router.push('/arena')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors de la suppression')
+      }
+    } catch (err) {
+      console.error('Error deleting account:', err)
+      alert('Erreur lors de la suppression')
     }
   }
 
@@ -158,6 +342,61 @@ export default function AccountPage() {
     return hoursUntilStart >= 2
   }
 
+  const getOrderStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
+      case 'CONFIRMED':
+        return 'bg-blue-500/20 text-blue-300 border-blue-500/50'
+      case 'PREPARING':
+        return 'bg-purple-500/20 text-purple-300 border-purple-500/50'
+      case 'READY':
+        return 'bg-green-500/20 text-green-300 border-green-500/50'
+      case 'COMPLETED':
+        return 'bg-gray-500/20 text-gray-300 border-gray-500/50'
+      case 'CANCELLED':
+        return 'bg-red-500/20 text-red-300 border-red-500/50'
+      default:
+        return 'bg-gray-500/20 text-gray-300 border-gray-500/50'
+    }
+  }
+
+  const getOrderStatusLabel = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'En attente'
+      case 'CONFIRMED':
+        return 'Confirmé'
+      case 'PREPARING':
+        return 'En préparation'
+      case 'READY':
+        return 'Prêt'
+      case 'COMPLETED':
+        return 'Terminé'
+      case 'CANCELLED':
+        return 'Annulé'
+      default:
+        return status
+    }
+  }
+
+  const getPaymentStatusLabel = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'En attente'
+      case 'PAID':
+        return 'Payé'
+      case 'PARTIALLY_PAID':
+        return 'Partiellement payé'
+      case 'CANCELLED':
+        return 'Annulé'
+      case 'REFUNDED':
+        return 'Remboursé'
+      default:
+        return status
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center">
@@ -167,7 +406,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black pt-40 sm:pt-36 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
       {/* Background gaming effect */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2NiA2NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjMzIiIGN5PSIzMyIgcj0iMzMiIGZpbGw9IiNmNmY2ZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9nPjwvc3ZnPg==')] animate-pulse"></div>
@@ -249,7 +488,59 @@ export default function AccountPage() {
 
         {/* Reservations List */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Mes Réservations</h2>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => setActiveTab('reservations')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === 'reservations'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-white/10 text-purple-300 hover:bg-white/20'
+              }`}
+            >
+              <Calendar className="w-5 h-5" />
+              <span>Mes Réservations</span>
+              <span className={`ml-2 px-2 py-1 rounded-lg text-xs ${
+                activeTab === 'reservations' ? 'bg-white/20' : 'bg-purple-600/20'
+              }`}>
+                {reservations.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === 'orders'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-white/10 text-purple-300 hover:bg-white/20'
+              }`}
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span>Boutique</span>
+              <span className={`ml-2 px-2 py-1 rounded-lg text-xs ${
+                activeTab === 'orders' ? 'bg-white/20' : 'bg-purple-600/20'
+              }`}>
+                {orders.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === 'profile'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-white/10 text-purple-300 hover:bg-white/20'
+              }`}
+            >
+              <UserCircle className="w-5 h-5" />
+              <span>Mon Profil</span>
+            </button>
+          </div>
+
+          {/* Reservations Content */}
+          {activeTab === 'reservations' && (
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Mes Réservations</h2>
 
           {reservations.length === 0 ? (
             <div className="text-center py-12">
@@ -315,6 +606,283 @@ export default function AccountPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+            </div>
+          )}
+
+          {/* Orders Content */}
+          {activeTab === 'orders' && (
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Mes Commandes</h2>
+
+              {orders.length === 0 ? (
+                <div className="text-center py-12">
+                  <ShoppingBag className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <p className="text-purple-300 text-lg mb-4">Aucune commande pour le moment</p>
+                  <Link
+                    href="/store"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg"
+                  >
+                    <Package className="w-5 h-5" />
+                    Visiter la boutique
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-xl font-bold text-white">
+                              Commande #{order.orderNumber}
+                            </h3>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getOrderStatusColor(order.status)}`}>
+                              {getOrderStatusLabel(order.status)}
+                            </span>
+                          </div>
+                          <p className="text-purple-300 text-sm">
+                            {new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-white">
+                            {formatPrice(Number(order.totalAmount))}
+                          </p>
+                          <p className={`text-xs font-semibold ${order.paymentStatus === 'PAID' ? 'text-green-400' : 'text-yellow-400'}`}>
+                            {getPaymentStatusLabel(order.paymentStatus)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-4">
+                        <p className="text-purple-300 text-sm font-semibold mb-2">Articles commandés :</p>
+                        <div className="space-y-2">
+                          {order.items.map((item) => (
+                            <div key={item.id} className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-3">
+                                <Package className="w-4 h-4 text-purple-400" />
+                                <span className="text-white">{item.productName}</span>
+                                <span className="text-purple-400">x{item.quantity}</span>
+                              </div>
+                              <span className="text-white font-semibold">
+                                {formatPrice(Number(item.totalPrice))}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Profile Content */}
+          {activeTab === 'profile' && (
+            <div>
+              {!profile ? (
+                <div className="text-center py-12">
+                  <UserCircle className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <p className="text-purple-300 text-lg mb-4">Chargement du profil...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Profile Information */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-xl font-bold text-white">Mes Informations</h2>
+                      <button
+                        onClick={() => setIsEditingProfile(!isEditingProfile)}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-600/50 rounded-xl transition-all text-sm font-semibold"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        {isEditingProfile ? 'Annuler' : 'Modifier'}
+                      </button>
+                    </div>
+
+                    {saveMessage && (
+                      <div className={`mb-4 px-4 py-3 rounded-lg text-sm ${
+                        saveMessage.includes('succès')
+                          ? 'bg-green-500/20 text-green-300 border border-green-500/50'
+                          : 'bg-red-500/20 text-red-300 border border-red-500/50'
+                      }`}>
+                        {saveMessage}
+                      </div>
+                    )}
+
+                    {isEditingProfile ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Prénom</label>
+                          <input
+                            type="text"
+                            value={profileForm.firstName}
+                            onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Nom</label>
+                          <input
+                            type="text"
+                            value={profileForm.lastName}
+                            onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Téléphone</label>
+                          <input
+                            type="tel"
+                            value={profileForm.phone}
+                            onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Adresse</label>
+                          <input
+                            type="text"
+                            value={profileForm.address}
+                            onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Ville</label>
+                          <input
+                            type="text"
+                            value={profileForm.city}
+                            onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <button
+                            onClick={handleSaveProfile}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg"
+                          >
+                            <Check className="w-5 h-5" />
+                            Enregistrer les modifications
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Prénom</p>
+                          <p className="text-white font-semibold">{profile.firstName}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Nom</p>
+                          <p className="text-white font-semibold">{profile.lastName}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Email</p>
+                          <p className="text-white font-semibold">{profile.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Téléphone</p>
+                          <p className="text-white font-semibold">{profile.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Adresse</p>
+                          <p className="text-white font-semibold">{profile.address || 'Non renseignée'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-purple-300 mb-1">Ville</p>
+                          <p className="text-white font-semibold">{profile.city || 'Non renseignée'}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Change Password */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-xl font-bold text-white">Mot de passe</h2>
+                      <button
+                        onClick={() => setShowPasswordForm(!showPasswordForm)}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-600/50 rounded-xl transition-all text-sm font-semibold"
+                      >
+                        <Key className="w-4 h-4" />
+                        {showPasswordForm ? 'Annuler' : 'Changer'}
+                      </button>
+                    </div>
+
+                    {showPasswordForm && (
+                      <div className="space-y-4">
+                        {passwordError && (
+                          <div className="bg-red-500/20 text-red-300 px-4 py-3 rounded-lg text-sm">
+                            {passwordError}
+                          </div>
+                        )}
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Mot de passe actuel</label>
+                          <input
+                            type="password"
+                            value={passwordForm.currentPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Nouveau mot de passe</label>
+                          <input
+                            type="password"
+                            value={passwordForm.newPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-purple-300 mb-2">Confirmer le mot de passe</label>
+                          <input
+                            type="password"
+                            value={passwordForm.confirmPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                        <button
+                          onClick={handleChangePassword}
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg"
+                        >
+                          <Check className="w-5 h-5" />
+                          Changer le mot de passe
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Delete Account */}
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+                    <h2 className="text-xl font-bold text-red-400 mb-4">Zone Danger</h2>
+                    <p className="text-red-300 text-sm mb-6">
+                      La suppression de votre compte est irréversible. Toutes vos données (réservations, commandes, informations personnelles) seront définitivement perdues.
+                    </p>
+                    <button
+                      onClick={handleDeleteAccount}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                      Supprimer mon compte
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
