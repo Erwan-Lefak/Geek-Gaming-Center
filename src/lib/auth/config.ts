@@ -65,6 +65,13 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         try {
+          console.log('🔐 [AUTH] Raw credentials received:', {
+            hasEmail: !!credentials?.email,
+            hasPassword: !!credentials?.password,
+            emailType: typeof credentials?.email,
+            passwordType: typeof credentials?.password
+          })
+
           const { email, password } = loginSchema.parse(credentials)
 
           console.log('🔐 [AUTH] Attempting login for:', email)
@@ -125,7 +132,8 @@ export const authConfig: NextAuthConfig = {
               id: customer.id,
               email: customer.email,
               is_active: customer.is_active,
-              has_password: !!customer.password
+              has_password: !!customer.password,
+              password_length: customer.password?.length
             })
           }
 
@@ -134,7 +142,7 @@ export const authConfig: NextAuthConfig = {
             const isValidPassword = await compare(password, customer.password)
 
             if (isValidPassword) {
-              console.log('✅ [AUTH] Customer authenticated successfully')
+              console.log('✅ [AUTH] Customer authenticated successfully as:', customer.firstName + ' ' + customer.lastName)
               return {
                 id: customer.id,
                 email: customer.email,
@@ -151,6 +159,8 @@ export const authConfig: NextAuthConfig = {
           return null
         } catch (error) {
           console.error('❌ [AUTH] Exception:', error)
+          console.error('❌ [AUTH] Error name:', error.name)
+          console.error('❌ [AUTH] Error message:', error.message)
           return null
         }
       },
