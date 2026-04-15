@@ -126,7 +126,9 @@ export async function POST(request: NextRequest) {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email || null,
+      email_verified: data.email ? true : false, // Auto-verify email when created by staff
       phone: data.phone,
+      phone_verified: false, // Phone still needs verification
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth as string) : null,
       address: data.address || null,
       city: data.city || null,
