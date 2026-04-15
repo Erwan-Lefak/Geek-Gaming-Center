@@ -119,16 +119,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Accès réservé aux clients' }, { status: 403 })
     }
 
-    // Soft delete - just mark as inactive
-    await prisma.customer.update({
+    // Hard delete - permanently remove the account
+    await prisma.customer.delete({
       where: { id: session.user.id },
-      data: {
-        is_active: false,
-        email: `deleted_${session.user.id}_${Date.now()}@deleted.com`, // Anonymize email
-      },
     })
 
-    return NextResponse.json({ message: 'Compte supprimé avec succès' })
+    // Create response with session clearing cookie
+    const response = NextResponse.json({ message: 'Compte supprimé avec succès' })
+
+    // Clear session cookie
+    response.cookies.delete('next-auth.session-token')
+    response.cookies.delete('next-auth.csrf-token')
+
+    return response
   } catch (error: any) {
     console.error('Delete account error:', error)
     return NextResponse.json(

@@ -262,8 +262,8 @@ export default function AccountPage() {
 
       if (response.ok) {
         setShowDeleteModal(false)
-        await fetch('/api/auth/signout', { method: 'POST' })
-        router.push('/arena')
+        // Redirect to arena with a flag to clear session
+        window.location.href = '/arena?loggedOut=true'
       } else {
         const data = await response.json()
         alert(data.error || 'Erreur lors de la suppression')
