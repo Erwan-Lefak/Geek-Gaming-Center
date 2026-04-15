@@ -941,19 +941,29 @@ export default function AccountPage() {
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
             <p className="text-red-800 text-sm">
-              Vous êtes sur le point de supprimer votre compte :
+              Vous êtes sur le point de supprimer définitivement votre compte
             </p>
-            <p className="text-red-900 font-bold mt-2">
-              {profile?.firstName} {profile?.lastName}
-            </p>
-            {profile?.email && (
-              <p className="text-red-700 text-sm mt-1">{profile.email}</p>
+            {profile && (
+              <>
+                <p className="text-red-900 font-bold mt-2">
+                  {profile.firstName} {profile.lastName}
+                </p>
+                {profile.email && !profile.email.startsWith('deleted_') && (
+                  <p className="text-red-700 text-sm mt-1">{profile.email}</p>
+                )}
+              </>
             )}
           </div>
 
           <p className="text-gray-600 text-sm">
-            Cette action est irréversible. Toutes vos données (réservations, commandes, informations personnelles) seront définitivement supprimées.
+            Cette action est <strong>irréversible</strong>. Toutes vos données seront définitivement supprimées :
           </p>
+          <ul className="text-gray-600 text-sm list-disc list-inside space-y-1 ml-2">
+            <li>Historique des réservations</li>
+            <li>Commandes et achats</li>
+            <li>Informations personnelles</li>
+            <li>Données de connexion</li>
+          </ul>
 
           <div className="flex gap-3 justify-end pt-4">
             <button
