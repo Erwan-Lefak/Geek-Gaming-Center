@@ -1,0 +1,21 @@
+$TTL 3600
+@    IN SOA dns14.ovh.net. tech.ovh.net. (2076206426 86400 3600 3600000 60)
+@    IN NS     dns14.ovh.net.
+@    IN NS     ns14.ovh.net.
+@    IN MX     1 mx0.mail.ovh.net.
+@    IN MX     5 mx1.mail.ovh.net.
+@    IN MX     50 mx2.mail.ovh.net.
+@    IN MX     100 mx3.mail.ovh.net.
+@    IN A     216.198.79.1
+@    IN TXT     "v=spf1 include:mx.ovh.com include:amazonses.com include:_spf.resend.com ~all"
+@    IN TXT     "1|www.geek-gaming-center.cam"
+_autodiscover._tcp        IN SRV     0 0 443 zimbra1.mail.ovh.net.
+_dmarc        IN TXT     "v=DMARC1; p=none;"
+ftp        IN CNAME     geek-gaming-center.cam.
+ovhmo-selector-1._domainkey        IN CNAME     ovhmo-selector-1._domainkey.4556584.cu.dkim.mail.ovh.net.
+ovhmo-selector-2._domainkey        IN CNAME     ovhmo-selector-2._domainkey.4556585.cu.dkim.mail.ovh.net.
+resend._domainkey        IN TXT     "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCn99pPhuWpaLrX/6raAEBKrkFGSq5M53feFKjcD+hxV6LyZaUUe7O8JNIfcqcIS/91ARPOgf4KSbqOqZ2m1qB98PapnCxlRp7ciARpxTaX9ibYI196E0KfR5sm2j9Ek6txMcv9aMz3HfHgLR9pNudOW6Bv1iGKeNajHu+sZG0VqQIDAQAB"
+send        IN MX     10 feedback-smtp.eu-west-1.amazonses.com
+send        IN TXT     "v=spf1 include:amazonses.com include:_spf.resend.com ~all"
+www        IN A     216.198.79.1
+www        IN TXT     "3|welcome"

@@ -9,7 +9,7 @@ interface ModalProps {
   onClose: () => void
   title?: string
   children: ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
 }
 
 export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
@@ -28,6 +28,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
+    full: 'w-full h-full max-w-full m-0 rounded-none',
   }
 
   return (
@@ -41,15 +42,15 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       {/* Modal */}
       <div
         className={cn(
-          'relative w-full max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl',
+          'relative w-full max-h-[90vh] flex flex-col rounded-xl shadow-2xl',
           sizes[size]
         )}
         style={{ backgroundColor: 'var(--background)' }}
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 z-10" style={{ backgroundColor: 'var(--background)' }}>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{title}</h2>
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b shrink-0" style={{ backgroundColor: 'var(--background)' }}>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900" style={{ color: 'var(--foreground)' }}>{title}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -60,7 +61,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         )}
 
         {/* Content */}
-        <div className="p-4 sm:p-6">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto">{children}</div>
       </div>
     </div>
   )

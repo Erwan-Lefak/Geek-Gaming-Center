@@ -104,10 +104,22 @@ export default function CustomersPage() {
     }
   }
 
-  const handleEdit = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setCustomerFormError('')
-    setShowModal(true)
+  const handleEdit = async (customer: Customer) => {
+    // Récupérer les données complètes du client depuis l'API
+    try {
+      const response = await fetch(`/api/customers/${customer.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setSelectedCustomer(data.customer) // Utiliser les données complètes
+        setCustomerFormError('')
+        setShowModal(true)
+      } else {
+        setCustomerFormError('Erreur lors du chargement du client')
+      }
+    } catch (error) {
+      console.error('Error fetching customer details:', error)
+      setCustomerFormError('Erreur de connexion au serveur')
+    }
   }
 
   const handleDeleteClick = (customer: Customer) => {
@@ -369,6 +381,12 @@ export default function CustomersPage() {
             lastName: selectedCustomer.lastName,
             email: selectedCustomer.email,
             phone: selectedCustomer.phone,
+            address: selectedCustomer.address || undefined,
+            city: selectedCustomer.city || undefined,
+            dateOfBirth: selectedCustomer.dateOfBirth || undefined,
+            howDidYouFindUs: selectedCustomer.howDidYouFindUs || undefined,
+            howDidYouFindUsDetails: selectedCustomer.howDidYouFindUsDetails || undefined,
+            notes: selectedCustomer.notes || undefined,
           } : undefined}
           submitLabel={selectedCustomer ? 'Mettre à jour' : 'Créer le Client'}
           includePassword={false}
@@ -384,7 +402,7 @@ export default function CustomersPage() {
           setSelectedCustomer(null)
         }}
         title="Confirmer la suppression"
-        size="md"
+        size="xl"
       >
         <div className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">

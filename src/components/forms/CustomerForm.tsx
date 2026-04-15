@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,22 +36,41 @@ export function CustomerForm({
   error: propError,
 }: CustomerFormProps) {
   const [formData, setFormData] = useState({
-    firstName: initialData.firstName || '',
-    lastName: initialData.lastName || '',
-    email: initialData.email || '',
-    phone: initialData.phone || '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
-    address: initialData.address || '',
-    city: initialData.city || '',
-    howDidYouFindUs: initialData.howDidYouFindUs || '',
-    howDidYouFindUsDetails: initialData.howDidYouFindUsDetails || '',
-    notes: initialData.notes || '',
-    dateOfBirth: initialData.dateOfBirth || '',
+    address: '',
+    city: '',
+    howDidYouFindUs: '',
+    howDidYouFindUsDetails: '',
+    notes: '',
+    dateOfBirth: '',
     acceptTerms: false,
   })
   const [error, setError] = useState(propError || '')
   const [loading, setLoading] = useState(false)
+
+  // Mettre à jour le formulaire quand initialData change
+  useEffect(() => {
+    setFormData({
+      firstName: initialData.firstName || '',
+      lastName: initialData.lastName || '',
+      email: initialData.email || '',
+      phone: initialData.phone || '',
+      password: '',
+      confirmPassword: '',
+      address: initialData.address || '',
+      city: initialData.city || '',
+      howDidYouFindUs: initialData.howDidYouFindUs || '',
+      howDidYouFindUsDetails: initialData.howDidYouFindUsDetails || '',
+      notes: initialData.notes || '',
+      dateOfBirth: initialData.dateOfBirth ? new Date(initialData.dateOfBirth).toISOString().split('T')[0] : '',
+      acceptTerms: !!initialData.firstName, // Auto-accept if editing
+    })
+  }, [initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -23,18 +23,21 @@ export interface SendEmailOptions {
 // Initialize Resend (only if API key is available)
 const getResend = () => {
   const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
+  if (!apiKey || apiKey === '') {
     console.warn('⚠️ RESEND_API_KEY not found - Email service disabled')
     return null
   }
-  return new Resend(apiKey)
+  try {
+    return new Resend(apiKey)
+  } catch (error) {
+    console.error('❌ Error initializing Resend:', error)
+    return null
+  }
 }
 
-const resend = getResend()
-
 // Default sender
-const DEFAULT_FROM = process.env.EMAIL_FROM || 'Geek Gaming Center <noreply@geekgamingcenter.cm>'
-const REPLY_TO = process.env.EMAIL_REPLY_TO || 'support@geekgamingcenter.cm'
+const DEFAULT_FROM = process.env.EMAIL_FROM || 'Geek Gaming Center <support@geek-gaming-center.cam>'
+const REPLY_TO = process.env.EMAIL_REPLY_TO || 'support@geek-gaming-center.cam'
 
 /**
  * Mail Service - Send emails using templates from database
@@ -145,6 +148,9 @@ export class MailService {
 
       // Wrap HTML with proper DOCTYPE
       const finalHtml = this.wrapHtml(htmlBody)
+
+      // Get Resend instance
+      const resend = getResend()
 
       // Check if Resend is available
       if (!resend) {
@@ -297,7 +303,7 @@ export class MailService {
     templateType: string,
     data: EmailData
   ): Promise<boolean> {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@geekgamingcenter.cm'
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin.ggccameroun@gmail.com'
 
     return this.sendEmail({
       to: adminEmail,
