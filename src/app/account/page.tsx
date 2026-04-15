@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Calendar, Clock, Gamepad2, User, LogOut, X, Check, ChevronRight, Package, ShoppingBag, UserCircle, Key, Trash2, Edit3 } from 'lucide-react'
+import Modal from '@/components/ui/modal'
 
 interface Reservation {
   id: string
@@ -79,6 +80,8 @@ export default function AccountPage() {
     confirmPassword: '',
   })
   const [passwordError, setPasswordError] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Check if user is logged in
   useEffect(() => {
@@ -246,13 +249,11 @@ export default function AccountPage() {
   }
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
-      return
-    }
+    setShowDeleteModal(true)
+  }
 
-    if (!confirm('Confirmer la suppression du compte ? Toutes vos données seront perdues.')) {
-      return
-    }
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true)
 
     try {
       const response = await fetch('/api/account', {
@@ -260,16 +261,18 @@ export default function AccountPage() {
       })
 
       if (response.ok) {
-        alert('Compte supprimé avec succès')
+        setShowDeleteModal(false)
         await fetch('/api/auth/signout', { method: 'POST' })
         router.push('/arena')
       } else {
         const data = await response.json()
         alert(data.error || 'Erreur lors de la suppression')
+        setIsDeleting(false)
       }
     } catch (err) {
       console.error('Error deleting account:', err)
       alert('Erreur lors de la suppression')
+      setIsDeleting(false)
     }
   }
 
@@ -926,6 +929,60 @@ export default function AccountPage() {
           </Link>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Confirmer la suppression du compte"
+        size="xl"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
+            <p className="text-red-800 text-sm">
+              Vous êtes sur le point de supprimer votre compte :
+            </p>
+            <p className="text-red-900 font-bold mt-2">
+              {profile?.firstName} {profile?.lastName}
+            </p>
+            {profile?.email && (
+              <p className="text-red-700 text-sm mt-1">{profile.email}</p>
+            )}
+          </div>
+
+          <p className="text-gray-600 text-sm">
+            Cette action est irréversible. Toutes vos données (réservations, commandes, informations personnelles) seront définitivement supprimées.
+          </p>
+
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              disabled={isDeleting}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4" />
+                  Supprimer définitivement
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
