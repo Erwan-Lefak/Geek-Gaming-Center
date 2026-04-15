@@ -67,7 +67,8 @@ export const authConfig: NextAuthConfig = {
         try {
           const { email, password } = loginSchema.parse(credentials)
 
-          const user = await prisma.user.findUnique({
+          // Try to authenticate as User (staff/admin)
+          let user = await prisma.user.findUnique({
             where: { email },
             select: {
               id: true,
@@ -79,28 +80,52 @@ export const authConfig: NextAuthConfig = {
             },
           })
 
-          if (!user || !user.isActive) {
-            return null
+          if (user && user.isActive) {
+            const isValidPassword = await compare(password, user.password)
+
+            if (isValidPassword) {
+              // Update last login
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { lastLogin: new Date() },
+              })
+
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+              }
+            }
           }
 
-          const isValidPassword = await compare(password, user.password)
-
-          if (!isValidPassword) {
-            return null
-          }
-
-          // Update last login
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { lastLogin: new Date() },
+          // Try to authenticate as Customer
+          const customer = await prisma.customer.findUnique({
+            where: { email },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              firstName: true,
+              lastName: true,
+              is_active: true,
+            },
           })
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
+          if (customer && customer.is_active && customer.password) {
+            const isValidPassword = await compare(password, customer.password)
+
+            if (isValidPassword) {
+              return {
+                id: customer.id,
+                email: customer.email,
+                name: `${customer.firstName} ${customer.lastName}`,
+                role: 'CUSTOMER',
+              }
+            }
           }
+
+          return null
         } catch (error) {
           console.error('Auth error:', error)
           return null

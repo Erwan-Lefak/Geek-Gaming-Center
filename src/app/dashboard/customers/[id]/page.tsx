@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Edit, Mail, Phone, Calendar, MapPin, CreditCard } from 'lucide-react'
+import { ArrowLeft, Edit, Mail, Phone, Calendar, MapPin, CreditCard, Lock, CheckCircle, XCircle } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -26,6 +26,8 @@ interface Customer {
   visitCount: number
   lastVisit?: string
   createdAt: string
+  password?: string
+  is_active?: boolean
 }
 
 export default function CustomerDetailPage() {
@@ -173,6 +175,69 @@ export default function CustomerDetailPage() {
               <div className="text-sm text-slate-600 mb-1">Statut</div>
               {getStatusBadge(customer.status)}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Informations de compte */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informations de compte</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Lock className="w-5 h-5 text-slate-600" />
+                <div>
+                  <div className="text-sm text-slate-600">Mot de passe</div>
+                  <div className="font-medium">
+                    {customer.password ? (
+                      <span className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        Défini
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-red-600" />
+                        Non défini
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-slate-600">Statut du compte</div>
+                <div className="font-medium">
+                  {customer.is_active ? (
+                    <span className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      Actif
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-red-600" />
+                      Inactif
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {customer.email && (
+              <div className="pt-4 border-t">
+                <div className="text-sm text-slate-600 mb-2">Connexion client</div>
+                <div className="bg-slate-50 p-3 rounded text-sm">
+                  <p><strong>Email:</strong> {customer.email}</p>
+                  <p className="text-slate-600 mt-1">
+                    {customer.password
+                      ? 'Le client peut se connecter avec son email et son mot de passe'
+                      : 'Le client doit d\'abord définir son mot de passe via le lien envoyé par email'}
+                  </p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
