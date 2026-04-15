@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Calendar, Clock, Gamepad2, User, LogOut, X, Check, ChevronRight, Package, ShoppingBag, UserCircle, Key, Trash2, Edit3 } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
@@ -150,7 +150,7 @@ export default function AccountPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/signout', { method: 'POST' })
+      await signOut({ redirect: false })
       router.push('/arena')
     } catch (err) {
       console.error('Logout error:', err)

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { registerCustomer } from '@/lib/customer/auth'
 import { z } from 'zod'
+import { MailService } from '@/lib/email/mail-service'
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
@@ -33,6 +34,37 @@ export async function POST(request: NextRequest) {
     const { confirmPassword, ...customerData } = validatedData
 
     const customer = await registerCustomer(customerData)
+
+    // Send welcome email to customer
+    try {
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL
+        ? `${process.env.NEXTAUTH_URL || process.env.VERCEL_URL}`
+        : 'http://localhost:3000'
+
+      await MailService.sendWelcomeEmail(
+        customer.email,
+        customer.firstName,
+        customer.lastName,
+        `${baseUrl}/login`
+      )
+    } catch (emailError) {
+      console.error('Error sending welcome email:', emailError)
+      // Don't fail registration if email fails
+    }
+
+    // Send notification to admin
+    try {
+      await MailService.sendAdminNotification('new_customer_registration', {
+        customer_name: `${customer.firstName} ${customer.lastName}`,
+        customer_email: customer.email,
+        customer_phone: customer.phone,
+        customer_address: customerData.address,
+        registration_date: new Date().toLocaleDateString('fr-FR'),
+      })
+    } catch (emailError) {
+      console.error('Error sending admin notification:', emailError)
+      // Don't fail registration if email fails
+    }
 
     return NextResponse.json({
       success: true,
