@@ -115,7 +115,7 @@ export default function RootLayout({
                     />
                   </div>
                 </div>
-                <p className="text-sm text-white tracking-widest">
+                <p className="text-sm text-white tracking-widest font-sans">
                   Votre destination gaming ultime. Boutique de composants électroniques premium et salle de jeux immersive.
                 </p>
               </div>
