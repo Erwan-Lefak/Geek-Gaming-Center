@@ -115,7 +115,15 @@ export default function RootLayout({
                     />
                   </div>
                 </div>
-                <p className="text-sm text-white font-sans" style={{ letterSpacing: '0.25em' }}>
+                <p
+                  className="text-sm text-white font-sans footer-expanded-spacing"
+                  style={{
+                    letterSpacing: '0.5em',
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale'
+                  }}
+                >
                   Votre destination gaming ultime. Boutique de composants électroniques premium et salle de jeux immersive.
                 </p>
               </div>

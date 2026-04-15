@@ -2460,3 +2460,17 @@ html:not(.light) section[class*="from-red-600"] .booking-cta-dark .booking-cta-i
   color: #ffffff !important;
   stroke: #ffffff !important;
 }
+
+/* ============================================
+   FOOTER LETTER SPACING FIX
+   Enhanced letter spacing for custom MisterBelvedere font
+   ============================================ */
+
+.footer-expanded-spacing {
+  letter-spacing: 0.5em !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-variant-ligatures: none !important;
+  font-feature-settings: "kern" 0 !important;
+}
