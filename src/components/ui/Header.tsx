@@ -56,7 +56,12 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="nav-link text-lg md:text-xl lg:text-2xl font-bold uppercase text-white hover:text-white transition-colors duration-200 relative group"
+                  className="nav-link nav-letter-spacing text-lg md:text-xl lg:text-2xl font-bold uppercase text-white hover:text-white transition-colors duration-200 relative group"
+                  style={{
+                    letterSpacing: '0.03em',
+                    fontFeatureSettings: '"kern" 0, "liga" 0',
+                    fontVariant: 'no-kerning'
+                  }}
                 >
                   {link.label}
                   <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
@@ -132,7 +137,12 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
+                className="nav-letter-spacing text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
+                style={{
+                  letterSpacing: '0.03em',
+                  fontFeatureSettings: '"kern" 0, "liga" 0',
+                  fontVariant: 'no-kerning'
+                }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
@@ -141,7 +151,12 @@ export default function Header() {
             <div className="h-px bg-border" />
             <Link
               href="/account"
-              className="text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
+              className="nav-letter-spacing text-xl font-bold uppercase text-white hover:text-primary-400 transition-colors"
+              style={{
+                letterSpacing: '0.03em',
+                fontFeatureSettings: '"kern" 0, "liga" 0',
+                fontVariant: 'no-kerning'
+              }}
               onClick={() => setMobileMenuOpen(false)}
             >
               Mon Compte
