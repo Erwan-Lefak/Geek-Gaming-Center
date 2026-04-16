@@ -78,20 +78,21 @@ export function SessionForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Message */}
       {error && (
-        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
           <p className="text-sm text-red-600 font-medium">{error}</p>
         </div>
       )}
 
-      {/* Client */}
-      <div>
-        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
-          Client
+      {/* Section: Client */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>
+          Informations Client
         </h3>
-        <div className="w-full">
-          <Label htmlFor="customerSearch" className="text-sm">Rechercher un client *</Label>
+        <div>
+          <Label htmlFor="customerSearch" className="text-sm font-medium">Rechercher un client *</Label>
           <Input
             id="customerSearch"
             type="text"
@@ -100,8 +101,8 @@ export function SessionForm({
               setSearchQuery(e.target.value)
               onSearchCustomers(e.target.value)
             }}
-            className="w-full h-10 sm:h-auto"
-            placeholder="Rechercher par nom, téléphone..."
+            placeholder="Nom ou téléphone du client..."
+            className="w-full mt-1.5"
             style={{
               backgroundColor: 'var(--background)',
               color: 'var(--foreground)',
@@ -111,7 +112,7 @@ export function SessionForm({
         </div>
 
         {customers.length > 0 && (
-          <div className="mt-2 max-h-48 overflow-y-auto border rounded-md" style={{ borderColor: 'var(--border)' }}>
+          <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
             {customers.map((customer) => (
               <div
                 key={customer.id}
@@ -119,38 +120,41 @@ export function SessionForm({
                   setFormData({ ...formData, customerId: customer.id })
                   setSearchQuery(`${customer.firstName} ${customer.lastName}`)
                 }}
-                className={`p-3 cursor-pointer transition-colors border-b ${
+                className={`p-4 cursor-pointer transition-all border-b last:border-b-0 ${
                   formData.customerId === customer.id
-                    ? 'bg-purple-50 dark:bg-purple-900/20 border-l-4 border-l-purple-600'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-purple-50 dark:bg-purple-900/30 border-l-4 border-l-purple-600'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
-                style={{ color: 'var(--foreground)' }}
               >
-                <div className="font-medium">{customer.firstName} {customer.lastName}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">{customer.phone}</div>
+                <div className="font-semibold text-base" style={{ color: 'var(--foreground)' }}>
+                  {customer.firstName} {customer.lastName}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {customer.phone}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Equipment & Duration */}
-      <div>
-        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
-          Détails de la session
+      {/* Section: Session Details */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>
+          Détails de la Session
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="w-full">
-            <Label htmlFor="equipment" className="text-sm">Équipement *</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="equipment" className="text-sm font-medium">Équipement *</Label>
             <select
               id="equipment"
               value={formData.equipmentId}
               onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
               required
-              className="w-full h-10 px-3 py-2 rounded-md border bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full h-11 px-3 py-2 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
               style={{ borderColor: 'var(--border)' }}
             >
-              <option value="">Sélectionner</option>
+              <option value="">Sélectionner un équipement</option>
               {equipment.map((eq) => (
                 <option key={eq.id} value={eq.id}>
                   {getEquipmentLabel(eq.type)}
@@ -159,8 +163,8 @@ export function SessionForm({
             </select>
           </div>
 
-          <div className="w-full">
-            <Label htmlFor="duration" className="text-sm">Durée (minutes) *</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="duration" className="text-sm font-medium">Durée (minutes) *</Label>
             <Input
               id="duration"
               type="number"
@@ -169,7 +173,7 @@ export function SessionForm({
               min="15"
               step="15"
               required
-              className="w-full h-10 sm:h-auto"
+              className="w-full h-11"
               placeholder="60"
               style={{
                 backgroundColor: 'var(--background)',
@@ -177,27 +181,30 @@ export function SessionForm({
                 borderColor: 'var(--border)'
               }}
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Minimum 15 min, par incréments de 15 min
+            </p>
           </div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4">
+      <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
         <Button
           type="button"
           variant="ghost"
           onClick={onCancel}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto h-11"
           disabled={loading}
         >
           Annuler
         </Button>
         <Button
           type="submit"
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto h-11"
           disabled={loading}
         >
-          {loading ? 'Création en cours...' : 'Créer la session'}
+          {loading ? 'Création...' : 'Créer la Session'}
         </Button>
       </div>
     </form>
