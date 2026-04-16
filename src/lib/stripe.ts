@@ -55,6 +55,7 @@ export async function createCheckoutSession(
     metadata: {
       ...(cartId && { cartId }),
       items: JSON.stringify(items.map(item => ({
+        productId: item.productId,
         name: item.product.name,
         quantity: item.quantity,
         price: item.product.price,

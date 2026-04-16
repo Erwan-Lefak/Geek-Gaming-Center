@@ -24,34 +24,6 @@ async function ensureOrdersDir() {
 }
 
 /**
- * Create order from checkout session
- */
-async function createOrder(session: any) {
-  await ensureOrdersDir();
-
-  const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-  const order = {
-    id: orderId,
-    stripeCheckoutSessionId: session.id,
-    stripePaymentIntentId: session.payment_intent,
-    customerEmail: session.customer_details?.email,
-    amountTotal: session.amount_total,
-    currency: session.currency,
-    status: 'completed',
-    items: session.metadata?.items ? JSON.parse(session.metadata.items) : [],
-    shippingDetails: session.shipping_details,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  const orderPath = path.join(ORDERS_DIR, `${orderId}.json`);
-  await fs.writeFile(orderPath, JSON.stringify(order, null, 2));
-
-  return order;
-}
-
-/**
  * Generate order number
  */
 function generateOrderNumber(): string {
@@ -60,6 +32,86 @@ function generateOrderNumber(): string {
     .toString()
     .padStart(4, '0');
   return `ORD-${timestamp}-${random}`;
+}
+
+/**
+ * Create order in database from checkout session
+ */
+async function createOrder(session: any) {
+  const customerEmail = session.customer_details?.email;
+
+  // Find or create customer
+  let customerId = null;
+  if (customerEmail) {
+    let customer = await prisma.customer.findUnique({
+      where: { email: customerEmail }
+    });
+
+    if (!customer) {
+      // Create customer if doesn't exist
+      const name = session.customer_details?.name || '';
+      const [firstName, ...lastNameParts] = name.split(' ');
+      const lastName = lastNameParts.join(' ') || '';
+
+      // Find a system user to use as created_by
+      const systemUser = await prisma.user.findFirst({
+        where: {
+          role: 'ADMIN'
+        },
+        select: {
+          id: true
+        }
+      });
+
+      customer = await prisma.customer.create({
+        data: {
+          firstName: firstName || 'Client',
+          lastName: lastName || 'Inconnu',
+          email: customerEmail,
+          phone: session.customer_details?.phone || '',
+          status: 'REGULAR',
+          createdById: systemUser?.id || 'system',
+        }
+      });
+    }
+
+    customerId = customer.id;
+  }
+
+  // Parse items
+  const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
+
+  // Calculate amounts
+  const totalAmount = session.amount_total / 100; // Convert from cents to XAF
+
+  // Generate order number
+  const orderNumber = generateOrderNumber();
+
+  // Create order in database
+  const order = await prisma.order.create({
+    data: {
+      orderNumber,
+      customerId: customerId || '', // Will need to handle guest orders
+      status: 'CONFIRMED',
+      totalAmount,
+      paymentMethod: 'CARD',
+      paymentStatus: 'PAID',
+      items: {
+        create: items.map((item: any) => ({
+          productId: item.productId || 'unknown',
+          productName: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          totalPrice: item.price * item.quantity,
+        }))
+      }
+    },
+    include: {
+      items: true
+    }
+  });
+
+  return order;
 }
 
 export async function POST(request: NextRequest) {
@@ -95,14 +147,13 @@ export async function POST(request: NextRequest) {
         console.log('Order created:', order.id);
 
         // Send order confirmation emails if customer email exists
-        if (session.customer_details?.email && session.metadata?.items) {
+        if (session.customer_details?.email && order) {
           const customerEmail = session.customer_details.email;
           const customerName = session.customer_details.name || 'Client';
-          const items = JSON.parse(session.metadata.items);
 
           // Calculate totals
-          const subtotal = session.amount_total / 100; // Convert from cents
-          const shipping = 0; // TODO: Get from metadata if needed
+          const subtotal = parseFloat(order.totalAmount.toString());
+          const shipping = 0;
           const total = subtotal;
 
           // Format shipping address
@@ -115,12 +166,12 @@ export async function POST(request: NextRequest) {
 
           // Send order confirmation to customer
           MailService.sendOrderConfirmation(customerEmail, customerName, {
-            orderNumber: order.id,
+            orderNumber: order.orderNumber,
             orderDate: new Date().toLocaleDateString('fr-FR'),
-            items: items.map((item: any) => ({
-              name: item.name,
+            items: order.items.map(item => ({
+              name: item.productName,
               quantity: item.quantity,
-              price: item.price,
+              price: parseFloat(item.unitPrice.toString()),
             })),
             subtotal,
             shipping,
@@ -132,30 +183,19 @@ export async function POST(request: NextRequest) {
           MailService.sendAdminNewOrder({
             customerName,
             customerEmail,
-            orderNumber: order.id,
+            orderNumber: order.orderNumber,
             orderDate: new Date().toLocaleDateString('fr-FR'),
             paymentMethod: 'Carte bancaire (Stripe)',
-            items: items.map((item: any) => ({
-              name: item.name,
+            items: order.items.map(item => ({
+              name: item.productName,
               quantity: item.quantity,
-              price: item.price,
+              price: parseFloat(item.unitPrice.toString()),
             })),
             subtotal,
             shipping,
             total,
             shippingAddress,
           }).catch(err => console.error('Failed to send admin order email:', err));
-        }
-
-        // Clear cart if cart ID is provided
-        if (session.metadata?.cartId) {
-          const cartPath = path.join(process.cwd(), 'backend/data/carts', `${session.metadata.cartId}.json`);
-          try {
-            await fs.unlink(cartPath);
-            console.log('Cart cleared:', session.metadata.cartId);
-          } catch (error) {
-            console.error('Failed to clear cart:', error);
-          }
         }
 
         break;

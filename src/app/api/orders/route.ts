@@ -22,10 +22,27 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Trouver le Customer associé à l'utilisateur NextAuth via l'email
+    const customer = await prisma.customer.findUnique({
+      where: {
+        email: session.user.email || '',
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!customer) {
+      // Aucun customer trouvé - retourner une liste vide
+      return NextResponse.json({
+        orders: [],
+      })
+    }
+
     // Récupérer les commandes avec les items
     const orders = await prisma.order.findMany({
       where: {
-        customerId: session.user.id,
+        customerId: customer.id,
       },
       include: {
         items: {
