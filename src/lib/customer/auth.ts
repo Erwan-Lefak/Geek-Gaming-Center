@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { hash, compare } from 'bcryptjs'
 import crypto from 'crypto'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma/client'
 
 export interface CustomerData {
   firstName: string

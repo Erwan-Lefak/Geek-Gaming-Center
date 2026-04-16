@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmail } from '@/lib/customer/auth'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma/client'
 import MailService from '@/lib/email/mail-service'
-
-const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
