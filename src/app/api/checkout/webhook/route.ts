@@ -9,6 +9,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { prisma } from '@/lib/prisma/client';
 import { MailService } from '@/lib/email/mail-service';
+import { createInvoiceFromOrder } from '@/lib/invoices/service';
 
 const ORDERS_DIR = path.join(process.cwd(), 'backend/data/orders');
 
@@ -144,7 +145,16 @@ export async function POST(request: NextRequest) {
         // Create order
         const order = await createOrder(session);
 
-        console.log('Order created:', order.id);
+        console.log('✅ [WEBHOOK] Order created:', order.id);
+
+        // Auto-generate invoice
+        try {
+          const invoice = await createInvoiceFromOrder(order);
+          console.log('✅ [WEBHOOK] Invoice generated:', invoice.invoiceNumber);
+        } catch (invoiceError) {
+          console.error('❌ [WEBHOOK] Failed to generate invoice:', invoiceError);
+          // Continue anyway - invoice failure shouldn't break the order
+        }
 
         // Send order confirmation emails if customer email exists
         if (session.customer_details?.email && order) {

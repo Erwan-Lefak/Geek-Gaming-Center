@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma/client'
+import { createInvoiceFromSession } from '@/lib/invoices/service'
 
 export interface ReservationData {
   customerId: string
@@ -192,7 +193,36 @@ export async function createReservation(data: ReservationData) {
       paidAt: new Date(),
       createdById: adminUser.id,
     },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          email: true,
+        },
+      },
+      equipment: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          code: true,
+          status: true,
+        },
+      },
+    },
   })
+
+  // Auto-generate invoice
+  try {
+    const invoice = await createInvoiceFromSession(session, 'CARD')
+    console.log('✅ [RESERVATION] Invoice generated:', invoice.invoiceNumber)
+  } catch (invoiceError) {
+    console.error('❌ [RESERVATION] Failed to generate invoice:', invoiceError)
+    // Continue anyway - invoice failure shouldn't break the reservation
+  }
 
   return session
 }

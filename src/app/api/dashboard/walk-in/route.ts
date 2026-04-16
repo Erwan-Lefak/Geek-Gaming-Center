@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma/client'
 import { requireAuth, hasRole } from '@/lib/auth/utils'
 import { z } from 'zod'
+import { createInvoiceFromSession } from '@/lib/invoices/service'
 
 // Schéma de création de session walk-in
 const walkInSchema = z.object({
@@ -164,6 +165,15 @@ export async function POST(request: NextRequest) {
         lastVisit: now,
       },
     })
+
+    // Auto-generate invoice
+    try {
+      const invoice = await createInvoiceFromSession(session, validatedData.paymentMethod)
+      console.log('✅ [WALK-IN] Invoice generated:', invoice.invoiceNumber)
+    } catch (invoiceError) {
+      console.error('❌ [WALK-IN] Failed to generate invoice:', invoiceError)
+      // Continue anyway - invoice failure shouldn't break the session
+    }
 
     return NextResponse.json({
       success: true,
