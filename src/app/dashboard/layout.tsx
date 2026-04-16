@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Caisse', href: '/dashboard/caisse', icon: '💰', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
   { name: 'Clients', href: '/dashboard/customers', icon: '👥', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
   { name: 'Sessions', href: '/dashboard/sessions', icon: '🎮', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
+  { name: 'Commandes', href: '/dashboard/orders', icon: '🛒', roles: ['MANAGER', 'ADMIN', 'SHAREHOLDER'] },
   { name: 'Factures', href: '/dashboard/invoices', icon: '📄', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
   { name: 'Produits', href: '/dashboard/products', icon: '📦', roles: ['MANAGER', 'ADMIN'] },
   { name: 'Équipements', href: '/dashboard/equipment', icon: '🔧', roles: ['TECHNICIAN', 'MANAGER', 'ADMIN'] },
