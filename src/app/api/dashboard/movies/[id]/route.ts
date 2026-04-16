@@ -22,13 +22,15 @@ const movieUpdateSchema = z.object({
 // GET /api/dashboard/movies/[id] - Get single movie
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
 
+    const { id } = await params
+
     const movie = await prisma.movie.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         screenings: {
           where: { isActive: true },
@@ -57,7 +59,7 @@ export async function GET(
 // PATCH /api/dashboard/movies/[id] - Update movie
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -66,11 +68,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     const body = await request.json()
     const validatedData = movieUpdateSchema.parse(body)
 
     const movie = await prisma.movie.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     })
 
@@ -100,7 +104,7 @@ export async function PATCH(
 // DELETE /api/dashboard/movies/[id] - Delete movie
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -109,10 +113,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     // Check if movie has screenings
     const screeningCount = await prisma.movieScreening.count({
       where: {
-        movieId: params.id,
+        movieId: id,
         isActive: true,
       },
     })
@@ -125,7 +131,7 @@ export async function DELETE(
     }
 
     await prisma.movie.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({

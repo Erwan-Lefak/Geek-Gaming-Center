@@ -22,13 +22,15 @@ const menuItemUpdateSchema = z.object({
 // GET /api/dashboard/menu-items/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
 
+    const { id } = await params
+
     const menuItem = await prisma.menuItem.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!menuItem) {
@@ -48,7 +50,7 @@ export async function GET(
 // PATCH /api/dashboard/menu-items/[id]
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -57,11 +59,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     const body = await request.json()
     const validatedData = menuItemUpdateSchema.parse(body)
 
     const menuItem = await prisma.menuItem.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     })
 
@@ -91,7 +95,7 @@ export async function PATCH(
 // DELETE /api/dashboard/menu-items/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -100,8 +104,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     await prisma.menuItem.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({

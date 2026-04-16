@@ -14,13 +14,15 @@ const screeningUpdateSchema = z.object({
 // GET /api/dashboard/screenings/[id] - Get single screening
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
 
+    const { id } = await params
+
     const screening = await prisma.movieScreening.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         movie: true,
         bookings: {
@@ -56,7 +58,7 @@ export async function GET(
 // PATCH /api/dashboard/screenings/[id] - Update screening
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -65,6 +67,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     const body = await request.json()
     const validatedData = screeningUpdateSchema.parse(body)
 
@@ -72,7 +76,7 @@ export async function PATCH(
     let updateData: any = { ...validatedData }
     if (validatedData.screenTime) {
       const screening = await prisma.movieScreening.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: { movie: { select: { duration: true } } },
       })
 
@@ -85,7 +89,7 @@ export async function PATCH(
     }
 
     const screening = await prisma.movieScreening.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         movie: {
@@ -126,7 +130,7 @@ export async function PATCH(
 // DELETE /api/dashboard/screenings/[id] - Delete screening
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -135,10 +139,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
+    const { id } = await params
+
     // Check if screening has bookings
     const bookingCount = await prisma.cinemaBooking.count({
       where: {
-        screeningId: params.id,
+        screeningId: id,
         status: { not: 'CANCELLED' },
       },
     })
@@ -151,7 +157,7 @@ export async function DELETE(
     }
 
     await prisma.movieScreening.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({
