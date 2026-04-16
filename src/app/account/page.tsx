@@ -104,6 +104,25 @@ export default function AccountPage() {
         return
       }
 
+      // Check if customer email is verified
+      const userId = (session?.user as any)?.id
+      if (userId) {
+        try {
+          const checkResponse = await fetch(`/api/auth/check-email-verification?userId=${userId}`)
+          if (checkResponse.ok) {
+            const checkData = await checkResponse.json()
+            if (!checkData.emailVerified) {
+              // Email not verified - redirect to warning page
+              router.push('/verify-email-warning')
+              return
+            }
+          }
+        } catch (err) {
+          console.error('Error checking email verification:', err)
+          // Continue with account page if check fails
+        }
+      }
+
       try {
         // Fetch reservations, orders and profile in parallel
         const [reservationsResponse, ordersResponse, profileResponse] = await Promise.all([
