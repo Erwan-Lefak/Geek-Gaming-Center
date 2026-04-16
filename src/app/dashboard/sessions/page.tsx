@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
-import { Label } from '@/components/ui/label'
+import { SessionForm } from '@/components/forms/SessionForm'
 import { Play, Pause, Square, Plus, Clock, Euro, Calendar, Filter, Search, TrendingUp, Users, Activity } from 'lucide-react'
 
 interface Equipment {
@@ -44,12 +44,7 @@ export default function SessionsPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-
-  const [formData, setFormData] = useState({
-    customerId: '',
-    equipmentId: '',
-    duration: 60,
-  })
+  const [formLoading, setFormLoading] = useState(false)
 
   const [customers, setCustomers] = useState<Customer[]>([])
 
@@ -107,9 +102,8 @@ export default function SessionsPage() {
     }
   }
 
-  const handleCreateSession = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleCreateSession = async (formData: any) => {
+    setFormLoading(true)
     try {
       const response = await fetch('/api/sessions', {
         method: 'POST',
@@ -119,11 +113,16 @@ export default function SessionsPage() {
 
       if (response.ok) {
         setShowModal(false)
-        setFormData({ customerId: '', equipmentId: '', duration: 60 })
         fetchSessions()
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la création de la session')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating session:', error)
+      throw error
+    } finally {
+      setFormLoading(false)
     }
   }
 
@@ -538,71 +537,21 @@ export default function SessionsPage() {
       </div>
 
       {/* Create Session Modal */}
-      {showModal && (
-        <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Nouvelle Session" size="md">
-          <form onSubmit={handleCreateSession} className="space-y-4">
-            <div>
-              <Label>Client</Label>
-              <Input
-                type="text"
-                placeholder="Rechercher un client..."
-                onChange={(e) => searchCustomers(e.target.value)}
-                className="mt-1"
-              />
-              {customers.length > 0 && (
-                <div className="mt-2 max-h-40 overflow-y-auto border rounded-md">
-                  {customers.map((customer) => (
-                    <div
-                      key={customer.id}
-                      onClick={() => setFormData({ ...formData, customerId: customer.id })}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                      style={{ color: 'var(--foreground)' }}
-                    >
-                      {customer.firstName} {customer.lastName} - {customer.phone}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Label>Équipement</Label>
-              <select
-                value={formData.equipmentId}
-                onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-                required
-                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Sélectionner un équipement</option>
-                {equipment.map((eq) => (
-                  <option key={eq.id} value={eq.id}>
-                    {getEquipmentLabel(eq.type)} - {eq.code}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <Label>Durée (minutes)</Label>
-              <Input
-                type="number"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-                min="15"
-                step="15"
-                required
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>
-                Annuler
-              </Button>
-              <Button type="submit">Créer Session</Button>
-            </div>
-          </form>
-        </Modal>
-      )}
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Nouvelle Session"
+        size="lg"
+      >
+        <SessionForm
+          onSubmit={handleCreateSession}
+          onCancel={() => setShowModal(false)}
+          equipment={equipment}
+          customers={customers}
+          onSearchCustomers={(query) => searchCustomers(query)}
+          loading={formLoading}
+        />
+      </Modal>
     </div>
   )
 }
