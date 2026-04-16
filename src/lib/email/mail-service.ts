@@ -322,6 +322,76 @@ export class MailService {
   }
 
   /**
+   * Send booking cancellation email
+   */
+  static async sendBookingCancellation(
+    email: string,
+    name: string,
+    bookingData: {
+      date: string
+      time: string
+      equipment: string
+    }
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to: email,
+      templateType: 'booking_cancelled',
+      data: {
+        customer_name: name,
+        booking_date: bookingData.date,
+        booking_time: bookingData.time,
+        equipment_name: bookingData.equipment,
+        website_title: 'Geek Gaming Center'
+      }
+    })
+  }
+
+  /**
+   * Send order confirmation email
+   */
+  static async sendOrderConfirmation(
+    email: string,
+    name: string,
+    orderData: {
+      orderNumber: string
+      orderDate: string
+      items: Array<{
+        name: string
+        quantity: number
+        price: number
+      }>
+      subtotal: number
+      shipping: number
+      total: number
+      shippingAddress: string
+    }
+  ): Promise<boolean> {
+    // Format order items as HTML list
+    const orderItemsHtml = orderData.items
+      .map(item => `<strong>${item.name}</strong> x${item.quantity} = ${item.price} XAF`)
+      .join('<br>')
+
+    // Format amounts
+    const formatFCFA = (amount: number) => `${new Intl.NumberFormat('fr-FR').format(amount)}F`
+
+    return this.sendEmail({
+      to: email,
+      templateType: 'order_confirmed',
+      data: {
+        customer_name: name,
+        order_number: orderData.orderNumber,
+        order_date: orderData.orderDate,
+        order_items: orderItemsHtml,
+        subtotal: formatFCFA(orderData.subtotal),
+        shipping: orderData.shipping === 0 ? 'Gratuite' : formatFCFA(orderData.shipping),
+        total: formatFCFA(orderData.total),
+        shipping_address: orderData.shippingAddress.replace(/\n/g, '<br>'),
+        website_title: 'Geek Gaming Center'
+      }
+    })
+  }
+
+  /**
    * Send notification to admin
    */
   static async sendAdminNotification(
@@ -338,6 +408,74 @@ export class MailService {
         website_title: 'Geek Gaming Center',
         admin_panel_url: process.env.NEXTAUTH_URL + '/dashboard'
       }
+    })
+  }
+
+  /**
+   * Send admin notification for new booking
+   */
+  static async sendAdminNewBooking(
+    bookingData: {
+      customerName: string
+      customerEmail: string
+      date: string
+      time: string
+      equipment: string
+      duration: number
+      price: number
+    }
+  ): Promise<boolean> {
+    return this.sendAdminNotification('new_booking', {
+      customer_name: bookingData.customerName,
+      email: bookingData.customerEmail,
+      booking_date: bookingData.date,
+      booking_time: bookingData.time,
+      equipment_name: bookingData.equipment,
+      duration: `${bookingData.duration} min`,
+      price: `${bookingData.price} XAF`
+    })
+  }
+
+  /**
+   * Send admin notification for new order
+   */
+  static async sendAdminNewOrder(
+    orderData: {
+      customerName: string
+      customerEmail: string
+      orderNumber: string
+      orderDate: string
+      paymentMethod: string
+      items: Array<{
+        name: string
+        quantity: number
+        price: number
+      }>
+      subtotal: number
+      shipping: number
+      total: number
+      shippingAddress: string
+    }
+  ): Promise<boolean> {
+    // Format order items as HTML list
+    const orderItemsHtml = orderData.items
+      .map(item => `<strong>${item.name}</strong> x${item.quantity} = ${item.price} XAF`)
+      .join('<br>')
+
+    // Format amounts
+    const formatFCFA = (amount: number) => `${new Intl.NumberFormat('fr-FR').format(amount)}F`
+
+    return this.sendAdminNotification('new_order', {
+      customer_name: orderData.customerName,
+      customer_email: orderData.customerEmail,
+      order_number: orderData.orderNumber,
+      order_date: orderData.orderDate,
+      payment_method: orderData.paymentMethod,
+      order_items: orderItemsHtml,
+      subtotal: formatFCFA(orderData.subtotal),
+      shipping: orderData.shipping === 0 ? 'Gratuite' : formatFCFA(orderData.shipping),
+      total: formatFCFA(orderData.total),
+      shipping_address: orderData.shippingAddress.replace(/\n/g, '<br>')
     })
   }
 

@@ -52,7 +52,14 @@ export async function createCheckoutSession(
     mode: 'payment',
     success_url: successUrl,
     cancel_url: cancelUrl,
-    metadata: cartId ? { cartId } : undefined,
+    metadata: {
+      ...(cartId && { cartId }),
+      items: JSON.stringify(items.map(item => ({
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price,
+      }))),
+    },
     customer_email: undefined, // Will be set when user auth is implemented
     billing_address_collection: 'required',
     shipping_address_collection: {

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma/client';
 import { generateSessionNumber } from '@/lib/reservations';
+import { MailService } from '@/lib/email/mail-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -122,6 +123,32 @@ export async function GET(request: NextRequest) {
         totalAmount: parseInt(metadata.price),
       },
     });
+
+    // Send confirmation emails (async, don't block response)
+    const customerEmail = session.customer_details?.email;
+    const customerName = session.customer_details?.name || 'Client';
+
+    if (customerEmail) {
+      // Send booking confirmation to customer
+      MailService.sendBookingConfirmation(customerEmail, customerName, {
+        date: metadata.date,
+        time: metadata.time,
+        equipment: metadata.equipment_name,
+        duration: parseInt(metadata.duration),
+        price: parseInt(metadata.price),
+      }).catch(err => console.error('Failed to send booking confirmation email:', err));
+
+      // Send admin notification
+      MailService.sendAdminNewBooking({
+        customerName,
+        customerEmail,
+        date: metadata.date,
+        time: metadata.time,
+        equipment: metadata.equipment_name,
+        duration: parseInt(metadata.duration),
+        price: parseInt(metadata.price),
+      }).catch(err => console.error('Failed to send admin booking email:', err));
+    }
 
     return NextResponse.json({
       success: true,

@@ -263,9 +263,86 @@ L'équipe Geek Gaming Center 🎮`,
       isActive: true
     },
 
+    // =================== ORDER EMAILS ===================
+
+    // 11. Order confirmed
+    {
+      mailType: 'order_confirmed',
+      mailSubject: '🎉 Commande confirmée !',
+      mailBody: `Bonjour {customer_name},<br><br>
+
+🎉 <strong>Merci pour votre commande !</strong><br><br>
+
+Nous sommes ravis de vous annoncer que votre commande a été confirmée.<br><br>
+
+<strong>📦 Détails de la commande :</strong><br><br>
+
+Référence : {order_number}<br>
+Date : {order_date}<br><br>
+
+<strong>Articles commandés :</strong><br><br>
+
+{order_items}<br><br>
+
+<strong>💰 Récapitulatif :</strong><br><br>
+
+Sous-total : {subtotal}<br>
+Livraison : {shipping}<br>
+<strong>Total : {total}</strong><br><br>
+
+<strong>📢 Adresse de livraison :</strong><br><br>
+
+{shipping_address}<br><br>
+
+<strong>⏳ Délai de livraison :</strong><br><br>
+
+Vous recevrez votre commande sous 2-5 jours ouvrés.<br>
+Nous vous informerons dès l'expédition de votre colis.<br><br>
+
+<strong>💡 À savoir :</strong><br><br>
+
+✅ Un email de confirmation vous a été envoyé<br>
+✅ Vous pouvez suivre votre commande depuis votre espace client<br>
+✅ Pour toute question, contactez notre support client<br><br>
+
+Merci de votre confiance !<br><br>
+
+L'équipe Geek Gaming Center 🎮<br>
+Ton corps. Ton moment. Ton karma.`,
+      isActive: true
+    },
+
+    // 12. Order shipped
+    {
+      mailType: 'order_shipped',
+      mailSubject: '🚀 Votre commande a été expédiée !',
+      mailBody: `Bonjour {customer_name},<br><br>
+
+🚀 <strong>Bonne nouvelle ! Votre commande est en route !</strong><br><br>
+
+Votre commande {order_number} a été expédiée et sera bientôt entre vos mains.<br><br>
+
+<strong>📦 Détails de l'expédition :</strong><br><br>
+
+Transporteur : {carrier}<br>
+Numéro de suivi : {tracking_number}<br>
+Adresse de livraison : {shipping_address}<br><br>
+
+<strong>⏳ Délai de livraison :</strong><br><br>
+
+Livraison prévue sous : {delivery_estimate}<br><br>
+
+Vous pouvez suivre votre commande en temps réel avec le numéro de suivi ci-dessus.<br><br>
+
+À très vite chez Geek Gaming Center !<br><br>
+
+L'équipe Geek Gaming Center 🎮`,
+      isActive: true
+    },
+
     // =================== ADMIN NOTIFICATIONS ===================
 
-    // 11. New customer
+    // 13. New customer
     {
       mailType: 'admin_new_customer',
       mailSubject: '🆕 Nouveau client inscrit',
@@ -315,7 +392,46 @@ Geek Gaming Center 🎮`,
       isActive: true
     },
 
-    // 13. Booking modified
+    // 14. New order
+    {
+      mailType: 'admin_new_order',
+      mailSubject: '🆕 Nouvelle commande boutique',
+      mailBody: `Bonjour Admin,<br><br>
+
+Une nouvelle commande a été passée sur la boutique.<br><br>
+
+<strong>👤 Client :</strong>
+
+Nom : {customer_name}<br>
+Email : {customer_email}<br><br>
+
+<strong>📦 Commande :</strong>
+
+Référence : {order_number}<br>
+Date : {order_date}<br>
+Mode de paiement : {payment_method}<br><br>
+
+<strong>📝 Articles :</strong>
+
+{order_items}<br><br>
+
+<strong>💰 Montants :</strong>
+
+Sous-total : {subtotal}<br>
+Livraison : {shipping}<br>
+Total : {total}<br><br>
+
+<strong>📍 Adresse de livraison :</strong>
+
+{shipping_address}<br><br>
+
+À très vite !<br><br>
+
+Geek Gaming Center 🎮`,
+      isActive: true
+    },
+
+    // 15. Booking modified
     {
       mailType: 'admin_booking_modified',
       mailSubject: 'Réservation modifiée',

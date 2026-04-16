@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { constructStripeEvent } from '@/lib/stripe';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { prisma } from '@/lib/prisma/client';
+import { MailService } from '@/lib/email/mail-service';
 
 const ORDERS_DIR = path.join(process.cwd(), 'backend/data/orders');
 
@@ -49,6 +51,17 @@ async function createOrder(session: any) {
   return order;
 }
 
+/**
+ * Generate order number
+ */
+function generateOrderNumber(): string {
+  const timestamp = Date.now().toString().slice(-8);
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0');
+  return `ORD-${timestamp}-${random}`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
@@ -80,6 +93,59 @@ export async function POST(request: NextRequest) {
         const order = await createOrder(session);
 
         console.log('Order created:', order.id);
+
+        // Send order confirmation emails if customer email exists
+        if (session.customer_details?.email && session.metadata?.items) {
+          const customerEmail = session.customer_details.email;
+          const customerName = session.customer_details.name || 'Client';
+          const items = JSON.parse(session.metadata.items);
+
+          // Calculate totals
+          const subtotal = session.amount_total / 100; // Convert from cents
+          const shipping = 0; // TODO: Get from metadata if needed
+          const total = subtotal;
+
+          // Format shipping address
+          const shippingAddress = session.shipping_details
+            ? `${session.shipping_details.address?.line1 || ''}\n` +
+              `${session.shipping_details.address?.city || ''}\n` +
+              `${session.shipping_details.address?.postal_code || ''}\n` +
+              `${session.shipping_details.address?.country || ''}`
+            : 'Adresse non renseignée';
+
+          // Send order confirmation to customer
+          MailService.sendOrderConfirmation(customerEmail, customerName, {
+            orderNumber: order.id,
+            orderDate: new Date().toLocaleDateString('fr-FR'),
+            items: items.map((item: any) => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            subtotal,
+            shipping,
+            total,
+            shippingAddress,
+          }).catch(err => console.error('Failed to send order confirmation email:', err));
+
+          // Send admin notification
+          MailService.sendAdminNewOrder({
+            customerName,
+            customerEmail,
+            orderNumber: order.id,
+            orderDate: new Date().toLocaleDateString('fr-FR'),
+            paymentMethod: 'Carte bancaire (Stripe)',
+            items: items.map((item: any) => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            subtotal,
+            shipping,
+            total,
+            shippingAddress,
+          }).catch(err => console.error('Failed to send admin order email:', err));
+        }
 
         // Clear cart if cart ID is provided
         if (session.metadata?.cartId) {
