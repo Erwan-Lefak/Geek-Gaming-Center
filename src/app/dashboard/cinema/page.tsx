@@ -653,7 +653,7 @@ export default function CinemaPage() {
           resetScreeningForm()
         }}
         title="Nouvelle Séance"
-        size="md"
+        size="xl"
       >
         <div className="space-y-4">
           <div>

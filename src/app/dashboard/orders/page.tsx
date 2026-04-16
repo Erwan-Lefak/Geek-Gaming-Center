@@ -449,7 +449,7 @@ export default function OrdersPage() {
           isOpen={showOrderModal}
           onClose={() => setShowOrderModal(false)}
           title={`Détails de la commande ${selectedOrder.orderNumber}`}
-          size="lg"
+          size="xl"
         >
           <div className="space-y-6">
             {/* Customer Info */}
