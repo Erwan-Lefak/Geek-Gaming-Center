@@ -9,7 +9,7 @@ import { Modal } from '@/components/ui/modal'
 
 interface Reservation {
   id: string
-  startTime: string
+  startedAt: string | null
   scheduledEndAt: string
   duration: number
   status: string
@@ -358,7 +358,7 @@ export default function AccountPage() {
 
     // Check if it's more than 2 hours before start
     const now = new Date()
-    const startTime = new Date(reservation.startTime)
+    const startTime = reservation.startedAt ? new Date(reservation.startedAt) : new Date(reservation.scheduledEndAt)
     const hoursUntilStart = (startTime.getTime() - now.getTime()) / (1000 * 60 * 60)
 
     return hoursUntilStart >= 2
@@ -597,13 +597,13 @@ export default function AccountPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className="flex items-center gap-2 text-purple-200">
                           <Calendar className="w-4 h-4" />
-                          <span>{formatDate(reservation.startTime)}</span>
+                          <span>{formatDate(reservation.startedAt || reservation.scheduledEndAt)}</span>
                         </div>
 
                         <div className="flex items-center gap-2 text-purple-200">
                           <Clock className="w-4 h-4" />
                           <span>
-                            {formatTime(reservation.startTime)} - {formatTime(reservation.scheduledEndAt)}
+                            {formatTime(reservation.startedAt || reservation.scheduledEndAt)} - {formatTime(reservation.scheduledEndAt)}
                           </span>
                         </div>
 
