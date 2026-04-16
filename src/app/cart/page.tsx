@@ -1,61 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-
-interface CartItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-  image: string
-  category: string
-}
+import { useCart } from '@/contexts/CartContext'
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Load cart from localStorage
-  useEffect(() => {
-    const loadCart = () => {
-      try {
-        const savedCart = localStorage.getItem('cart')
-        if (savedCart) {
-          setCartItems(JSON.parse(savedCart))
-        }
-      } catch (error) {
-        console.error('Error loading cart:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadCart()
-  }, [])
-
-  // Update quantity
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) return
-
-    const updatedCart = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    )
-    setCartItems(updatedCart)
-    localStorage.setItem('cart', JSON.stringify(updatedCart))
-  }
-
-  // Remove item
-  const removeItem = (id: string) => {
-    const updatedCart = cartItems.filter(item => item.id !== id)
-    setCartItems(updatedCart)
-    localStorage.setItem('cart', JSON.stringify(updatedCart))
-  }
+  const { cart, isLoading, updateQuantity, removeItem } = useCart()
 
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const subtotal = cart?.subtotal || 0
   const shippingFee = subtotal > 50000 ? 0 : 2000
   const total = subtotal + shippingFee
 
@@ -70,6 +24,8 @@ export default function CartPage() {
       </div>
     )
   }
+
+  const cartItems = cart?.items || []
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black pt-[6.5rem] sm:pt-28">
@@ -108,13 +64,13 @@ export default function CartPage() {
             {/* Cart Items List */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item) => (
-                <div key={item.id} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
+                <div key={item.productId} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
                   <div className="flex gap-4">
                     {/* Product Image */}
                     <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-xl overflow-hidden">
                       <Image
-                        src={item.image}
-                        alt={item.name}
+                        src={item.product.image || '/placeholder.png'}
+                        alt={item.product.name}
                         fill
                         className="object-cover"
                       />
@@ -122,21 +78,21 @@ export default function CartPage() {
 
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-white mb-1 truncate">{item.name}</h3>
-                      <p className="text-sm text-purple-300 mb-3">{item.category}</p>
+                      <h3 className="text-lg font-bold text-white mb-1 truncate">{item.product.name}</h3>
+                      <p className="text-sm text-purple-300 mb-3">{item.product.category}</p>
 
                       {/* Quantity Controls */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                             className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="text-white font-semibold min-w-[2rem] text-center">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                             className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                           >
                             <Plus className="w-4 h-4" />
@@ -144,9 +100,9 @@ export default function CartPage() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          <span className="text-lg font-bold text-white">{formatPrice(item.price * item.quantity)}</span>
+                          <span className="text-lg font-bold text-white">{formatPrice(item.product.price * item.quantity)}</span>
                           <button
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => removeItem(item.productId)}
                             className="p-2 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
