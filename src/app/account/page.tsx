@@ -973,15 +973,15 @@ export default function AccountPage() {
           {reservationToCancel && (
             <>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-900 font-medium mb-2">⚠️ Attention</p>
-                <p className="text-yellow-800 text-sm">
+                <p className="text-yellow-900 dark:text-yellow-300 font-medium mb-2">⚠️ Attention</p>
+                <p className="text-yellow-800 dark:text-yellow-200 text-sm">
                   Vous êtes sur le point d'annuler votre réservation
                 </p>
               </div>
 
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <p className="text-purple-900 font-semibold mb-3">Détails de la réservation</p>
-                <div className="space-y-1 text-sm text-purple-800">
+                <p className="text-purple-900 dark:text-purple-300 font-semibold mb-3">Détails de la réservation</p>
+                <div className="space-y-1 text-sm text-purple-800 dark:text-purple-200">
                   <p><span className="font-medium">Équipement :</span> {reservationToCancel.equipment.name}</p>
                   <p>
                     <span className="font-medium">Date :</span> {' '}
@@ -999,9 +999,9 @@ export default function AccountPage() {
                 <p className="font-bold text-purple-900 dark:text-purple-300">
                   ⏰ Politique d'annulation :
                 </p>
-                <ul className="list-disc list-inside space-y-1 ml-4 mt-2 text-purple-800 dark:text-purple-200">
-                  <li>Gratuite jusqu'à 2 heures avant le début de la session</li>
-                  <li>Après ce délai, des frais d'annulation pourront s'appliquer</li>
+                <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                  <li className="text-purple-900 dark:text-purple-300">Gratuite jusqu'à 2 heures avant le début de la session</li>
+                  <li className="text-purple-900 dark:text-purple-300">Après ce délai, des frais d'annulation pourront s'appliquer</li>
                 </ul>
               </div>
 
