@@ -165,63 +165,65 @@ export async function POST(request: NextRequest) {
     console.log('📧 Attempting to send order confirmation emails...');
     console.log('Customer Email:', customerEmail);
     console.log('Order Number:', order.orderNumber);
-    console.log('RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY);
+    console.log('Customer Name:', customerName);
+    console.log('Items count:', order.items.length);
+    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    console.log('RESEND_API_KEY starts with:', process.env.RESEND_API_KEY?.substring(0, 10) + '...');
+
+    // Verify MailService methods exist
+    console.log('MailService.sendOrderConfirmation exists:', typeof MailService.sendOrderConfirmation);
+    console.log('MailService.sendAdminNewOrder exists:', typeof MailService.sendAdminNewOrder);
 
     // Send order confirmation to customer
-    MailService.sendOrderConfirmation(customerEmail, customerName, {
-      orderNumber: order.orderNumber,
-      orderDate: new Date().toLocaleDateString('fr-FR'),
-      items: order.items.map(item => ({
-        name: item.productName,
-        quantity: item.quantity,
-        price: parseFloat(item.unitPrice.toString()),
-      })),
-      subtotal,
-      shipping,
-      total: subtotal,
-      shippingAddress,
-    })
-      .then(() => {
-        console.log('✅ Order confirmation email sent successfully to:', customerEmail);
-      })
-      .catch((err) => {
-        console.error('❌ Failed to send order confirmation email:', err);
-        console.error('Error details:', {
-          email: customerEmail,
-          orderNumber: order.orderNumber,
-          error: err.message,
-          stack: err.stack,
-        });
+    try {
+      await MailService.sendOrderConfirmation(customerEmail, customerName, {
+        orderNumber: order.orderNumber,
+        orderDate: new Date().toLocaleDateString('fr-FR'),
+        items: order.items.map(item => ({
+          name: item.productName,
+          quantity: item.quantity,
+          price: parseFloat(item.unitPrice.toString()),
+        })),
+        subtotal,
+        shipping,
+        total: subtotal,
+        shippingAddress,
       });
+      console.log('✅ Order confirmation email sent successfully to:', customerEmail);
+    } catch (emailError) {
+      console.error('❌ FAILED to send order confirmation email!');
+      console.error('Error type:', emailError.constructor.name);
+      console.error('Error message:', emailError.message);
+      console.error('Error stack:', emailError.stack);
+      console.error('Full error:', JSON.stringify(emailError, Object.getOwnPropertyNames(emailError)));
+    }
 
     // Send admin notification
-    MailService.sendAdminNewOrder({
-      customerName,
-      customerEmail,
-      orderNumber: order.orderNumber,
-      orderDate: new Date().toLocaleDateString('fr-FR'),
-      paymentMethod: 'Carte bancaire (Stripe)',
-      items: order.items.map(item => ({
-        name: item.productName,
-        quantity: item.quantity,
-        price: parseFloat(item.unitPrice.toString()),
-      })),
-      subtotal,
-      shipping,
-      total: subtotal,
-      shippingAddress,
-    })
-      .then(() => {
-        console.log('✅ Admin notification email sent successfully');
-      })
-      .catch((err) => {
-        console.error('❌ Failed to send admin notification email:', err);
-        console.error('Error details:', {
-          orderNumber: order.orderNumber,
-          error: err.message,
-          stack: err.stack,
-        });
+    try {
+      await MailService.sendAdminNewOrder({
+        customerName,
+        customerEmail,
+        orderNumber: order.orderNumber,
+        orderDate: new Date().toLocaleDateString('fr-FR'),
+        paymentMethod: 'Carte bancaire (Stripe)',
+        items: order.items.map(item => ({
+          name: item.productName,
+          quantity: item.quantity,
+          price: parseFloat(item.unitPrice.toString()),
+        })),
+        subtotal,
+        shipping,
+        total: subtotal,
+        shippingAddress,
       });
+      console.log('✅ Admin notification email sent successfully');
+    } catch (emailError) {
+      console.error('❌ FAILED to send admin notification email!');
+      console.error('Error type:', emailError.constructor.name);
+      console.error('Error message:', emailError.message);
+      console.error('Error stack:', emailError.stack);
+      console.error('Full error:', JSON.stringify(emailError, Object.getOwnPropertyNames(emailError)));
+    }
 
     return NextResponse.json({
       success: true,
