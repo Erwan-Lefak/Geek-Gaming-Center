@@ -6,7 +6,6 @@ import { z } from 'zod'
 const screeningSchema = z.object({
   movieId: z.string().min(1, 'Le film est requis'),
   screenTime: z.string().datetime('Format de date invalide'),
-  duration: z.number().min(1, 'La durée est requise'),
   screenNumber: z.number().min(1).default(1),
   totalSeats: z.number().min(1).default(50),
   price: z.number().min(0, 'Le prix est requis'),

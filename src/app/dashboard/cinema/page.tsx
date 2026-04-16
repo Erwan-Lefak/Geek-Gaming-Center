@@ -204,6 +204,20 @@ export default function CinemaPage() {
   }
 
   const handleSaveScreening = async () => {
+    // Validation
+    if (!screeningForm.movieId) {
+      alert('Veuillez sélectionner un film')
+      return
+    }
+    if (!screeningForm.screenTime) {
+      alert('Veuillez sélectionner une date et heure')
+      return
+    }
+    if (!screeningForm.price || screeningForm.price <= 0) {
+      alert('Veuillez entrer un prix valide')
+      return
+    }
+
     try {
       const res = await fetch('/api/dashboard/screenings', {
         method: 'POST',
@@ -211,11 +225,15 @@ export default function CinemaPage() {
         body: JSON.stringify(screeningForm),
       })
 
+      const data = await res.json()
+
       if (res.ok) {
         await fetchScreenings()
         setShowScreeningModal(false)
         resetScreeningForm()
         alert('Séance créée avec succès !')
+      } else {
+        alert(data.error || 'Erreur lors de la création de la séance')
       }
     } catch (error) {
       console.error('Error saving screening:', error)
