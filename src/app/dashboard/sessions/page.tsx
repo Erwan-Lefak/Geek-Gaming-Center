@@ -72,11 +72,7 @@ export default function SessionsPage() {
   const fetchSessions = async () => {
     try {
       setLoading(true)
-      const params = new URLSearchParams({
-        limit: '100', // Increased limit for history
-      })
-
-      const response = await fetch(`/api/sessions?${params}`)
+      const response = await fetch('/api/sessions/all')
       const data = await response.json()
       setSessions(data.sessions || [])
     } catch (error) {
