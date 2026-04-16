@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmail } from '@/lib/customer/auth'
+import { PrismaClient } from '@prisma/client'
+import MailService from '@/lib/email/mail-service'
+
+const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +17,30 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await verifyEmail(token)
+
+    // Get customer details to send account ready email
+    const customer = await prisma.customer.findUnique({
+      where: { email: result.email },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+      }
+    })
+
+    if (customer) {
+      // Send account ready email
+      try {
+        await MailService.sendAccountReadyEmail(
+          customer.email,
+          customer.firstName,
+          customer.lastName
+        )
+      } catch (emailError) {
+        // Log error but don't fail the verification
+        console.error('Failed to send account ready email:', emailError)
+      }
+    }
 
     return NextResponse.json({
       success: true,

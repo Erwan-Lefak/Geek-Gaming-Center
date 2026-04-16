@@ -226,6 +226,31 @@ export class MailService {
   }
 
   /**
+   * Send account ready email after email verification
+   */
+  static async sendAccountReadyEmail(
+    email: string,
+    firstName: string,
+    lastName: string
+  ): Promise<boolean> {
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://geek-gaming-center.cam'}/login`
+
+    return this.sendEmail({
+      to: email,
+      templateType: 'customer_account_ready',
+      data: {
+        customer_name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        login_link: this.createButton(loginUrl, 'Se Connecter'),
+        login_url: loginUrl,
+        website_title: 'Geek Gaming Center'
+      }
+    })
+  }
+
+  /**
    * Send password reset email
    */
   static async sendPasswordReset(
