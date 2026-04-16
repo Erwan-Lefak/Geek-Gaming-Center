@@ -1,179 +1,103 @@
 /**
  * Restaurant Page - Geek Gaming Center
  * Menu de restauration gaming et otaku
+ * Synchronisé avec la base de données du dashboard
  */
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { UtensilsCrossed, Clock, Star } from 'lucide-react';
 import Header from '@/components/ui/Header';
 
+interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  image?: string;
+  ingredients: string[];
+  allergens: string[];
+  isVegetarian: boolean;
+  isVegan: boolean;
+  isSpicy: boolean;
+  preparationTime: number;
+}
+
 export default function RestaurantPage() {
-  const [activeCategory, setActiveCategory] = useState<'plats' | 'snacks' | 'boissons' | 'desserts'>('plats');
+  const [activeCategory, setActiveCategory] = useState<string>('plats');
+  const [menuData, setMenuData] = useState<Record<string, MenuItem[]>>({})
+  const [categories, setCategories] = useState<Array<{id: string, label: string}>>([])
+  const [loading, setLoading] = useState(true)
 
-  const menuItems = {
-    plats: [
-      {
-        name: 'Burger Gamer Signature',
-        description: 'Double steak, fromage fondue, bacon croustillant, sauce maison',
-        price: 6500,
-        popular: true
-      },
-      {
-        name: 'Tacos Akatsuki',
-        description: 'Sauce fromagère spéciale, viande hachée, frites, nuggets',
-        price: 4500,
-        popular: true
-      },
-      {
-        name: 'Ramen Naruto',
-        description: 'Broth maison, nouilles fraîches, porc braisé, oeuf mollet',
-        price: 5500,
-        popular: false
-      },
-      {
-        name: 'Pizza One Piece',
-        description: 'Grande taille, sauce tomate, mozzarella, pepperoni, olives',
-        price: 8000,
-        popular: true
-      },
-      {
-        name: 'Wings Dragon Ball',
-        description: '6 ailes de poulet marinées, sauce buffalo au choix',
-        price: 4000,
-        popular: false
-      },
-      {
-        name: 'Pokebowl Pokemon',
-        description: 'Riz vinaigré, thon, saumon, avocat, mangue, sésame',
-        price: 7000,
-        popular: false
-      }
-    ],
-    snacks: [
-      {
-        name: 'Nachos Gaming',
-        description: 'Chips de maïs, guacamole, salsa, fromage fondu',
-        price: 3500,
-        popular: true
-      },
-      {
-        name: 'Chicken Tenders',
-        description: '4 tenders de poulet panés avec sauce barbecue',
-        price: 3000,
-        popular: false
-      },
-      {
-        name: 'Onion Rings',
-        description: 'Anneaux d\'oignons croustillants',
-        price: 2500,
-        popular: false
-      },
-      {
-        name: 'Mozzarella Sticks',
-        description: '6 bâtonnets de mozzarella frits',
-        price: 3000,
-        popular: true
-      },
-      {
-        name: 'French Fries',
-        description: 'Frites maison avec ketchup et mayonnaise',
-        price: 2000,
-        popular: false
-      },
-      {
-        name: 'Loaded Fries',
-        description: 'Frites avec fromage, bacon, sauce cheddar',
-        price: 4000,
-        popular: true
-      }
-    ],
-    boissons: [
-      {
-        name: 'Coca-Cola',
-        description: '33cl ou 50cl, frais',
-        price: 1000,
-        popular: false
-      },
-      {
-        name: 'Energy Drink Gaming',
-        description: 'Monster, Red Bull ou Burn',
-        price: 2000,
-        popular: true
-      },
-      {
-        name: 'Jus de Fruits',
-        description: 'Orange, Ananas, ou Multivitamin',
-        price: 1500,
-        popular: false
-      },
-      {
-        name: 'Eau Minérale',
-        description: '50cl',
-        price: 500,
-        popular: false
-      },
-      {
-        name: 'Milkshake',
-        description: 'Chocolat, Vanille, Fraise, Oreo',
-        price: 2500,
-        popular: true
-      },
-      {
-        name: 'Ice Tea',
-        description: 'Pêche ou Citron',
-        price: 1200,
-        popular: false
-      }
-    ],
-    desserts: [
-      {
-        name: 'Cookie Géant',
-        description: 'Chocolat ou Noisette, tiède',
-        price: 2000,
-        popular: true
-      },
-      {
-        name: 'Brownie',
-        description: 'Chocolat fondant, glace vanille',
-        price: 2500,
-        popular: true
-      },
-      {
-        name: 'Cheesecake',
-        description: 'Fraise, Citron ou Spéculos',
-        price: 3000,
-        popular: false
-      },
-      {
-        name: 'Tiramisu',
-        description: 'Recette italienne traditionnelle',
-        price: 3000,
-        popular: false
-      },
-      {
-        name: 'Coupe Glacée',
-        description: '3 boules au choix, chantilly, sauce chocolat',
-        price: 2500,
-        popular: true
-      },
-      {
-        name: 'Beignets',
-        description: '3 beignets sucrés, sucre glace',
-        price: 1500,
-        popular: false
-      }
-    ]
-  };
+  // Category mapping: database → page
+  const categoryMapping: Record<string, string> = {
+    'Plat principal': 'plats',
+    'Entrée': 'plats',
+    'Snack': 'snacks',
+    'Boisson': 'boissons',
+    'Dessert': 'desserts',
+  }
 
-  const categories = [
-    { id: 'plats', label: 'Plats Principaux' },
-    { id: 'snacks', label: 'Snacks' },
-    { id: 'boissons', label: 'Boissons' },
-    { id: 'desserts', label: 'Desserts' }
-  ];
+  const categoryLabels: Record<string, string> = {
+    'plats': 'Plats Principaux',
+    'snacks': 'Snacks',
+    'boissons': 'Boissons',
+    'desserts': 'Desserts',
+  }
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch('/api/restaurant/menu')
+        if (!res.ok) throw new Error('Failed to fetch menu')
+        const data = await res.json()
+
+        // Transform database categories to page categories
+        const transformedMenu: Record<string, MenuItem[]> = {}
+        const seenCategories = new Set<string>()
+
+        Object.entries(data.menu).forEach(([dbCategory, items]: [string, MenuItem[]]) => {
+          const pageCategory = categoryMapping[dbCategory] || dbCategory.toLowerCase()
+
+          if (!transformedMenu[pageCategory]) {
+            transformedMenu[pageCategory] = []
+          }
+
+          transformedMenu[pageCategory].push(...items)
+          seenCategories.add(pageCategory)
+        })
+
+        setMenuData(transformedMenu)
+        setCategories(Array.from(seenCategories).map(cat => ({
+          id: cat,
+          label: categoryLabels[cat] || cat.charAt(0).toUpperCase() + cat.slice(1),
+        })))
+      } catch (error) {
+        console.error('Error fetching menu:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchMenu()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black">
+        <Header />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-white text-xl">Chargement du menu...</div>
+        </div>
+      </div>
+    )
+  }
+
+  const currentItems = menuData[activeCategory] || []
 
   return (
     <div className="min-h-screen bg-black">
@@ -197,84 +121,110 @@ export default function RestaurantPage() {
                 <Star className="w-6 h-6" strokeWidth={2} />
               </div>
               <div>
-                <p className="text-white dark:text-black font-semibold">Spécialités</p>
-                <p className="text-sm text-white dark:text-black">Burgers, Tacos, Ramen, Pizza</p>
+                <p className="text-white dark:text-black font-semibold">Qualité</p>
+                <p className="text-sm text-white dark:text-black">Produits frais & maison</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Menu Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          {/* Category Tabs */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+      {/* Category Tabs */}
+      <section className="bg-black py-6 px-4 border-b border-border">
+        <div className="container mx-auto">
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setActiveCategory(category.id as any)}
-                className={`px-8 py-4 rounded-xl font-bold uppercase transition-all duration-300 restaurant-category-button ${
+                onClick={() => setActiveCategory(category.id)}
+                className={`flex-shrink-0 px-6 py-3 rounded-full font-bold transition-all duration-300 restaurant-category-button ${
                   activeCategory === category.id
-                    ? 'bg-gradient-to-r from-red-600 to-orange-500 !text-white shadow-lg scale-105'
-                    : 'bg-surface hover:bg-elevated'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-500 text-white shadow-lg scale-105'
+                    : 'bg-surface hover:bg-elevated text-white dark:text-black'
                 }`}
               >
                 {category.label}
               </button>
             ))}
           </div>
-
-          {/* Menu Items Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {menuItems[activeCategory].map((item, index) => (
-              <div
-                key={index}
-                className="bg-surface border border-border rounded-2xl p-6 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 group"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-2xl font-bold text-white group-hover:text-orange-500 transition-colors">
-                    {item.name}
-                  </h3>
-                  <p className="text-2xl font-bold text-orange-500 ml-4">
-                    {item.price.toLocaleString()} FCFA
-                  </p>
-                </div>
-                <p className="text-white/70 text-base mb-4">
-                  {item.description}
-                </p>
-                <button className="w-full py-3 bg-gradient-to-r from-red-600 to-orange-500 !text-white font-bold uppercase rounded-xl hover:opacity-90 transition-opacity">
-                  Commander
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* Order CTA - Full Width */}
+      {/* Menu Items Grid */}
       <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="bg-gradient-to-r from-red-600/20 to-orange-500/20 border border-red-500/30 rounded-3xl p-8 md:p-12">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex-1">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 uppercase">
-                  Envie de commander ?
-                </h2>
-                <p className="text-white/80 text-lg">
-                  Profitez de notre cuisine sur place ou à emporter. Les commandes sont disponibles directement à l'accueil du Geek Gaming Center.
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
-                <button className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-500 font-bold uppercase rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap restaurant-cta-button">
-                  Commander sur place
-                </button>
-                <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold uppercase rounded-xl hover:bg-white hover:text-black transition-all whitespace-nowrap">
-                  Réserver une table
-                </button>
-              </div>
+        <div className="container mx-auto max-w-7xl">
+          {currentItems.length === 0 ? (
+            <div className="text-center text-white/60 text-xl py-20">
+              Aucun article disponible dans cette catégorie pour le moment
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-surface border border-border rounded-2xl overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 group"
+                >
+                  {/* Image */}
+                  {item.image && (
+                    <div className="relative h-48 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {(item.isVegetarian || item.isVegan || item.isSpicy) && (
+                    <div className="flex gap-2 px-4 py-2 bg-black/20">
+                      {item.isVegetarian && (
+                        <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
+                          Végétarien
+                        </span>
+                      )}
+                      {item.isVegan && (
+                        <span className="px-2 py-1 bg-green-600/20 text-green-500 text-xs rounded-full">
+                          Vegan
+                        </span>
+                      )}
+                      {item.isSpicy && (
+                        <span className="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full">
+                          Épicé
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-500 transition-colors">
+                      {item.name}
+                    </h3>
+                    {item.description && (
+                      <p className="text-white/70 text-sm mb-3 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-2xl font-bold text-orange-500">
+                        {item.price.toLocaleString('fr-FR')} FCFA
+                      </span>
+                      {item.preparationTime && (
+                        <span className="text-xs text-white/50 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {item.preparationTime} min
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
