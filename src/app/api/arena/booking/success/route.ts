@@ -111,6 +111,7 @@ export async function GET(request: NextRequest) {
         scheduledEndAt,
         duration: parseInt(metadata.duration),
         pricingId: pricing.id,
+        price: pricing.price,
         status: 'PENDING',
         stripeSessionId: sessionId,
         stripePaymentIntentId: session.payment_intent as string,
