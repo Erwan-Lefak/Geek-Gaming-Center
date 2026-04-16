@@ -96,16 +96,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate end date
-    // datetime-local sends "YYYY-MM-DDTHH:mm" which should be treated as local time
-    // Parse as local date to avoid UTC conversion issues
-    const parseLocalDate = (dateString: string) => {
+    // datetime-local sends "YYYY-MM-DDTHH:mm" which is local time
+    // We need to convert it to UTC for storage
+    const parseLocalDateAsUTC = (dateString: string) => {
       const [datePart, timePart] = dateString.split('T')
       const [year, month, day] = datePart.split('-').map(Number)
       const [hour, minute] = timePart.split(':').map(Number)
-      return new Date(year, month - 1, day, hour, minute, 0, 0)
+
+      // Create date in local timezone
+      const localDate = new Date(year, month - 1, day, hour, minute, 0, 0)
+
+      // Get UTC timestamp by using getTime() which already accounts for timezone
+      return new Date(localDate.getTime())
     }
 
-    const screenTime = parseLocalDate(validatedData.screenTime)
+    const screenTime = parseLocalDateAsUTC(validatedData.screenTime)
     const endDate = new Date(screenTime.getTime() + movie.duration * 60000)
 
     const screening = await prisma.movieScreening.create({
