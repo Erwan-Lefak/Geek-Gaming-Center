@@ -28,13 +28,13 @@ export default function BookingPage() {
 
   // Equipment pricing
   const equipmentPrices: Record<string, number> = {
-    'PS5': 2000,
-    'PS4': 1000,
-    'XBOX Series X': 1500,
-    'PC': 1500,
-    'Oculus': 2500,
-    'VR-PS4': 2500,
-    'Simu Racing': 2000,
+    'PlayStation 5': 2000,
+    'PlayStation 4': 1000,
+    'Xbox Series X': 1500,
+    'PC Gamer': 1500,
+    'Oculus Quest': 2500,
+    'VR PlayStation': 2500,
+    'Simulateur Auto': 2000,
   }
 
   // Build equipment types dynamically from API data
