@@ -13,6 +13,8 @@ import { CartItem } from '@/types/cart';
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-01-27.acacia' as any,
   typescript: true,
+  timeout: 10000, // 10 second timeout
+  maxNetworkRetries: 2,
 });
 
 /**
