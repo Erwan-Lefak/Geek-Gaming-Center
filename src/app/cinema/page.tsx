@@ -89,23 +89,6 @@ export default function CinemaPage() {
       ],
       type: 'movie' as const,
       colors: 'from-gray-600 to-red-500'
-    },
-    {
-      id: 'snowfall',
-      title: 'Snowfall',
-      subtitle: 'Séries FX - Saisons 1 à 6',
-      poster: '/snowfall.jpg',
-      duration: '45-50 min/ép',
-      episodes: '60 épisodes (6 saisons)',
-      genre: 'Drame / Crime',
-      rating: '18+',
-      synopsis: 'Los Angeles, 1983. Franklin Saint, jeune homme ambitieux d\'South Central, voit une opportunité dans l\'émergence du crack-cocaïne. La série suit son ascension dans le monde du trafic, tout en explorant les conséquences devastatrices de l\'épidémie de crack sur la communauté noire américaine. Une plongée brutale et captivante dans une période sombre de l\'histoire américaine, mêlant personnages fictifs et événements réels.',
-      sessions: [
-        { time: '21:00', status: 'available' },
-        { time: '22:30', status: 'available' },
-      ],
-      type: 'series' as const,
-      colors: 'from-indigo-600 to-blue-500'
     }
   ];
 
