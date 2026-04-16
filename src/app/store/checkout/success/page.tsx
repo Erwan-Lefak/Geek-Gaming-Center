@@ -9,11 +9,13 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, ShoppingBag, Home, Package } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [orderDetails, setOrderDetails] = useState<any>(null);
+  const { clearCart } = useCart();
 
   useEffect(() => {
     // In a real implementation, you would fetch order details from your API
@@ -21,8 +23,11 @@ function CheckoutSuccessContent() {
     if (sessionId) {
       // For now, just show success message
       setOrderDetails({ sessionId });
+
+      // Clear cart after successful purchase
+      clearCart();
     }
-  }, [sessionId]);
+  }, [sessionId, clearCart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
