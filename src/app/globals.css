@@ -2496,7 +2496,7 @@ p, span, a, button, input, textarea, select, label,
 }
 
 /* ============================================
-   DELETE ACCOUNT MODAL - FORCE RED TEXT
+   DELETE ACCOUNT & CANCEL MODAL - FORCE COLORS
    Ensure warning text is visible in both light and dark modes
    ============================================ */
 
@@ -2522,6 +2522,36 @@ html.light *.text-red-700 {
   color: #b91c1c !important;
 }
 
+/* Force all yellow text colors in light mode */
+html.light .text-yellow-900,
+html.light p.text-yellow-900,
+html.light li.text-yellow-900,
+html.light *.text-yellow-900 {
+  color: #78350f !important;
+}
+
+html.light .text-yellow-800,
+html.light p.text-yellow-800,
+html.light li.text-yellow-800,
+html.light *.text-yellow-800 {
+  color: #92400e !important;
+}
+
+/* Force all purple text colors in light mode */
+html.light .text-purple-900,
+html.light p.text-purple-900,
+html.light li.text-purple-900,
+html.light *.text-purple-900 {
+  color: #4c1d95 !important;
+}
+
+html.light .text-purple-800,
+html.light p.text-purple-800,
+html.light li.text-purple-800,
+html.light *.text-purple-800 {
+  color: #5b21b6 !important;
+}
+
 /* Specifically target the warning box in the delete modal */
 html.light .bg-red-50 p,
 html.light .bg-red-50 .text-red-800,
@@ -2542,4 +2572,30 @@ html.dark p.text-red-300,
 html.dark li.text-red-300,
 html.dark *.text-red-300 {
   color: #fca5a5 !important;
+}
+
+/* Target yellow box in cancel modal */
+html.light .bg-yellow-50 p,
+html.light .bg-yellow-50 .text-yellow-800,
+html.light .bg-yellow-50 .text-yellow-900 {
+  color: #78350f !important;
+}
+
+html.dark .bg-yellow-50 p,
+html.dark .bg-yellow-50 .text-yellow-800,
+html.dark .bg-yellow-50 .text-yellow-900 {
+  color: #fef08a !important;
+}
+
+/* Target purple box in cancel modal */
+html.light .bg-purple-50 p,
+html.light .bg-purple-50 .text-purple-800,
+html.light .bg-purple-50 .text-purple-900 {
+  color: #4c1d95 !important;
+}
+
+html.dark .bg-purple-50 p,
+html.dark .bg-purple-50 .text-purple-800,
+html.dark .bg-purple-50 .text-purple-900 {
+  color: #ddd6fe !important;
 }
