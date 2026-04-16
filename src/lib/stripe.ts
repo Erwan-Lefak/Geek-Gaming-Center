@@ -37,7 +37,9 @@ export async function createCheckoutSession(
       product_data: {
         name: item.product.name,
         description: item.product.description?.substring(0, 500) || '', // Stripe max 500 chars
-        images: item.product.image ? [item.product.image] : [],
+        // Skip images for now - local paths are not valid URLs for Stripe
+        // TODO: Use hosted image URLs when available
+        images: [],
       },
       unit_amount: Math.round(item.product.price), // Stripe uses cents/units
     },
