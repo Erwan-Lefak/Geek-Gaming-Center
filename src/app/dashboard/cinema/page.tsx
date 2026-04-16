@@ -149,7 +149,15 @@ export default function CinemaPage() {
   }
 
   const handleDeleteMovieConfirm = async () => {
-    if (!selectedMovie) return
+    if (!selectedMovie) {
+      alert('Aucun film sélectionné')
+      return
+    }
+
+    if (!selectedMovie.id) {
+      alert('ID de film manquant')
+      return
+    }
 
     setIsDeleting(true)
 
@@ -221,7 +229,15 @@ export default function CinemaPage() {
   }
 
   const handleDeleteScreeningConfirm = async () => {
-    if (!selectedScreening) return
+    if (!selectedScreening) {
+      alert('Aucune séance sélectionnée')
+      return
+    }
+
+    if (!selectedScreening.id) {
+      alert('ID de séance manquant')
+      return
+    }
 
     setIsDeleting(true)
 
