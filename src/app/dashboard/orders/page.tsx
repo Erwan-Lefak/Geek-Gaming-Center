@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
-import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock, Edit, Trash2, Eye } from 'lucide-react'
+import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock, Edit, Trash2, Eye, Plus } from 'lucide-react'
 import { formatFCFA } from '@/lib/currency'
 
 interface OrderItem {
@@ -44,6 +44,16 @@ export default function OrdersPage() {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [showCreateOrderModal, setShowCreateOrderModal] = useState(false)
+  const [orderForm, setOrderForm] = useState({
+    customerId: '',
+    customerEmail: '',
+    items: [] as Array<{ productId: string; name: string; quantity: number; price: number }>,
+    totalAmount: 0,
+    paymentMethod: 'CASH' as 'CASH' | 'CARD' | 'MOBILE_MONEY',
+    status: 'PENDING' as 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED',
+    shippingAddress: '',
+  })
 
   useEffect(() => {
     fetchOrders()
@@ -193,6 +203,79 @@ export default function OrdersPage() {
     totalRevenue: orders.reduce((sum, o) => sum + o.totalAmount, 0),
   }
 
+  const handleCreateOrder = async () => {
+    try {
+      if (!orderForm.customerEmail || orderForm.items.length === 0) {
+        alert('Veuillez remplir tous les champs obligatoires')
+        return
+      }
+
+      const response = await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderForm),
+      })
+
+      if (response.ok) {
+        await fetchOrders()
+        setShowCreateOrderModal(false)
+        setOrderForm({
+          customerId: '',
+          customerEmail: '',
+          items: [],
+          totalAmount: 0,
+          paymentMethod: 'CASH',
+          status: 'PENDING',
+          shippingAddress: '',
+        })
+        alert('Commande créée avec succès !')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors de la création de la commande')
+      }
+    } catch (error) {
+      console.error('Error creating order:', error)
+      alert('Erreur lors de la création de la commande')
+    }
+  }
+
+  const addItemToOrder = () => {
+    const productName = prompt('Nom du produit:')
+    if (!productName) return
+
+    const quantity = parseInt(prompt('Quantité:') || '1')
+    const price = parseFloat(prompt('Prix unitaire (FCFA):') || '0')
+
+    if (quantity > 0 && price > 0) {
+      const newItem = {
+        productId: Date.now().toString(),
+        name: productName,
+        quantity,
+        price,
+      }
+
+      const newItems = [...orderForm.items, newItem]
+      const totalAmount = newItems.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+
+      setOrderForm({
+        ...orderForm,
+        items: newItems,
+        totalAmount,
+      })
+    }
+  }
+
+  const removeItemFromOrder = (index: number) => {
+    const newItems = orderForm.items.filter((_, i) => i !== index)
+    const totalAmount = newItems.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+
+    setOrderForm({
+      ...orderForm,
+      items: newItems,
+      totalAmount,
+    })
+  }
+
   return (
     <div className="min-h-screen mt-28 lg:mt-20">
       {/* Header */}
@@ -207,6 +290,13 @@ export default function OrdersPage() {
                 Historique complet des commandes en ligne
               </p>
             </div>
+            <Button
+              onClick={() => setShowCreateOrderModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              Nouvelle Commande
+            </Button>
           </div>
         </div>
       </div>
@@ -565,6 +655,173 @@ export default function OrdersPage() {
           </div>
         </Modal>
       )}
+
+      {/* Create Order Modal */}
+      <Modal
+        isOpen={showCreateOrderModal}
+        onClose={() => setShowCreateOrderModal(false)}
+        title="Nouvelle Commande"
+        size="xl"
+      >
+        <div className="space-y-6">
+          {/* Customer Info */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <User className="w-5 h-5" />
+              Informations Client
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email du client *</label>
+                <Input
+                  type="email"
+                  value={orderForm.customerEmail}
+                  onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
+                  placeholder="client@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse de livraison</label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  rows={3}
+                  value={orderForm.shippingAddress}
+                  onChange={(e) => setOrderForm({ ...orderForm, shippingAddress: e.target.value })}
+                  placeholder="Adresse complète de livraison"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+                <Package className="w-5 h-5" />
+                Articles ({orderForm.items.length})
+              </h3>
+              <Button
+                onClick={addItemToOrder}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4" />
+                Ajouter Article
+              </Button>
+            </div>
+
+            {orderForm.items.length === 0 ? (
+              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Package className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
+                <p className="text-gray-500 dark:text-gray-400">Aucun article. Cliquez sur "Ajouter Article" pour commencer.</p>
+              </div>
+            ) : (
+              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y dark:divide-gray-700">
+                    {orderForm.items.map((item, index) => (
+                      <tr key={index} className="dark:bg-gray-800">
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.name}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.quantity}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.price)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.quantity * item.price)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Button
+                            onClick={() => removeItemFromOrder(index)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        Total
+                      </td>
+                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                        {formatFCFA(orderForm.totalAmount)}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Payment & Status */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <CreditCard className="w-5 h-5" />
+              Paiement & Statut
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mode de paiement</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  value={orderForm.paymentMethod}
+                  onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value as any })}
+                >
+                  <option value="CASH">Espèces</option>
+                  <option value="CARD">Carte bancaire</option>
+                  <option value="MOBILE_MONEY">Mobile Money</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  value={orderForm.status}
+                  onChange={(e) => setOrderForm({ ...orderForm, status: e.target.value as any })}
+                >
+                  <option value="PENDING">En attente</option>
+                  <option value="CONFIRMED">Confirmée</option>
+                  <option value="PROCESSING">En traitement</option>
+                  <option value="SHIPPED">Expédiée</option>
+                  <option value="DELIVERED">Livrée</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 pt-4 border-t dark:border-gray-700">
+            <Button
+              onClick={() => setShowCreateOrderModal(false)}
+              className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleCreateOrder}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700"
+            >
+              Créer la Commande
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
