@@ -13,9 +13,6 @@ interface MenuItem {
   image?: string
   ingredients: string[]
   allergens: string[]
-  isVegetarian: boolean
-  isVegan: boolean
-  isSpicy: boolean
   isActive: boolean
   isAvailable: boolean
   preparationTime: number
@@ -53,9 +50,6 @@ export default function RestaurantPage() {
     price: 0,
     ingredients: [] as string[],
     allergens: [] as string[],
-    isVegetarian: false,
-    isVegan: false,
-    isSpicy: false,
     isAvailable: true,
     preparationTime: 15,
   })
@@ -146,9 +140,6 @@ export default function RestaurantPage() {
       price: Number(item.price),
       ingredients: item.ingredients,
       allergens: item.allergens,
-      isVegetarian: item.isVegetarian,
-      isVegan: item.isVegan,
-      isSpicy: item.isSpicy,
       isAvailable: item.isAvailable,
       preparationTime: item.preparationTime,
     })
@@ -163,9 +154,6 @@ export default function RestaurantPage() {
       price: 0,
       ingredients: [],
       allergens: [],
-      isVegetarian: false,
-      isVegan: false,
-      isSpicy: false,
       isAvailable: true,
       preparationTime: 15,
     })
@@ -249,17 +237,6 @@ export default function RestaurantPage() {
                 </div>
                 <p className="text-sm mb-2" style={{ color: 'var(--muted-foreground)' }}>{item.category}</p>
                 <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>{item.description}</p>
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {item.isVegetarian && (
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Végétarien</span>
-                  )}
-                  {item.isVegan && (
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Vegan</span>
-                  )}
-                  {item.isSpicy && (
-                    <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Épicé</span>
-                  )}
-                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEditMenuItem(item)}
@@ -415,35 +392,6 @@ export default function RestaurantPage() {
                 style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
               />
             </div>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={menuItemForm.isVegetarian}
-                onChange={(e) => setMenuItemForm({ ...menuItemForm, isVegetarian: e.target.checked })}
-                className="mr-2"
-              />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>Végétarien</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={menuItemForm.isVegan}
-                onChange={(e) => setMenuItemForm({ ...menuItemForm, isVegan: e.target.checked })}
-                className="mr-2"
-              />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>Vegan</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={menuItemForm.isSpicy}
-                onChange={(e) => setMenuItemForm({ ...menuItemForm, isSpicy: e.target.checked })}
-                className="mr-2"
-              />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>Épicé</span>
-            </label>
           </div>
           <label className="flex items-center">
             <input
