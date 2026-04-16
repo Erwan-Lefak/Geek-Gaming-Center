@@ -109,6 +109,11 @@ export default function CinemaPage() {
   }
 
   const handleSaveMovie = async () => {
+    if (!movieForm.title) {
+      alert('Le titre du film est requis')
+      return
+    }
+
     try {
       const url = selectedMovie
         ? `/api/dashboard/movies/${selectedMovie.id}`
@@ -128,6 +133,9 @@ export default function CinemaPage() {
         setSelectedMovie(null)
         resetMovieForm()
         alert(selectedMovie ? 'Film mis à jour avec succès !' : 'Film créé avec succès !')
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Erreur lors de la sauvegarde du film')
       }
     } catch (error) {
       console.error('Error saving movie:', error)
