@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { customerEmail, items, totalAmount, paymentMethod, status, shippingAddress } = body
+    const { customerEmail, customerFirstName, customerLastName, customerPhone, items, totalAmount, paymentMethod, status, shippingAddress } = body
 
     // Validation
     if (!customerEmail || !items || items.length === 0 || !totalAmount || !paymentMethod) {
@@ -114,16 +114,24 @@ export async function POST(request: NextRequest) {
     })
 
     if (!customer) {
-      // Create a new customer
-      const emailParts = customerEmail.split('@')
-      const displayName = emailParts[0] || 'Client'
-
+      // Create a new customer with provided info
       customer = await prisma.customer.create({
         data: {
           email: customerEmail,
-          firstName: displayName,
-          lastName: '',
-          phone: '',
+          firstName: customerFirstName || customerEmail.split('@')[0] || 'Client',
+          lastName: customerLastName || '',
+          phone: customerPhone || '',
+          createdById: user.id, // Add required createdById field
+        },
+      })
+    } else if ((customerFirstName || customerLastName || customerPhone) && user.id) {
+      // Update existing customer if new info provided
+      customer = await prisma.customer.update({
+        where: { id: customer.id },
+        data: {
+          ...(customerFirstName && { firstName: customerFirstName }),
+          ...(customerLastName && { lastName: customerLastName }),
+          ...(customerPhone && { phone: customerPhone }),
         },
       })
     }

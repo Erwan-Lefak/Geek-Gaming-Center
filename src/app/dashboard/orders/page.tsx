@@ -49,6 +49,9 @@ export default function OrdersPage() {
   const [orderForm, setOrderForm] = useState({
     customerId: '',
     customerEmail: '',
+    customerFirstName: '',
+    customerLastName: '',
+    customerPhone: '',
     items: [] as Array<{ productId: string; name: string; quantity: number; price: number }>,
     totalAmount: 0,
     paymentMethod: 'CASH' as 'CASH' | 'CARD' | 'MOBILE_MONEY',
@@ -214,7 +217,17 @@ export default function OrdersPage() {
       const response = await fetch('/api/admin/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderForm),
+        body: JSON.stringify({
+          customerEmail: orderForm.customerEmail,
+          customerFirstName: orderForm.customerFirstName,
+          customerLastName: orderForm.customerLastName,
+          customerPhone: orderForm.customerPhone,
+          items: orderForm.items,
+          totalAmount: orderForm.totalAmount,
+          paymentMethod: orderForm.paymentMethod,
+          status: orderForm.status,
+          shippingAddress: orderForm.shippingAddress,
+        }),
       })
 
       if (response.ok) {
@@ -223,6 +236,9 @@ export default function OrdersPage() {
         setOrderForm({
           customerId: '',
           customerEmail: '',
+          customerFirstName: '',
+          customerLastName: '',
+          customerPhone: '',
           items: [],
           totalAmount: 0,
           paymentMethod: 'CASH',
@@ -683,15 +699,46 @@ export default function OrdersPage() {
               Informations Client
             </h3>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email du client *</label>
-                <Input
-                  type="email"
-                  value={orderForm.customerEmail}
-                  onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
-                  placeholder="client@example.com"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
+                  <Input
+                    type="text"
+                    value={orderForm.customerFirstName}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerFirstName: e.target.value })}
+                    placeholder="Jean"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+                  <Input
+                    type="text"
+                    value={orderForm.customerLastName}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerLastName: e.target.value })}
+                    placeholder="Dupont"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                  <Input
+                    type="email"
+                    value={orderForm.customerEmail}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
+                    placeholder="client@example.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
+                  <Input
+                    type="tel"
+                    value={orderForm.customerPhone}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerPhone: e.target.value })}
+                    placeholder="+237 6 00 00 00 00"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse de livraison</label>
