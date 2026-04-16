@@ -18,6 +18,20 @@ const arenaBookingSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check Stripe configuration
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY is not configured');
+      return NextResponse.json(
+        { success: false, error: 'Stripe configuration error' },
+        { status: 500 }
+      );
+    }
+
+    // Warn if using test key in production
+    if (process.env.STRIPE_SECRET_KEY.startsWith('sk_test_') && process.env.NODE_ENV === 'production') {
+      console.warn('⚠️ Using Stripe TEST key in PRODUCTION environment');
+    }
+
     const body = await request.json();
 
     // Validate request body
@@ -49,6 +63,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Arena checkout error:', error);
+    console.error('Error type:', error.type);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -57,10 +74,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Provide more detailed error message for Stripe errors
+    let errorMessage = error.message || 'Failed to create checkout session';
+    if (error.type === 'StripeConnectionError') {
+      errorMessage = 'Connection to Stripe failed. Please try again.';
+    } else if (error.type === 'StripeAPIError') {
+      errorMessage = 'Stripe API error. Please try again.';
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to create checkout session',
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
       },
       { status: 500 }
     );

@@ -113,7 +113,9 @@ function BookingConfirmContent() {
           window.location.href = stripeData.data.url
         } else {
           const error = await stripeResponse.json()
-          alert(error.error || 'Erreur lors de la création du paiement Stripe')
+          const errorMessage = error.details || error.error || 'Erreur lors de la création du paiement Stripe'
+          console.error('Stripe checkout error:', error)
+          alert(`Erreur: ${errorMessage}`)
           setIsLoading(false)
         }
         return
