@@ -6,7 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, Calendar, Filter, Package, Download } from 'lucide-react'
+import { Modal } from '@/components/ui/modal'
+import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock } from 'lucide-react'
 import { formatFCFA } from '@/lib/currency'
 
 interface OrderItem {
@@ -41,6 +42,8 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [showOrderModal, setShowOrderModal] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -94,6 +97,11 @@ export default function OrdersPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const handleOrderClick = (order: Order) => {
+    setSelectedOrder(order)
+    setShowOrderModal(true)
   }
 
   // Filter orders
@@ -298,7 +306,11 @@ export default function OrdersPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredOrders.map((order) => (
-                      <TableRow key={order.id} className="dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <TableRow
+                        key={order.id}
+                        className="dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => handleOrderClick(order)}
+                      >
                         <TableCell className="dark:bg-gray-800">
                           <span className="font-medium text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
                             {order.orderNumber}
@@ -351,6 +363,129 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <Modal
+          isOpen={showOrderModal}
+          onClose={() => setShowOrderModal(false)}
+          title={`Détails de la commande ${selectedOrder.orderNumber}`}
+          size="lg"
+        >
+          <div className="space-y-6">
+            {/* Customer Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-purple-500" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Client</p>
+                  <p className="font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                    {selectedOrder.customer.firstName} {selectedOrder.customer.lastName}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-purple-500" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                    {selectedOrder.customer.email}
+                  </p>
+                </div>
+              </div>
+              {selectedOrder.customer.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-purple-500" />
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Téléphone</p>
+                    <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                      {selectedOrder.customer.phone}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-purple-500" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Date</p>
+                  <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                    {formatDate(selectedOrder.createdAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Status & Payment */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Package className="w-4 h-4 text-purple-500" />
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Statut</p>
+                </div>
+                {getStatusBadge(selectedOrder.status)}
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <CreditCard className="w-4 h-4 text-purple-500" />
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Paiement</p>
+                </div>
+                {getPaymentStatusBadge(selectedOrder.paymentStatus)}
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {selectedOrder.paymentMethod === 'CARD' ? 'Carte bancaire' : selectedOrder.paymentMethod}
+                </p>
+              </div>
+            </div>
+
+            {/* Order Items */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+                <Package className="w-5 h-5" />
+                Articles ({selectedOrder.items.length})
+              </h3>
+              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y dark:divide-gray-700">
+                    {selectedOrder.items.map((item) => (
+                      <tr key={item.id} className="dark:bg-gray-800">
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.productName}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.quantity}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.unitPrice)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.totalPrice)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        Total
+                      </td>
+                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                        {formatFCFA(selectedOrder.totalAmount)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

@@ -66,15 +66,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Find Prisma Customer via email (not NextAuth user ID)
+    const { prisma } = await import('@/lib/prisma/client')
+    const customer = await prisma.customer.findUnique({
+      where: {
+        email: session.user.email || '',
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: 'Client non trouvé. Veuillez créer un compte.' },
+        { status: 404 }
+      )
+    }
+
     const body = await request.json()
 
     // Valider les données
     const validatedData = createReservationSchema.parse(body)
 
-    // Créer la réservation
+    // Créer la réservation avec le Prisma Customer ID
     const sessionNumber = await generateSessionNumber()
     const reservation = await createReservation({
-      customerId: session.user.id,
+      customerId: customer.id, // Use Prisma Customer ID, not NextAuth user ID
       equipmentId: validatedData.equipmentId,
       date: new Date(validatedData.date),
       startTime: validatedData.startTime,
