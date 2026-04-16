@@ -38,7 +38,16 @@ export async function POST(request: NextRequest) {
     const validatedData = arenaBookingSchema.parse(body);
 
     // Get base URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000';
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000';
+
+    // Clean up baseUrl - remove trailing slashes and quotes
+    baseUrl = baseUrl.replace(/\/+$/, '').trim();
+
+    // Construct URLs
+    const successUrl = `${baseUrl}/arena/booking/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/arena/booking/confirm`;
+
+    console.log('Stripe Checkout URLs:', { successUrl, cancelUrl, baseUrl });
 
     // Create Stripe Checkout Session
     const session = await createArenaBookingSession(
@@ -50,8 +59,8 @@ export async function POST(request: NextRequest) {
         duration: validatedData.duration,
         price: validatedData.price,
       },
-      `${baseUrl}/arena/booking/success?session_id={CHECKOUT_SESSION_ID}`,
-      `${baseUrl}/arena/booking/confirm`
+      successUrl,
+      cancelUrl
     );
 
     return NextResponse.json({
