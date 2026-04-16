@@ -273,7 +273,7 @@ export default function CinemaPage() {
           onClick={() => setSelectedShow(null)}
         >
           <div
-            className="bg-surface border border-border rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-surface border border-border rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {(() => {
