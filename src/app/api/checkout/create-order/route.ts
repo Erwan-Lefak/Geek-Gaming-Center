@@ -46,20 +46,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if order already exists
-    const existingOrder = await prisma.order.findFirst({
-      where: {
-        orderNumber: sessionId,
-      },
-    });
-
-    if (existingOrder) {
-      return NextResponse.json({
-        success: true,
-        order: existingOrder,
-      });
-    }
-
     // Get customer email
     const customerEmail = stripeSession.customer_details?.email;
 
@@ -100,6 +86,31 @@ export async function POST(request: NextRequest) {
           status: 'REGULAR',
           createdById: systemUser?.id || 'system',
         }
+      });
+    }
+
+    // Check if order already exists (last 10 minutes for this customer)
+    const existingOrder = await prisma.order.findFirst({
+      where: {
+        customerId: customer.id,
+        createdAt: {
+          gte: new Date(Date.now() - 10 * 60 * 1000), // Last 10 minutes
+        },
+      },
+      include: {
+        items: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    if (existingOrder) {
+      // Order already created recently, return it without sending emails again
+      return NextResponse.json({
+        success: true,
+        order: existingOrder,
+        alreadyExists: true,
       });
     }
 

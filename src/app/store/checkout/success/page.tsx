@@ -17,15 +17,17 @@ function CheckoutSuccessContent() {
   const sessionId = searchParams.get('session_id');
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [orderCreated, setOrderCreated] = useState(false);
   const { clearCart } = useCart();
   const { data: session } = useSession();
 
   useEffect(() => {
     const createOrderInDatabase = async () => {
-      if (!sessionId) return;
+      if (!sessionId || orderCreated) return;
 
       try {
         setIsLoading(true);
+        setOrderCreated(true); // Prevent multiple calls
 
         // Call API to create order from Stripe session
         const response = await fetch('/api/checkout/create-order', {
@@ -57,7 +59,7 @@ function CheckoutSuccessContent() {
     };
 
     createOrderInDatabase();
-  }, [sessionId, clearCart]);
+  }, [sessionId]); // Remove clearCart and orderCreated from dependencies
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
