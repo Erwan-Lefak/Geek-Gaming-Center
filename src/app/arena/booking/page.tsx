@@ -26,15 +26,15 @@ export default function BookingPage() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
-  // Equipment pricing
+  // Equipment pricing by type
   const equipmentPrices: Record<string, number> = {
-    'PlayStation 5': 2000,
-    'PlayStation 4': 1000,
-    'Xbox Series X': 1500,
-    'PC Gamer': 1500,
-    'Oculus Quest': 2500,
-    'VR PlayStation': 2500,
-    'Simulateur Auto': 2000,
+    'PS5': 2000,
+    'PS4': 1000,
+    'XBOX_SERIES_X': 1500,
+    'PC_GAMING': 1500,
+    'OCULUS_VR': 2500,
+    'VR_PS4': 2500,
+    'SIMU_RACING': 2000,
   }
 
   // Build equipment types dynamically from API data
@@ -52,25 +52,23 @@ export default function BookingPage() {
     const dayOfWeek = selectedDate.getDay()
     const isSunday = dayOfWeek === 0
 
+    // Debug log
+    console.log('Date:', selectedDate.toDateString(), 'Day of week:', dayOfWeek, 'Is Sunday:', isSunday)
+
     // Operating hours: Mon-Sat 9h30-21h, Sun 12h-21h
     const startHour = isSunday ? 12 : 9
     const startMinute = isSunday ? 0 : 30
     const endHour = 21
 
     for (let hour = startHour; hour < endHour; hour++) {
-      // Add slot at start time (9:30 or 12:00)
-      if (hour === startHour && startMinute === 30) {
+      if (hour === startHour) {
+        // First hour: only add start time (9:30 or 12:00)
         slots.push({
-          time: `${hour}:30`,
-          available: Math.random() > 0.3, // Simulated availability
-        })
-      } else if (hour === startHour && startMinute === 0) {
-        slots.push({
-          time: `${hour}:00`,
+          time: `${hour}:${startMinute === 0 ? '00' : startMinute}`,
           available: Math.random() > 0.3,
         })
       } else {
-        // Add both :00 and :30 slots
+        // Other hours: add both :00 and :30
         slots.push({
           time: `${hour}:00`,
           available: Math.random() > 0.3,
@@ -143,6 +141,7 @@ export default function BookingPage() {
   }
 
   const handleDateSelect = (date: Date) => {
+    console.log('Clicked date:', date.toDateString(), 'getDay():', date.getDay())
     if (!isPastDate(date)) {
       setSelectedDate(date)
       setSelectedSlot(null)
@@ -189,8 +188,8 @@ export default function BookingPage() {
         if (response.ok) {
           // Transform equipment data
           const transformed = data.equipment.map((eq: any) => {
-            // Get price from default pricing map
-            const pricePerHour = equipmentPrices[eq.name] || 0
+            // Get price from default pricing map by type
+            const pricePerHour = equipmentPrices[eq.type] || 0
 
             return {
               id: eq.id,
@@ -215,11 +214,18 @@ export default function BookingPage() {
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
-        const dateStr = selectedDate.toISOString().split('T')[0]
+        // Format date as YYYY-MM-DD using local timezone (not UTC)
+        const year = selectedDate.getFullYear()
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+        const day = String(selectedDate.getDate()).padStart(2, '0')
+        const dateStr = `${year}-${month}-${day}`
+
         const equipmentParam = selectedEquipment !== 'all' ? `&equipmentId=${selectedEquipment}` : ''
 
         const response = await fetch(`/api/reservations/availability?date=${dateStr}${equipmentParam}`)
         const data = await response.json()
+
+        console.log('API Response for', dateStr, ':', data.slots?.slice(0, 5))
 
         if (response.ok) {
           setTimeSlots(data.slots)
@@ -334,24 +340,6 @@ export default function BookingPage() {
 
           {/* Right Side - Time Slots (30%) */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Equipment Filter */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-6">
-              <label className="block text-sm font-semibold text-purple-200 mb-3">
-                Filtre par équipement
-              </label>
-              <select
-                value={selectedEquipment}
-                onChange={(e) => setSelectedEquipment(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                {equipmentTypes.map(type => (
-                  <option key={type.value} value={type.value} className="bg-gray-900">
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Time Slots */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -410,16 +398,34 @@ export default function BookingPage() {
               </div>
               <div className="space-y-2 text-sm">
                 {equipmentList.length > 0 ? (
-                  equipmentList.map((equipment) => (
-                    <div key={equipment.id} className="flex justify-between text-purple-200">
-                      <span>{equipment.name}</span>
-                      <span className="text-white font-semibold">{equipment.pricePerHour}F/h</span>
-                    </div>
-                  ))
+                  equipmentList.map((equipment) => {
+                    const isSelected = selectedEquipment === equipment.id
+                    return (
+                      <div
+                        key={equipment.id}
+                        onClick={() => setSelectedEquipment(equipment.id)}
+                        className={`
+                          flex justify-between items-center p-3 rounded-xl cursor-pointer transition-all
+                          ${isSelected
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-2 border-white/30'
+                            : 'bg-white/5 text-purple-200 border-2 border-transparent hover:bg-white/10 hover:border-white/20'
+                          }
+                        `}
+                      >
+                        <span className={isSelected ? 'font-semibold' : ''}>{equipment.name}</span>
+                        <span className={`font-semibold ${isSelected ? 'text-white' : 'text-white'}`}>{equipment.pricePerHour}F/h</span>
+                      </div>
+                    )
+                  })
                 ) : (
                   <div className="text-purple-300 text-center">Chargement des tarifs...</div>
                 )}
               </div>
+              {selectedEquipment === 'all' && (
+                <p className="text-yellow-300 text-xs mt-3 text-center">
+                  Sélectionnez un équipement pour voir les créneaux disponibles
+                </p>
+              )}
             </div>
 
             {/* Continue Button */}

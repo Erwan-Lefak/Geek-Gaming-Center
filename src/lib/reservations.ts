@@ -99,19 +99,15 @@ export async function checkAvailability(
 
   // Générer les créneaux horaires
   for (let hour = startHour; hour < endHour; hour++) {
-    if (hour === startHour && startMinute === 30) {
-      const timeKey = `${hour}:30`
+    if (hour === startHour) {
+      // Première heure: seulement le créneau de début (9:30 ou 12:00)
+      const timeKey = `${hour}:${startMinute === 0 ? '00' : startMinute}`
       slots.push({
         time: timeKey,
         available: true, // TODO: Vérifier avec bookedSlots
       })
-    } else if (hour === startHour && startMinute === 0) {
-      const timeKey = `${hour}:00`
-      slots.push({
-        time: timeKey,
-        available: true,
-      })
     } else {
+      // Autres heures: deux créneaux (:00 et :30)
       slots.push({
         time: `${hour}:00`,
         available: true,
