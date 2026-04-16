@@ -498,12 +498,11 @@ export default function ProductsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="sku">SKU *</Label>
+              <Label htmlFor="sku">SKU</Label>
               <Input
                 id="sku"
                 value={formData.sku}
                 onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                required
               />
             </div>
             <div>
