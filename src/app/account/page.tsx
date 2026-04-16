@@ -926,20 +926,20 @@ export default function AccountPage() {
         {/* Quick Links */}
         <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <Link
-            href="/arena"
+            href="/store"
             className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-6 hover:bg-white/20 transition-all group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-600/20 rounded-xl flex items-center justify-center">
-                  <Gamepad2 className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 bg-green-600/20 rounded-xl flex items-center justify-center">
+                  <ShoppingBag className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">Salle de Jeux</h3>
-                  <p className="text-purple-300 text-sm">Découvrir nos équipements</p>
+                  <h3 className="text-white font-bold text-lg">Boutique</h3>
+                  <p className="text-purple-300 text-sm">Achter des articles</p>
                 </div>
               </div>
-              <ChevronRight className="w-6 h-6 text-purple-400 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="w-6 h-6 text-green-400 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
