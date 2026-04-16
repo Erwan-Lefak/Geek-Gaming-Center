@@ -320,10 +320,11 @@ export default function AccountPage() {
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    // Use UTC hours/minutes to avoid timezone conversion
+    // The stored time is already in the correct timezone
+    const hours = date.getUTCHours().toString().padStart(2, '0')
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
   }
 
   const formatPrice = (price: number) => {
