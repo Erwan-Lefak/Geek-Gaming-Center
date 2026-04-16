@@ -188,7 +188,7 @@ model Product {
   category       String    @map("category")
   subcategory    String?   @map("subcategory")
   brand          String?   @map("brand")
-  sku            String    @unique @map("sku")
+  sku            String?   @unique @map("sku")
   costPrice      Decimal   @map("cost_price") @db.Decimal(10, 2)
   sellingPrice   Decimal   @map("selling_price") @db.Decimal(10, 2)
   currency       String?   @default("XAF") @map("currency")
