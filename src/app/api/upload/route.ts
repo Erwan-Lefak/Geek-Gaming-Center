@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import path from 'path';
 
-// POST /api/upload - Upload multiple files
+// POST /api/upload - Upload multiple files (returns data URIs for Vercel compatibility)
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -44,26 +42,16 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Generate unique filename
-      const timestamp = Date.now();
-      const randomStr = Math.random().toString(36).substring(2, 15);
-      const extension = path.extname(file.name);
-      const filename = `${timestamp}-${randomStr}${extension}`;
-
-      // Convert file to buffer
+      // Convert file to base64 data URI
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-
-      // Save file to public/uploads directory
-      const uploadDir = path.join(process.cwd(), 'public/uploads');
-      const filepath = path.join(uploadDir, filename);
-
-      await writeFile(filepath, buffer);
+      const base64 = buffer.toString('base64');
+      const dataUri = `data:${file.type};base64,${base64}`;
 
       // Add to uploaded files array
       uploadedFiles.push({
         name: file.name,
-        url: `/uploads/${filename}`,
+        url: dataUri,
         size: file.size,
       });
     }
