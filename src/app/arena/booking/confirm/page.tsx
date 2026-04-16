@@ -37,6 +37,10 @@ function BookingConfirmContent() {
         const response = await fetch('/api/reservations')
 
         if (response.status === 401) {
+          // Store current URL parameters in sessionStorage
+          const currentUrl = window.location.search
+          sessionStorage.setItem('bookingRedirect', currentUrl)
+
           // Redirect to login with return URL
           router.push(`/login?redirect=${encodeURIComponent('/arena/booking/confirm')}`)
           return
@@ -45,6 +49,14 @@ function BookingConfirmContent() {
         if (response.ok) {
           // User is authenticated
           setCustomer({ authenticated: true })
+
+          // Check if there are saved booking parameters to restore
+          const savedParams = sessionStorage.getItem('bookingRedirect')
+          if (savedParams && !searchParams.toString()) {
+            // No params in URL but we have saved params, restore them
+            router.push(`/arena/booking/confirm${savedParams}`)
+            sessionStorage.removeItem('bookingRedirect')
+          }
         }
       } catch (err) {
         console.error('Auth check error:', err)
@@ -52,7 +64,7 @@ function BookingConfirmContent() {
     }
 
     checkAuth()
-  }, [router])
+  }, [router, searchParams])
 
   // Fetch real price from API
   useEffect(() => {
