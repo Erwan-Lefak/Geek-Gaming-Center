@@ -26,6 +26,7 @@ interface Order {
   paymentMethod: string
   paymentStatus: string
   createdAt: string
+  shippingAddress?: string
   items: OrderItem[]
   customer: {
     id: string
@@ -569,6 +570,17 @@ export default function OrdersPage() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Téléphone</p>
                     <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
                       {selectedOrder.customer.phone}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {selectedOrder.shippingAddress && (
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-purple-500" />
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Adresse de livraison</p>
+                    <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap" style={{ color: 'var(--foreground)' }}>
+                      {selectedOrder.shippingAddress}
                     </p>
                   </div>
                 </div>
