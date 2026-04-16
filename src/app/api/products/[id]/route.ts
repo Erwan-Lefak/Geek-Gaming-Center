@@ -32,17 +32,22 @@ export async function GET(
         sku: product.sku,
         costPrice: Number(product.costPrice),
         sellingPrice: Number(product.sellingPrice),
+        price: Number(product.sellingPrice), // Alias for compatibility
         currency: product.currency,
         currentStock: product.currentStock,
+        stock: product.currentStock, // Alias for compatibility
         minStock: product.minStock,
         maxStock: product.maxStock,
         reorderPoint: product.reorderPoint,
         supplierId: product.supplierId,
         images: product.images,
         thumbnail: product.thumbnail,
+        image: product.thumbnail || (product.images && product.images[0]) || null, // Alias for compatibility
         isActive: product.isActive,
         isFeatured: product.isFeatured,
+        featured: product.isFeatured, // Alias for compatibility
         specifications: product.specifications,
+        slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''), // Generate slug
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
       }
@@ -100,17 +105,22 @@ export async function PUT(
         sku: updatedProduct.sku,
         costPrice: Number(updatedProduct.costPrice),
         sellingPrice: Number(updatedProduct.sellingPrice),
+        price: Number(updatedProduct.sellingPrice), // Alias for compatibility
         currency: updatedProduct.currency,
         currentStock: updatedProduct.currentStock,
+        stock: updatedProduct.currentStock, // Alias for compatibility
         minStock: updatedProduct.minStock,
         maxStock: updatedProduct.maxStock,
         reorderPoint: updatedProduct.reorderPoint,
         supplierId: updatedProduct.supplierId,
         images: updatedProduct.images,
         thumbnail: updatedProduct.thumbnail,
+        image: updatedProduct.thumbnail || (updatedProduct.images && updatedProduct.images[0]) || null, // Alias
         isActive: updatedProduct.isActive,
         isFeatured: updatedProduct.isFeatured,
+        featured: updatedProduct.isFeatured, // Alias
         specifications: updatedProduct.specifications,
+        slug: updatedProduct.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
         createdAt: updatedProduct.createdAt,
         updatedAt: updatedProduct.updatedAt,
       }
