@@ -955,15 +955,17 @@ export default function AccountPage() {
             )}
           </div>
 
-          <p className="text-sm" style={{ color: '#1f2937 !important' }}>
-            Cette action est <strong>irréversible</strong>. Toutes vos données seront définitivement supprimées :
-          </p>
-          <ul className="text-sm list-disc list-inside space-y-1 ml-2" style={{ color: '#1f2937 !important' }}>
-            <li>Historique des réservations</li>
-            <li>Commandes et achats</li>
-            <li>Informations personnelles</li>
-            <li>Données de connexion</li>
-          </ul>
+          <div className="text-sm">
+            <p className="font-bold text-red-900 dark:text-red-300">
+              Cette action est <strong>irréversible</strong>. Toutes vos données seront définitivement supprimées :
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+              <li className="text-red-900 dark:text-red-300">Historique des réservations</li>
+              <li className="text-red-900 dark:text-red-300">Commandes et achats</li>
+              <li className="text-red-900 dark:text-red-300">Informations personnelles</li>
+              <li className="text-red-900 dark:text-red-300">Données de connexion</li>
+            </ul>
+          </div>
 
           <div className="flex gap-3 justify-end pt-4">
             <button
