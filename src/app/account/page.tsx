@@ -973,15 +973,15 @@ export default function AccountPage() {
           {reservationToCancel && (
             <>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-900 dark:text-yellow-300 font-medium mb-2">⚠️ Attention</p>
-                <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+                <p className="text-yellow-900 font-medium mb-2">⚠️ Attention</p>
+                <p className="text-yellow-800 text-sm">
                   Vous êtes sur le point d'annuler votre réservation
                 </p>
               </div>
 
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <p className="text-purple-900 dark:text-purple-300 font-semibold mb-3">Détails de la réservation</p>
-                <div className="space-y-1 text-sm text-purple-800 dark:text-purple-200">
+                <p className="text-purple-900 font-semibold mb-3">Détails de la réservation</p>
+                <div className="space-y-1 text-sm text-purple-800">
                   <p><span className="font-medium">Équipement :</span> {reservationToCancel.equipment.name}</p>
                   <p>
                     <span className="font-medium">Date :</span> {' '}
