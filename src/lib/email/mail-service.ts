@@ -66,20 +66,37 @@ export class MailService {
    * Inspired by Karma Pilates Yahoo Mail wrapper
    */
   private static wrapHtml(html: string): string {
+    const currentYear = new Date().getFullYear();
     return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        body { font-family: 'Arial', 'Helvetica', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .button { display: inline-block; padding: 12px 24px; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .button:hover { background-color: #6d28d9; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; text-align: center; }
+        .footer a { color: #7c3aed; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
     ${html}
+    <div class="footer">
+        <p style="margin: 0 0 10px;">
+            Vous recevez cet email car vous avez effectué une commande sur Geek Gaming Center.
+        </p>
+        <p style="margin: 0 0 10px;">
+            Geek Gaming Center • ${currentYear} • Tous droits réservés
+        </p>
+        <p style="margin: 0;">
+            <a href="https://geek-gaming-center.cam">Site Web</a> •
+            <a href="mailto:${process.env.EMAIL_REPLY_TO || 'support@geek-gaming-center.cam'}">Contact</a> •
+            <a href="mailto:${process.env.EMAIL_REPLY_TO || 'support@geek-gaming-center.cam'}?subject=unsubscribe">Se désabonner</a>
+        </p>
+    </div>
 </body>
 </html>`
   }
@@ -158,14 +175,30 @@ export class MailService {
         return false
       }
 
-      // Send via Resend
-      const { data: resendData, error } = await resend.emails.send({
+      // Prepare email data with anti-spam headers
+      const emailData: any = {
         from,
         to: Array.isArray(to) ? to : [to],
         subject,
         html: finalHtml,
-        replyTo: REPLY_TO
-      })
+        replyTo: REPLY_TO,
+        // Add headers to improve deliverability
+        headers: {
+          'X-Priority': '1',
+          'X-MSMail-Priority': 'High',
+          'Importance': 'high',
+          'X-Auto-Response-Suppress': 'All',
+          'List-Unsubscribe': `<mailto:${REPLY_TO}?subject=unsubscribe>`,
+        },
+        // Add tags for better tracking
+        tags: [
+          { name: 'email_type', value: templateType || 'custom' },
+          { name: 'app', value: 'geek-gaming-center' },
+        ],
+      }
+
+      // Send via Resend
+      const { data: resendData, error } = await resend.emails.send(emailData)
 
       if (error) {
         console.error('❌ Resend error:', error)
