@@ -967,55 +967,41 @@ export default function AccountPage() {
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         title="Annuler la réservation"
-        size="lg"
+        size="xl"
       >
         <div className="space-y-4">
           {reservationToCancel && (
             <>
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-                <p className="text-red-400 font-medium mb-2 flex items-center gap-2">
-                  <X className="w-5 h-5" />
-                  Attention
-                </p>
-                <p className="text-red-300 text-sm">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-900 font-medium mb-2">⚠️ Attention</p>
+                <p className="text-yellow-800 text-sm">
                   Vous êtes sur le point d'annuler votre réservation
                 </p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <p className="text-white font-semibold mb-3">Détails de la réservation</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between text-purple-200">
-                    <span className="font-medium">Équipement :</span>
-                    <span className="text-white font-semibold">{reservationToCancel.equipment.name}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-purple-200">
-                    <span className="font-medium">Date :</span>
-                    <span className="text-white font-semibold">
-                      {formatDate(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-purple-200">
-                    <span className="font-medium">Heure :</span>
-                    <span className="text-white font-semibold">
-                      {formatTime(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)} - {formatTime(reservationToCancel.scheduledEndAt)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-purple-200">
-                    <span className="font-medium">Durée :</span>
-                    <span className="text-white font-semibold">{reservationToCancel.duration / 60} heure(s)</span>
-                  </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-purple-900 font-semibold mb-3">Détails de la réservation</p>
+                <div className="space-y-1 text-sm text-purple-800">
+                  <p><span className="font-medium">Équipement :</span> {reservationToCancel.equipment.name}</p>
+                  <p>
+                    <span className="font-medium">Date :</span> {' '}
+                    {formatDate(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)}
+                  </p>
+                  <p>
+                    <span className="font-medium">Heure :</span> {' '}
+                    {formatTime(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)} - {formatTime(reservationToCancel.scheduledEndAt)}
+                  </p>
+                  <p><span className="font-medium">Durée :</span> {reservationToCancel.duration / 60} heure(s)</p>
                 </div>
               </div>
 
-              <div className="text-sm text-purple-300 bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
-                <p className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4" />
-                  <span className="font-semibold">Politique d'annulation</span>
+              <div className="text-sm">
+                <p className="font-bold text-purple-900 dark:text-purple-300">
+                  ⏰ Politique d'annulation :
                 </p>
-                <ul className="space-y-1 ml-6 text-purple-200">
-                  <li>• Gratuite jusqu'à 2 heures avant le début</li>
-                  <li>• Après ce délai, des frais pourront s'appliquer</li>
+                <ul className="list-disc list-inside space-y-1 ml-4 mt-2 text-purple-800 dark:text-purple-200">
+                  <li>Gratuite jusqu'à 2 heures avant le début de la session</li>
+                  <li>Après ce délai, des frais d'annulation pourront s'appliquer</li>
                 </ul>
               </div>
 
@@ -1026,14 +1012,14 @@ export default function AccountPage() {
                     setReservationToCancel(null)
                   }}
                   disabled={isCancelling}
-                  className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleConfirmCancel}
                   disabled={isCancelling}
-                  className="px-6 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 font-semibold"
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 font-semibold"
                 >
                   {isCancelling ? (
                     <>
