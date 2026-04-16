@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cancelReservation } from '@/lib/reservations'
+import { auth } from '@/lib/auth'
 
 // DELETE /api/reservations/:id - Annuler une réservation
 export async function DELETE(
@@ -7,9 +8,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const customerId = request.cookies.get('customer_id')?.value
+    const session = await auth()
 
-    if (!customerId) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non authentifié' },
         { status: 401 }
@@ -24,6 +25,8 @@ export async function DELETE(
         { status: 400 }
       )
     }
+
+    const customerId = session.user.id
 
     const cancelledReservation = await cancelReservation(sessionId, customerId)
 
@@ -70,9 +73,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const customerId = request.cookies.get('customer_id')?.value
+    const session = await auth()
 
-    if (!customerId) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Non authentifié' },
         { status: 401 }
