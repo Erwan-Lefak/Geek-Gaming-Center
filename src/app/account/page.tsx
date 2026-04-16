@@ -83,6 +83,11 @@ export default function AccountPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Cancel reservation modal state
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null)
+  const [isCancelling, setIsCancelling] = useState(false)
+
   // Check if user is logged in
   useEffect(() => {
     const fetchData = async () => {
@@ -176,20 +181,26 @@ export default function AccountPage() {
     }
   }
 
-  const handleCancelReservation = async (reservationId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
-      return
-    }
+  const handleCancelReservation = (reservation: Reservation) => {
+    setReservationToCancel(reservation)
+    setShowCancelModal(true)
+  }
+
+  const handleConfirmCancel = async () => {
+    if (!reservationToCancel) return
+
+    setIsCancelling(true)
 
     try {
-      const response = await fetch(`/api/reservations/${reservationId}`, {
+      const response = await fetch(`/api/reservations/${reservationToCancel.id}`, {
         method: 'DELETE',
       })
 
       if (response.ok) {
         // Remove from list
-        setReservations(reservations.filter(r => r.id !== reservationId))
-        alert('Réservation annulée avec succès !')
+        setReservations(reservations.filter(r => r.id !== reservationToCancel.id))
+        setShowCancelModal(false)
+        setReservationToCancel(null)
       } else {
         const data = await response.json()
         alert(data.error || 'Erreur lors de l\'annulation')
@@ -197,6 +208,8 @@ export default function AccountPage() {
     } catch (err) {
       console.error('Cancel error:', err)
       alert('Erreur lors de l\'annulation')
+    } finally {
+      setIsCancelling(false)
     }
   }
 
@@ -618,7 +631,7 @@ export default function AccountPage() {
 
                     {isCancellable(reservation) && (
                       <button
-                        onClick={() => handleCancelReservation(reservation.id)}
+                        onClick={() => handleCancelReservation(reservation)}
                         className="ml-4 flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-300 rounded-xl border border-red-600/50 transition-all"
                       >
                         <X className="w-4 h-4" />
@@ -948,6 +961,78 @@ export default function AccountPage() {
           </Link>
         </div>
       </div>
+
+      {/* Cancel Reservation Confirmation Modal */}
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title="Annuler la réservation"
+        size="md"
+      >
+        <div className="space-y-4">
+          {reservationToCancel && (
+            <>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-900 font-medium mb-2">⚠️ Attention</p>
+                <p className="text-yellow-800 text-sm">
+                  Vous êtes sur le point d'annuler votre réservation
+                </p>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-purple-900 font-semibold mb-2">Détails de la réservation</p>
+                <div className="space-y-1 text-sm text-purple-800">
+                  <p><span className="font-medium">Équipement :</span> {reservationToCancel.equipment.name}</p>
+                  <p>
+                    <span className="font-medium">Date :</span> {' '}
+                    {formatDate(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)}
+                  </p>
+                  <p>
+                    <span className="font-medium">Heure :</span> {' '}
+                    {formatTime(reservationToCancel.startedAt || reservationToCancel.scheduledEndAt)} - {formatTime(reservationToCancel.scheduledEndAt)}
+                  </p>
+                  <p><span className="font-medium">Durée :</span> {reservationToCancel.duration / 60} heure(s)</p>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <p>⏰ L'annulation est gratuite jusqu'à 2 heures avant le début de la session.</p>
+                <p>Après ce délai, des frais d'annulation pourront s'appliquer.</p>
+              </div>
+
+              <div className="flex gap-3 justify-end pt-4">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false)
+                    setReservationToCancel(null)
+                  }}
+                  disabled={isCancelling}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleConfirmCancel}
+                  disabled={isCancelling}
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 font-semibold"
+                >
+                  {isCancelling ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      Annulation...
+                    </>
+                  ) : (
+                    <>
+                      <X className="w-4 h-4" />
+                      Confirmer l'annulation
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
 
       {/* Delete Account Confirmation Modal */}
       <Modal

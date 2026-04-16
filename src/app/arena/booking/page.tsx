@@ -149,12 +149,12 @@ export default function BookingPage() {
   }
 
   const handleContinue = () => {
-    if (selectedSlot && selectedEquipment !== 'all') {
+    if (selectedSlot && selectedEquipment && selectedEquipment !== 'all') {
       // Get selected equipment details
       const equipment = equipmentList.find(eq => eq.id === selectedEquipment)
 
       if (!equipment) {
-        alert('Veuillez sélectionner un équipement')
+        alert("Veuillez sélectionner un équipement")
         return
       }
 
@@ -174,8 +174,10 @@ export default function BookingPage() {
       })
 
       router.push(`/arena/booking/confirm?${params.toString()}`)
-    } else if (selectedEquipment === 'all') {
-      alert('Veuillez sélectionner un équipement spécifique')
+    } else if (!selectedSlot) {
+      alert('Veuillez sélectionner un créneau horaire')
+    } else if (!selectedEquipment || selectedEquipment === 'all') {
+      alert('Veuillez sélectionner un équipement')
     }
   }
 
@@ -216,7 +218,7 @@ export default function BookingPage() {
     fetchEquipment()
   }, [])
 
-  // Fetch availability when date or equipment changes
+  // Fetch availability when date changes (removed equipment dependency)
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
@@ -226,12 +228,8 @@ export default function BookingPage() {
         const day = String(selectedDate.getDate()).padStart(2, '0')
         const dateStr = `${year}-${month}-${day}`
 
-        const equipmentParam = selectedEquipment !== 'all' ? `&equipmentId=${selectedEquipment}` : ''
-
-        const response = await fetch(`/api/reservations/availability?date=${dateStr}${equipmentParam}`)
+        const response = await fetch(`/api/reservations/availability?date=${dateStr}`)
         const data = await response.json()
-
-        console.log('API Response for', dateStr, ':', data.slots?.slice(0, 5))
 
         if (response.ok) {
           setTimeSlots(data.slots)
@@ -247,7 +245,7 @@ export default function BookingPage() {
     }
 
     fetchAvailability()
-  }, [selectedDate, selectedEquipment])
+  }, [selectedDate])
 
   const calendarDays = generateCalendarDays()
   const monthNames = [
