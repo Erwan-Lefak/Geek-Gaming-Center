@@ -49,8 +49,11 @@ export default function CinemaPage() {
   const [loading, setLoading] = useState(true)
   const [showMovieModal, setShowMovieModal] = useState(false)
   const [showScreeningModal, setShowScreeningModal] = useState(false)
+  const [showDeleteMovieModal, setShowDeleteMovieModal] = useState(false)
+  const [showDeleteScreeningModal, setShowDeleteScreeningModal] = useState(false)
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [selectedScreening, setSelectedScreening] = useState<Screening | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Movie form state
   const [movieForm, setMovieForm] = useState({
@@ -132,18 +135,25 @@ export default function CinemaPage() {
     }
   }
 
-  const handleDeleteMovie = async (movieId: string, movieTitle: string) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le film "${movieTitle}" ?`)) {
-      return
-    }
+  const handleDeleteMovie = (movie: Movie) => {
+    setSelectedMovie(movie)
+    setShowDeleteMovieModal(true)
+  }
+
+  const handleDeleteMovieConfirm = async () => {
+    if (!selectedMovie) return
+
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/dashboard/movies/${movieId}`, {
+      const res = await fetch(`/api/dashboard/movies/${selectedMovie.id}`, {
         method: 'DELETE',
       })
 
       if (res.ok) {
         await fetchMovies()
+        setShowDeleteMovieModal(false)
+        setSelectedMovie(null)
         alert('Film supprimé avec succès !')
       } else {
         const data = await res.json()
@@ -152,6 +162,8 @@ export default function CinemaPage() {
     } catch (error) {
       console.error('Error deleting movie:', error)
       alert('Erreur lors de la suppression du film')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -195,18 +207,25 @@ export default function CinemaPage() {
     }
   }
 
-  const handleDeleteScreening = async (screeningId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette séance ?')) {
-      return
-    }
+  const handleDeleteScreening = (screening: Screening) => {
+    setSelectedScreening(screening)
+    setShowDeleteScreeningModal(true)
+  }
+
+  const handleDeleteScreeningConfirm = async () => {
+    if (!selectedScreening) return
+
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/dashboard/screenings/${screeningId}`, {
+      const res = await fetch(`/api/dashboard/screenings/${selectedScreening.id}`, {
         method: 'DELETE',
       })
 
       if (res.ok) {
         await fetchScreenings()
+        setShowDeleteScreeningModal(false)
+        setSelectedScreening(null)
         alert('Séance supprimée avec succès !')
       } else {
         const data = await res.json()
@@ -215,6 +234,8 @@ export default function CinemaPage() {
     } catch (error) {
       console.error('Error deleting screening:', error)
       alert('Erreur lors de la suppression de la séance')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -378,7 +399,7 @@ export default function CinemaPage() {
                       Modifier
                     </button>
                     <button
-                      onClick={() => handleDeleteMovie(movie.id, movie.title)}
+                      onClick={() => handleDeleteMovie(movie)}
                       className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
                     >
                       <Trash2 size={16} />
@@ -460,7 +481,7 @@ export default function CinemaPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => handleDeleteScreening(screening.id)}
+                        onClick={() => handleDeleteScreening(screening)}
                         className="text-red-600 hover:text-red-900"
                       >
                         Supprimer
@@ -747,6 +768,123 @@ export default function CinemaPage() {
           >
             Annuler
           </button>
+        </div>
+      </Modal>
+
+      {/* Delete Movie Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteMovieModal}
+        onClose={() => {
+          setShowDeleteMovieModal(false)
+          setSelectedMovie(null)
+        }}
+        title="Confirmer la suppression"
+        size="xl"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
+            <p className="text-red-800 text-sm">
+              Vous êtes sur le point de supprimer le film :
+            </p>
+            <p className="text-red-900 font-bold mt-2">
+              {selectedMovie?.title}
+            </p>
+          </div>
+
+          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            Cette action est irréversible. Toutes les séances associées à ce film seront également supprimées.
+          </p>
+
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              onClick={() => {
+                setShowDeleteMovieModal(false)
+                setSelectedMovie(null)
+              }}
+              disabled={isDeleting}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleDeleteMovieConfirm}
+              disabled={isDeleting}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Suppression...
+                </>
+              ) : (
+                'Supprimer définitivement'
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Screening Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteScreeningModal}
+        onClose={() => {
+          setShowDeleteScreeningModal(false)
+          setSelectedScreening(null)
+        }}
+        title="Confirmer la suppression"
+        size="xl"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
+            <p className="text-red-800 text-sm">
+              Vous êtes sur le point de supprimer la séance de :
+            </p>
+            <p className="text-red-900 font-bold mt-2">
+              {selectedScreening?.movie.title}
+            </p>
+            <p className="text-red-700 text-sm mt-1">
+              {new Date(selectedScreening?.screenTime || '').toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </p>
+          </div>
+
+          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            Cette action est irréversible. La séance sera définitivement supprimée.
+          </p>
+
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              onClick={() => {
+                setShowDeleteScreeningModal(false)
+                setSelectedScreening(null)
+              }}
+              disabled={isDeleting}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleDeleteScreeningConfirm}
+              disabled={isDeleting}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Suppression...
+                </>
+              ) : (
+                'Supprimer définitivement'
+              )}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
