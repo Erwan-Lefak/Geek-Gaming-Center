@@ -27,7 +27,7 @@ interface MenuItem {
 }
 
 export default function RestaurantPage() {
-  const [activeCategory, setActiveCategory] = useState<string>('plats');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [menuData, setMenuData] = useState<Record<string, MenuItem[]>>({})
   const [categories, setCategories] = useState<Array<{id: string, label: string}>>([])
   const [loading, setLoading] = useState(true)
@@ -72,10 +72,13 @@ export default function RestaurantPage() {
         })
 
         setMenuData(transformedMenu)
-        setCategories(Array.from(seenCategories).map(cat => ({
-          id: cat,
-          label: categoryLabels[cat] || cat.charAt(0).toUpperCase() + cat.slice(1),
-        })))
+        setCategories([
+          { id: 'all', label: 'Tous' },
+          ...Array.from(seenCategories).map(cat => ({
+            id: cat,
+            label: categoryLabels[cat] || cat.charAt(0).toUpperCase() + cat.slice(1),
+          }))
+        ])
       } catch (error) {
         console.error('Error fetching menu:', error)
       } finally {
@@ -97,7 +100,9 @@ export default function RestaurantPage() {
     )
   }
 
-  const currentItems = menuData[activeCategory] || []
+  const currentItems = activeCategory === 'all'
+    ? Object.values(menuData).flat()
+    : menuData[activeCategory] || []
 
   return (
     <div className="min-h-screen bg-black">
