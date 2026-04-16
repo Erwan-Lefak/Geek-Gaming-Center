@@ -68,14 +68,14 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-[130px]">
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
         <Breadcrumb
           items={[
             { label: 'Accueil', href: '/' },
             { label: 'Boutique', href: '/store' },
-            { label: 'Panier', href: '/store/cart' },
+            { label: 'Panier', href: '/cart' },
             { label: 'Paiement', href: '/store/checkout', active: true },
           ]}
         />

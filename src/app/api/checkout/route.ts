@@ -30,7 +30,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Get base URL from env or use request origin
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000';
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || 'http://localhost:3000';
+
+    // Clean up baseUrl - remove trailing slashes and quotes
+    baseUrl = baseUrl.replace(/\/+$/, '').trim();
 
     // Create Checkout Session
     const session = await createCheckoutSession(
