@@ -60,7 +60,9 @@ function BookingConfirmContent() {
       if (!bookingData.equipmentId) return
 
       try {
-        const date = new Date(bookingData.date)
+        // Parse date string to avoid timezone issues
+        const [year, month, day] = bookingData.date.split('-').map(Number)
+        const date = new Date(year, month - 1, day) // month is 0-indexed
         const isWeekend = date.getDay() === 0 || date.getDay() === 6
 
         const response = await fetch(
@@ -122,7 +124,9 @@ function BookingConfirmContent() {
       }
 
       // For cash and other payment methods: Check if date is weekend
-      const date = new Date(bookingData.date)
+      // Parse date string to avoid timezone issues
+      const [year, month, day] = bookingData.date.split('-').map(Number)
+      const date = new Date(year, month - 1, day) // month is 0-indexed
       const isWeekend = date.getDay() === 0 || date.getDay() === 6
 
       // Get pricing ID first
@@ -173,7 +177,9 @@ function BookingConfirmContent() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return ''
-    const date = new Date(dateString)
+    // Parse date string to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number)
+    const date = new Date(year, month - 1, day) // month is 0-indexed
     return date.toLocaleDateString('fr-FR', {
       weekday: 'long',
       year: 'numeric',

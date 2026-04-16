@@ -158,11 +158,17 @@ export default function BookingPage() {
         return
       }
 
+      // Format date using local timezone (not UTC) to avoid day offset
+      const year = selectedDate.getFullYear()
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+      const day = String(selectedDate.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}`
+
       // Build confirmation URL with booking data
       const params = new URLSearchParams({
         equipment: selectedEquipment,
         equipmentName: equipment.name,
-        date: selectedDate.toISOString().split('T')[0],
+        date: dateStr,
         time: selectedSlot,
         duration: '60', // Default 1 hour
       })

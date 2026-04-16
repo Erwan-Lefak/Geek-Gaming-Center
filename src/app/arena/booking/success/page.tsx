@@ -109,12 +109,17 @@ function BookingSuccessContent() {
                   <div>
                     <p className="text-sm text-purple-400">Date</p>
                     <p className="text-white font-semibold">
-                      {new Date(bookingDetails.date).toLocaleDateString('fr-FR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {(() => {
+                        // Parse date string to avoid timezone issues
+                        const [year, month, day] = bookingDetails.date.split('-').map(Number)
+                        const date = new Date(year, month - 1, day) // month is 0-indexed
+                        return date.toLocaleDateString('fr-FR', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })
+                      })()}
                     </p>
                   </div>
                 </div>
