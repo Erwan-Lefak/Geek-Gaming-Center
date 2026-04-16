@@ -184,7 +184,9 @@ export default function RootLayout({
                 </ul>
                 <div className="mt-6 flex gap-4">
                   <a
-                    href="#"
+                    href="https://www.facebook.com/profile.php?id=100093027884683"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-white hover:text-primary-400 transition-colors"
                     aria-label="Facebook"
                   >
@@ -202,7 +204,9 @@ export default function RootLayout({
                     <Instagram className="w-5 h-5" />
                   </a>
                   <a
-                    href="#"
+                    href="https://www.tiktok.com/@ggc_cameroun"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-white hover:text-primary-400 transition-colors"
                     aria-label="TikTok"
                   >
