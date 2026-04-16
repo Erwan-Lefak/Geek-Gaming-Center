@@ -30,7 +30,7 @@ interface Screening {
   screenNumber: number
   totalSeats: number
   availableSeats: number
-  price: number
+  price: number | string
   isActive: boolean
   movie: {
     id: string
