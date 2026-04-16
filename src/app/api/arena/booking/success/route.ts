@@ -70,8 +70,9 @@ export async function GET(request: NextRequest) {
     // Create the reservation
     const [hours, minutes] = metadata.time.split(':').map(Number);
 
-    const startTime = new Date(metadata.date);
-    startTime.setHours(hours, minutes, 0, 0);
+    // Parse date manually to avoid timezone issues
+    const [year, month, day] = metadata.date.split('-').map(Number);
+    const startTime = new Date(year, month - 1, day, hours, minutes, 0);
 
     const scheduledEndAt = new Date(startTime.getTime() + parseInt(metadata.duration) * 60 * 1000);
 
