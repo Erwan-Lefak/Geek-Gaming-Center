@@ -160,9 +160,14 @@ export default function ProductsPage() {
           images: [],
         })
         fetchProducts()
+        alert(selectedProduct ? 'Produit mis à jour avec succès !' : 'Produit créé avec succès !')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors de la sauvegarde du produit')
       }
     } catch (error) {
       console.error('Error saving product:', error)
+      alert('Erreur lors de la sauvegarde du produit')
     }
   }
 
