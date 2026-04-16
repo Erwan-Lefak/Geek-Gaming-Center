@@ -56,11 +56,15 @@ export async function checkAvailability(
   const endHour = 21
 
   // Récupérer toutes les réservations pour cette date
-  const startOfDay = new Date(date)
-  startOfDay.setHours(0, 0, 0, 0)
+  // Les dates en base sont stockées en UTC avec l'heure locale (ex: 16h pour une résa de 16h)
+  // Il faut donc convertir la date de recherche en UTC avec la même heure
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1 // getMonth() est 0-indexé
+  const day = date.getDate()
 
-  const endOfDay = new Date(date)
-  endOfDay.setHours(23, 59, 59, 999)
+  // Créer les dates de recherche en UTC pour correspondre au stockage
+  const startOfDay = new Date(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T00:00:00Z`)
+  const endOfDay = new Date(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T23:59:59Z`)
 
   const existingReservations = await prisma.gamingSession.findMany({
     where: {
@@ -91,7 +95,10 @@ export async function checkAvailability(
     // Générer tous les créneaux de 30 min entre start et end
     let current = new Date(start)
     while (current < end) {
-      const timeKey = `${equipId}-${current.getHours()}:${current.getMinutes().toString().padStart(2, '0')}`
+      // Utiliser getHours() et getMinutes() pour avoir l'heure locale
+      const hour = current.getHours()
+      const minute = current.getMinutes()
+      const timeKey = `${equipId}-${hour}:${minute.toString().padStart(2, '0')}`
       bookedSlots.add(timeKey)
       current = new Date(current.getTime() + 30 * 60 * 1000) // +30 min
     }

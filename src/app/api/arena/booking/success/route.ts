@@ -70,9 +70,14 @@ export async function GET(request: NextRequest) {
     // Create the reservation
     const [hours, minutes] = metadata.time.split(':').map(Number);
 
-    // Parse date manually to avoid timezone issues
+    // Parse date manually - the server is in UTC but we want to store local time
+    // Create date at UTC to preserve the intended time
     const [year, month, day] = metadata.date.split('-').map(Number);
-    const startTime = new Date(year, month - 1, day, hours, minutes, 0);
+
+    // Create date in UTC to avoid timezone shifts
+    // Format: YYYY-MM-DDTHH:mm:ssZ
+    const dateTimeStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00Z`;
+    const startTime = new Date(dateTimeStr);
 
     const scheduledEndAt = new Date(startTime.getTime() + parseInt(metadata.duration) * 60 * 1000);
 
