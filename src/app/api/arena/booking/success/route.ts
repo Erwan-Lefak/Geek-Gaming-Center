@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma/client';
+import { generateSessionNumber } from '@/lib/reservations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -97,9 +98,13 @@ export async function GET(request: NextRequest) {
         }))?.id
       : null;
 
+    // Generate session number
+    const sessionNumber = await generateSessionNumber();
+
     // Create gaming session
     const gamingSession = await prisma.gamingSession.create({
       data: {
+        sessionNumber,
         equipmentId: metadata.equipment_id,
         customerId: customerId || null,
         scheduledStartAt: startTime,
