@@ -10,6 +10,7 @@ interface Equipment {
   type: string
   code: string
   pricePerHour: number
+  available: boolean
 }
 
 interface TimeSlot {
@@ -20,11 +21,12 @@ interface TimeSlot {
 export default function BookingPage() {
   const router = useRouter()
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedEquipment, setSelectedEquipment] = useState<string>('all')
+  const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [equipmentList, setEquipmentList] = useState<Equipment[]>([])
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [isLoadingEquipment, setIsLoadingEquipment] = useState(false)
 
   // Equipment pricing by type
   const equipmentPrices: Record<string, number> = {
@@ -145,11 +147,13 @@ export default function BookingPage() {
     if (!isPastDate(date)) {
       setSelectedDate(date)
       setSelectedSlot(null)
+      setSelectedEquipment(null) // Reset equipment when date changes
+      setEquipmentList([]) // Clear equipment list
     }
   }
 
   const handleContinue = () => {
-    if (selectedSlot && selectedEquipment && selectedEquipment !== 'all') {
+    if (selectedSlot && selectedEquipment) {
       // Get selected equipment details
       const equipment = equipmentList.find(eq => eq.id === selectedEquipment)
 
@@ -176,7 +180,7 @@ export default function BookingPage() {
       router.push(`/arena/booking/confirm?${params.toString()}`)
     } else if (!selectedSlot) {
       alert('Veuillez sélectionner un créneau horaire')
-    } else if (!selectedEquipment || selectedEquipment === 'all') {
+    } else if (!selectedEquipment) {
       alert('Veuillez sélectionner un équipement')
     }
   }
@@ -186,37 +190,60 @@ export default function BookingPage() {
     alert('Fonctionnalité de liste d\'attente bientôt disponible !')
   }
 
-  // Fetch equipment from API
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      try {
-        const response = await fetch('/api/equipment?withPricing=true')
-        const data = await response.json()
+  // Fetch equipment available for selected slot
+  const handleSlotSelect = async (slotTime: string) => {
+    setSelectedSlot(slotTime)
+    setSelectedEquipment(null)
+    setIsLoadingEquipment(true)
 
-        if (response.ok) {
-          // Transform equipment data
-          const transformed = data.equipment.map((eq: any) => {
-            // Get price from default pricing map by type
-            const pricePerHour = equipmentPrices[eq.type] || 0
+    try {
+      // Format date as YYYY-MM-DD using local timezone (not UTC)
+      const year = selectedDate.getFullYear()
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+      const day = String(selectedDate.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}`
 
-            return {
-              id: eq.id,
-              name: eq.name,
-              type: eq.type,
-              code: eq.code,
-              pricePerHour,
-            }
-          })
+      // First, fetch all equipment
+      const equipmentResponse = await fetch('/api/equipment?withPricing=true')
+      const equipmentData = await equipmentResponse.json()
 
-          setEquipmentList(transformed)
-        }
-      } catch (error) {
-        console.error('Error fetching equipment:', error)
+      if (!equipmentResponse.ok) {
+        throw new Error('Failed to fetch equipment')
       }
-    }
 
-    fetchEquipment()
-  }, [])
+      // Then, check availability for each equipment at this slot
+      const availabilityPromises = equipmentData.equipment.map(async (eq: any) => {
+        const pricePerHour = equipmentPrices[eq.type] || 0
+
+        // Check availability for this specific equipment and time slot
+        const response = await fetch(`/api/reservations/availability?date=${dateStr}&equipmentId=${eq.id}`)
+        const availabilityData = await response.json()
+
+        // Find if this specific slot is available
+        const slotAvailability = availabilityData.slots.find((slot: any) => slot.time === slotTime)
+        const isAvailable = slotAvailability ? slotAvailability.available : true
+
+        return {
+          id: eq.id,
+          name: eq.name,
+          type: eq.type,
+          code: eq.code,
+          pricePerHour,
+          available: isAvailable,
+        }
+      })
+
+      const equipmentWithAvailability = await Promise.all(availabilityPromises)
+
+      setEquipmentList(equipmentWithAvailability)
+    } catch (error) {
+      console.error('Error fetching equipment:', error)
+    } finally {
+      setIsLoadingEquipment(false)
+    }
+  }
+
+  // Fetch equipment from API - REMOVED: Now loaded when slot is selected
 
   // Fetch availability when date changes (removed equipment dependency)
   useEffect(() => {
@@ -358,7 +385,7 @@ export default function BookingPage() {
                   return (
                     <div key={index} className="space-y-1">
                       <button
-                        onClick={() => slot.available && setSelectedSlot(slot.time)}
+                        onClick={() => slot.available && handleSlotSelect(slot.time)}
                         disabled={!slot.available}
                         className={`
                           w-full p-3 rounded-xl font-semibold transition-all duration-200 text-left
@@ -400,45 +427,58 @@ export default function BookingPage() {
                 <Info className="w-5 h-5 text-purple-400" />
                 <h3 className="text-lg font-bold text-white">Tarifs</h3>
               </div>
-              <div className="space-y-2 text-sm">
-                {equipmentList.length > 0 ? (
-                  equipmentList.map((equipment) => {
+
+              {!selectedSlot ? (
+                <div className="text-center py-8">
+                  <p className="text-purple-300 text-sm">
+                    Sélectionnez un créneau horaire pour voir les équipements disponibles
+                  </p>
+                </div>
+              ) : isLoadingEquipment ? (
+                <div className="text-center py-8">
+                  <p className="text-purple-300 text-sm">Chargement des équipements...</p>
+                </div>
+              ) : equipmentList.length > 0 ? (
+                <div className="space-y-2 text-sm">
+                  {equipmentList.map((equipment) => {
                     const isSelected = selectedEquipment === equipment.id
                     return (
                       <div
                         key={equipment.id}
-                        onClick={() => setSelectedEquipment(equipment.id)}
+                        onClick={() => equipment.available && setSelectedEquipment(equipment.id)}
                         className={`
-                          flex justify-between items-center p-3 rounded-xl cursor-pointer transition-all
+                          flex justify-between items-center p-3 rounded-xl transition-all
                           ${isSelected
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-2 border-white/30'
-                            : 'bg-white/5 text-purple-200 border-2 border-transparent hover:bg-white/10 hover:border-white/20'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-2 border-white/30 cursor-pointer'
+                            : equipment.available
+                            ? 'bg-white/5 text-purple-200 border-2 border-transparent hover:bg-white/10 hover:border-white/20 cursor-pointer'
+                            : 'bg-gray-800/50 text-gray-500 border-2 border-transparent cursor-not-allowed opacity-50'
                           }
                         `}
                       >
                         <span className={isSelected ? 'font-semibold' : ''}>{equipment.name}</span>
-                        <span className={`font-semibold ${isSelected ? 'text-white' : 'text-white'}`}>{equipment.pricePerHour}F/h</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-semibold ${isSelected ? 'text-white' : equipment.available ? 'text-white' : 'text-gray-500'}`}>{equipment.pricePerHour}F/h</span>
+                          {!equipment.available && <span className="text-xs text-red-400">Réservé</span>}
+                        </div>
                       </div>
                     )
-                  })
-                ) : (
-                  <div className="text-purple-300 text-center">Chargement des tarifs...</div>
-                )}
-              </div>
-              {selectedEquipment === 'all' && (
-                <p className="text-yellow-300 text-xs mt-3 text-center">
-                  Sélectionnez un équipement pour voir les créneaux disponibles
-                </p>
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-red-300 text-sm">Aucun équipement disponible pour ce créneau</p>
+                </div>
               )}
             </div>
 
             {/* Continue Button */}
             <button
               onClick={handleContinue}
-              disabled={!selectedSlot}
+              disabled={!selectedSlot || !selectedEquipment}
               className={`
                 w-full py-4 rounded-xl font-bold shadow-lg transform transition-all duration-200
-                ${selectedSlot
+                ${selectedSlot && selectedEquipment
                   ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white hover:scale-105 cursor-pointer'
                   : 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50'
                 }
