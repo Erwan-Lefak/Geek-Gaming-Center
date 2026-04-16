@@ -8,7 +8,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle, ShoppingBag, Home } from 'lucide-react';
+import { CheckCircle2, ShoppingBag, Home, Package } from 'lucide-react';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -25,70 +25,99 @@ function CheckoutSuccessContent() {
   }, [sessionId]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="glass-card p-12 rounded-2xl text-center">
-            {/* Success Icon */}
-            <div className="w-24 h-24 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-12 h-12 text-success" />
-            </div>
-
-            {/* Success Message */}
-            <h1 className="text-4xl font-bold text-white mb-4">
-              Commande confirmée !
-            </h1>
-
-            <p className="text-xl text-gray-300 mb-8">
-              Merci pour votre achat. Vous recevrez bientôt un email de confirmation.
-            </p>
-
-            {/* Order Reference */}
-            {sessionId && (
-              <div className="mb-8 p-4 bg-surface rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Référence de transaction</p>
-                <p className="text-lg font-mono text-primary-400">{sessionId}</p>
-              </div>
-            )}
-
-            {/* What's Next */}
-            <div className="text-left mb-8 p-6 bg-surface rounded-lg">
-              <h2 className="text-lg font-semibold text-white mb-4">Que se passe-t-il maintenant ?</h2>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-bold">1</div>
-                  <span>Vous recevrez un email de confirmation avec les détails de votre commande</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-bold">2</div>
-                  <span>Nous préparerons votre commande avec soin</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-bold">3</div>
-                  <span>Vous serez notifié lorsque votre commande sera expédiée</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/store"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Continuer mes achats
-              </Link>
-
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-surface hover:bg-surface/80 border border-border text-white font-semibold rounded-xl transition-all"
-              >
-                <Home className="w-5 h-5" />
-                Retour à l'accueil
-              </Link>
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 w-full max-w-4xl mx-auto">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 lg:p-16">
+          {/* Icon */}
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-24 bg-green-600/20 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-12 h-12 text-green-400" />
             </div>
           </div>
+
+          {/* Title */}
+          <h1 className="text-3xl sm:text-4xl font-bold text-white text-center mb-6">
+            Commande Confirmée !
+          </h1>
+
+          {/* Message */}
+          <p className="text-purple-300 text-center mb-8 text-base">
+            Merci pour votre achat. Vous recevrez bientôt un email de confirmation.
+          </p>
+
+          {/* Order Reference */}
+          {sessionId && (
+            <div className="bg-white/5 rounded-2xl p-6 mb-8">
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Détails de la Commande
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-purple-200">
+                  <div className="w-5 h-5 text-purple-400 flex-shrink-0">🔖</div>
+                  <div>
+                    <p className="text-sm text-purple-400">Référence de transaction</p>
+                    <p className="text-white font-semibold font-mono text-sm">{sessionId}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* What's Next */}
+          <div className="bg-white/5 rounded-2xl p-6 mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">Que se passe-t-il maintenant ?</h2>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                <div>
+                  <p className="text-white font-semibold">Email de confirmation</p>
+                  <p className="text-sm text-purple-300">Vous recevrez un email avec les détails de votre commande</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                <div>
+                  <p className="text-white font-semibold">Préparation de la commande</p>
+                  <p className="text-sm text-purple-300">Nous préparerons votre commande avec soin</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                <div>
+                  <p className="text-white font-semibold">Notification d'expédition</p>
+                  <p className="text-sm text-purple-300">Vous serez notifié lorsque votre commande sera expédiée</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/store"
+              className="flex-1 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all text-lg border border-white/20 flex items-center justify-center gap-2"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              Continuer mes achats
+            </Link>
+
+            <Link
+              href="/"
+              className="flex-1 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl transition-all text-lg flex items-center justify-center gap-2"
+            >
+              <Home className="w-5 h-5" />
+              Retour à l'accueil
+            </Link>
+          </div>
+
+          <p className="text-center text-purple-400 text-sm mt-6">
+            Pour toute question, contactez notre support client
+          </p>
         </div>
       </div>
     </div>
@@ -98,8 +127,19 @@ function CheckoutSuccessContent() {
 export default function CheckoutSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 w-full max-w-4xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 lg:p-16">
+            <div className="flex justify-center mb-8">
+              <div className="w-24 h-24 bg-purple-600/20 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white text-center mb-6">
+              Chargement...
+            </h1>
+          </div>
+        </div>
       </div>
     }>
       <CheckoutSuccessContent />
