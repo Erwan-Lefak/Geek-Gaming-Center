@@ -19,42 +19,58 @@ function generateOrderNumber(): string {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('='.repeat(50));
+    console.log('🛒 CREATE ORDER API CALLED');
+    console.log('='.repeat(50));
+
     const { sessionId } = await request.json();
 
     if (!sessionId) {
+      console.error('❌ Session ID manquant');
       return NextResponse.json(
         { error: 'Session ID manquant' },
         { status: 400 }
       );
     }
 
+    console.log('✅ Session ID reçu:', sessionId);
+
     // Retrieve Stripe session
     const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (!stripeSession) {
+      console.error('❌ Session Stripe introuvable pour ID:', sessionId);
       return NextResponse.json(
         { error: 'Session Stripe introuvable' },
         { status: 404 }
       );
     }
 
+    console.log('✅ Session Stripe récupérée');
+
     // Check if payment was successful
     if (stripeSession.payment_status !== 'paid') {
+      console.error('❌ Paiement non réussi, statut:', stripeSession.payment_status);
       return NextResponse.json(
         { error: 'Paiement non réussi' },
         { status: 400 }
       );
     }
 
+    console.log('✅ Paiement confirmé');
+
     // Get customer email
     const customerEmail = stripeSession.customer_details?.email;
 
     if (!customerEmail) {
+      console.error('❌ Email client manquant dans la session Stripe');
       return NextResponse.json(
         { error: 'Email client manquant' },
         { status: 400 }
       );
     }
+
+    console.log('✅ Email client:', customerEmail);
 
     // Find or create customer
     let customer = await prisma.customer.findUnique({
@@ -149,6 +165,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    console.log('✅ Commande créée en base de données:', order.orderNumber);
+    console.log('   Customer ID:', customer.id);
+    console.log('   Items:', order.items.length);
+
     // Send confirmation emails (async, don't block response)
     const customerName = stripeSession.customer_details?.name || customer.firstName;
     const shippingAddress = stripeSession.shipping_details
@@ -225,12 +245,17 @@ export async function POST(request: NextRequest) {
       console.error('Full error:', JSON.stringify(emailError, Object.getOwnPropertyNames(emailError)));
     }
 
+    console.log('✅ API response sent successfully');
+    console.log('='.repeat(50));
+
     return NextResponse.json({
       success: true,
       order,
     });
   } catch (error: any) {
-    console.error('Create order error:', error);
+    console.error('❌ FATAL ERROR in create-order API:');
+    console.error('Error:', error);
+    console.error('Stack:', error.stack);
     return NextResponse.json(
       {
         error: error.message || 'Erreur lors de la création de la commande',
