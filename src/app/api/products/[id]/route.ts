@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'backend/data/products.json');
+import { prisma } from '@/lib/prisma/client';
 
 // GET /api/products/[id] - Récupérer un produit
 export async function GET(
@@ -11,9 +8,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const db = JSON.parse(data);
-    const product = db.products.find((p: any) => p.id === id);
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+    });
 
     if (!product) {
       return NextResponse.json(
@@ -24,7 +22,30 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: product
+      data: {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        subcategory: product.subcategory,
+        brand: product.brand,
+        sku: product.sku,
+        costPrice: Number(product.costPrice),
+        sellingPrice: Number(product.sellingPrice),
+        currency: product.currency,
+        currentStock: product.currentStock,
+        minStock: product.minStock,
+        maxStock: product.maxStock,
+        reorderPoint: product.reorderPoint,
+        supplierId: product.supplierId,
+        images: product.images,
+        thumbnail: product.thumbnail,
+        isActive: product.isActive,
+        isFeatured: product.isFeatured,
+        specifications: product.specifications,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      }
     });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -43,39 +64,61 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const db = JSON.parse(data);
 
-    const productIndex = db.products.findIndex((p: any) => p.id === id);
-
-    if (productIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: 'Product not found' },
-        { status: 404 }
-      );
-    }
-
-    // Mettre à jour le produit
-    const updatedProduct = {
-      ...db.products[productIndex],
-      ...body,
-      id: id, // Empêcher la modification de l'ID
-      updatedAt: new Date().toISOString()
-    };
-
-    db.products[productIndex] = updatedProduct;
-
-    // Sauvegarder
-    await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: {
+        name: body.name,
+        description: body.description,
+        category: body.category,
+        subcategory: body.subcategory || null,
+        brand: body.brand || null,
+        sku: body.sku || null,
+        costPrice: body.costPrice || 0,
+        sellingPrice: body.sellingPrice || 0,
+        currentStock: body.currentStock || 0,
+        minStock: body.minStock || 5,
+        maxStock: body.maxStock || 50,
+        reorderPoint: body.reorderPoint || 10,
+        images: body.images || [],
+        thumbnail: body.thumbnail || null,
+        isActive: body.isActive !== undefined ? body.isActive : true,
+        isFeatured: body.isFeatured || false,
+        specifications: body.specifications || null,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      data: updatedProduct
+      data: {
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        description: updatedProduct.description,
+        category: updatedProduct.category,
+        subcategory: updatedProduct.subcategory,
+        brand: updatedProduct.brand,
+        sku: updatedProduct.sku,
+        costPrice: Number(updatedProduct.costPrice),
+        sellingPrice: Number(updatedProduct.sellingPrice),
+        currency: updatedProduct.currency,
+        currentStock: updatedProduct.currentStock,
+        minStock: updatedProduct.minStock,
+        maxStock: updatedProduct.maxStock,
+        reorderPoint: updatedProduct.reorderPoint,
+        supplierId: updatedProduct.supplierId,
+        images: updatedProduct.images,
+        thumbnail: updatedProduct.thumbnail,
+        isActive: updatedProduct.isActive,
+        isFeatured: updatedProduct.isFeatured,
+        specifications: updatedProduct.specifications,
+        createdAt: updatedProduct.createdAt,
+        updatedAt: updatedProduct.updatedAt,
+      }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating product:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update product' },
+      { success: false, error: error.message || 'Failed to update product' },
       { status: 500 }
     );
   }
@@ -88,32 +131,19 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const db = JSON.parse(data);
 
-    const productIndex = db.products.findIndex((p: any) => p.id === id);
-
-    if (productIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: 'Product not found' },
-        { status: 404 }
-      );
-    }
-
-    // Supprimer le produit
-    db.products.splice(productIndex, 1);
-
-    // Sauvegarder
-    await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
+    await prisma.product.delete({
+      where: { id },
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Product deleted successfully'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting product:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete product' },
+      { success: false, error: error.message || 'Failed to delete product' },
       { status: 500 }
     );
   }

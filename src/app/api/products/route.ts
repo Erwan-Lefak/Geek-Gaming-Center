@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'backend/data/products.json');
+import { prisma } from '@/lib/prisma/client';
 
 // GET /api/products - Récupérer tous les produits
 export async function GET(request: NextRequest) {
@@ -10,26 +7,59 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
     const featured = searchParams.get('featured');
+    const limit = searchParams.get('limit');
 
-    // Lire le fichier de base de données
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const db = JSON.parse(data);
-    let products = db.products;
+    const where: any = {
+      isActive: true,
+    };
 
     // Filtrer par catégorie
     if (category && category !== 'all') {
-      products = products.filter((p: any) => p.category === category);
+      where.category = category;
     }
 
     // Filtrer les produits vedettes
     if (featured === 'true') {
-      products = products.filter((p: any) => p.featured === true);
+      where.isFeatured = true;
     }
+
+    const products = await prisma.product.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      ...(limit && { take: parseInt(limit) }),
+    });
+
+    const formattedProducts = products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      subcategory: product.subcategory,
+      brand: product.brand,
+      sku: product.sku,
+      costPrice: Number(product.costPrice),
+      sellingPrice: Number(product.sellingPrice),
+      currency: product.currency,
+      currentStock: product.currentStock,
+      minStock: product.minStock,
+      maxStock: product.maxStock,
+      reorderPoint: product.reorderPoint,
+      supplierId: product.supplierId,
+      images: product.images,
+      thumbnail: product.thumbnail,
+      isActive: product.isActive,
+      isFeatured: product.isFeatured,
+      specifications: product.specifications,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    }));
 
     return NextResponse.json({
       success: true,
-      data: products,
-      count: products.length
+      data: formattedProducts,
+      count: formattedProducts.length
     });
   } catch (error) {
     console.error('Error reading products:', error);
@@ -44,48 +74,60 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, price, category, stock, image, featured } = body;
 
-    // Validation
-    if (!name || !description || !price || !category) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    // Lire le fichier de base de données
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const db = JSON.parse(data);
-
-    // Créer le nouveau produit
-    const newProduct = {
-      id: String(Date.now()),
-      name,
-      description,
-      price: Number(price),
-      category,
-      stock: Number(stock) || 0,
-      image: image || null,
-      featured: featured || false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    // Ajouter à la base de données
-    db.products.push(newProduct);
-
-    // Sauvegarder
-    await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
+    const newProduct = await prisma.product.create({
+      data: {
+        name: body.name,
+        description: body.description || null,
+        category: body.category,
+        subcategory: body.subcategory || null,
+        brand: body.brand || null,
+        sku: body.sku || null,
+        costPrice: body.costPrice || 0,
+        sellingPrice: body.sellingPrice || 0,
+        currentStock: body.currentStock || 0,
+        minStock: body.minStock || 5,
+        maxStock: body.maxStock || 50,
+        reorderPoint: body.reorderPoint || 10,
+        images: body.images || [],
+        thumbnail: body.thumbnail || null,
+        isActive: body.isActive !== undefined ? body.isActive : true,
+        isFeatured: body.isFeatured || false,
+        specifications: body.specifications || null,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      data: newProduct
+      data: {
+        id: newProduct.id,
+        name: newProduct.name,
+        description: newProduct.description,
+        category: newProduct.category,
+        subcategory: newProduct.subcategory,
+        brand: newProduct.brand,
+        sku: newProduct.sku,
+        costPrice: Number(newProduct.costPrice),
+        sellingPrice: Number(newProduct.sellingPrice),
+        currency: newProduct.currency,
+        currentStock: newProduct.currentStock,
+        minStock: newProduct.minStock,
+        maxStock: newProduct.maxStock,
+        reorderPoint: newProduct.reorderPoint,
+        supplierId: newProduct.supplierId,
+        images: newProduct.images,
+        thumbnail: newProduct.thumbnail,
+        isActive: newProduct.isActive,
+        isFeatured: newProduct.isFeatured,
+        specifications: newProduct.specifications,
+        createdAt: newProduct.createdAt,
+        updatedAt: newProduct.updatedAt,
+      }
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating product:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create product' },
+      { success: false, error: error.message || 'Failed to create product' },
       { status: 500 }
     );
   }
