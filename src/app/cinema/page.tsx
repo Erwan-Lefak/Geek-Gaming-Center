@@ -1,18 +1,41 @@
 /**
  * Cinema Page - Geek Gaming Center
  * Sessions du soir avec affiches de films/séries
+ * Synchronisé avec la base de données du dashboard
  */
 
 'use client';
 
-import { useState } from 'react';
-import { Film, Clock, Calendar, Info, Play } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Clock, Calendar, Info, Play } from 'lucide-react';
 import Header from '@/components/ui/Header';
 import Image from 'next/image';
+
+interface Show {
+  id: string;
+  title: string;
+  subtitle: string;
+  poster: string;
+  duration: string;
+  episodes: string;
+  genre: string;
+  rating: string;
+  synopsis: string;
+  sessions: Array<{
+    time: string;
+    status: 'available' | 'limited' | 'full';
+    screeningId?: string;
+    price?: number;
+  }>;
+  type: 'movie' | 'series';
+  colors: string;
+}
 
 export default function CinemaPage() {
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<number>(0);
+  const [shows, setShows] = useState<Show[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Générer les dates de la semaine (7 jours à partir d'aujourd'hui)
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -21,76 +44,24 @@ export default function CinemaPage() {
     return date;
   });
 
-  const shows = [
-    {
-      id: 'one-piece',
-      title: 'One Piece Live Action',
-      subtitle: 'Netflix - Saisons 1 & 2',
-      poster: '/one-piece-live-action.jpeg',
-      duration: '45-60 min/ép',
-      episodes: 'S1: 8 épisodes | S2: Annoncée',
-      genre: 'Aventure / Action',
-      rating: '16+',
-      synopsis: 'Monkey D. Luffy, un jeune aventurier au corps en caoutchouc, rêve de devenir le Roi des Pirates. Avec son équipage - Zoro, Nami, Usopp et Sanji - il navigue sur le Grand Line à la recherche du légendaire trésor "One Piece". Une adaptation épique du manga d\'Eiichiro Oda qui capture l\'esprit d\'aventure et l\'amitié qui font le succès de la franchise.',
-      sessions: [
-        { time: '21:00', status: 'available' },
-        { time: '22:30', status: 'available' },
-      ],
-      type: 'series' as const,
-      colors: 'from-blue-600 to-cyan-500'
-    },
-    {
-      id: 'sinners',
-      title: 'Sinners',
-      subtitle: 'Ryan Coogler - 2025',
-      poster: '/sinners.webp',
-      duration: '2h 15min',
-      episodes: 'Film',
-      genre: 'Drame / Thriller',
-      rating: '18+',
-      synopsis: 'Le nouveau film de Ryan Coogler avec Michael B. Jordan. Une histoire poignante de rédemption et de sacrifice se déroulant dans les rues de Los Angeles. Deux jumeaux séparés à la naissance se retrouvent des années plus tard, chacun pris dans des spirales différentes. Un thriller dramatique explorant les thèmes de la famille, de la loyauté et des choix qui définissent notre destinée.',
-      sessions: [
-        { time: '21:00', status: 'limited' },
-        { time: '23:30', status: 'available' },
-      ],
-      type: 'movie' as const,
-      colors: 'from-purple-600 to-pink-500'
-    },
-    {
-      id: 'jjk',
-      title: 'Jujutsu Kaisen',
-      subtitle: 'Saison 1 & 2',
-      poster: '/jujutsu-kaisen.jpeg',
-      duration: '23 min/ép',
-      episodes: '47 épisodes (S1: 24 | S2: 23)',
-      genre: 'Anime / Action Surnaturelle',
-      rating: '16+',
-      synopsis: 'Yuji Itadori, un lycéen aux capacités physiques extraordinaires, se retrouve entraîné dans le monde des malédictions après avoir ingéré le doigt de Ryomen Sukuna, le Roi des Malédictions. Rejoignant l\'école de magie de Tokyo, il apprend à maîtriser ses pouvoirs tout en combattant les esprits maléfiques. La saison 2 adapte l\'arc Shibuya, considéré comme l\'un des meilleurs arcs de l\'histoire de l\'anime moderne.',
-      sessions: [
-        { time: '21:00', status: 'available' },
-        { time: '23:00', status: 'full' },
-      ],
-      type: 'series' as const,
-      colors: 'from-red-600 to-orange-500'
-    },
-    {
-      id: 'f1',
-      title: 'F1',
-      subtitle: 'Brad Pitt - 2025',
-      poster: '/f1-movie.jpg',
-      duration: '2h 30min',
-      episodes: 'Film',
-      genre: 'Sport / Drame',
-      rating: 'Tous publics',
-      synopsis: 'Un pilote vétéran revenu à la compétition fait équipe avec une équipe en difficulté. Son objectif : battre les champions en titre et les jeunes prodiges de la Formule 1. Tourné pendant les vrais Grands Prix, ce film plonge le spectateur dans l\'intensité, la vitesse et les enjeux du sport automobile. Avec la participation de septuples champions du monde en vedette.',
-      sessions: [
-        { time: '20:30', status: 'available' },
-        { time: '23:00', status: 'limited' },
-      ],
-      type: 'movie' as const,
-      colors: 'from-gray-600 to-red-500'
-    }
-  ];
+  // Fetch movies from API
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/cinema/movies?nowShowing=true');
+        if (!res.ok) throw new Error('Failed to fetch movies');
+        const data = await res.json();
+        setShows(data.movies || []);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, [activeDate]); // Re-fetch when date changes
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -117,6 +88,17 @@ export default function CinemaPage() {
         return '';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black">
+        <Header />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-white text-xl">Chargement...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -182,95 +164,105 @@ export default function CinemaPage() {
             À l'affiche ce soir
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {shows.map((show) => (
-              <div
-                key={show.id}
-                className="bg-surface border border-border rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 group"
-              >
-                {/* Poster */}
-                <div className="relative aspect-[2/3] bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
-                  <Image
-                    src={show.poster}
-                    alt={show.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300" />
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <span
-                      className="px-3 py-1 bg-black/60 backdrop-blur-sm text-xs font-bold rounded-full uppercase cinema-rating-badge"
-                      style={{ color: '#ffffff !important' } as any}
-                    >
-                      {show.rating}
-                    </span>
-                    {show.type === 'series' && (
+          {shows.length === 0 ? (
+            <div className="text-center text-white/60 text-xl py-20">
+              Aucun film à l'affiche pour le moment
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {shows.map((show) => (
+                <div
+                  key={show.id}
+                  className="bg-surface border border-border rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 group"
+                >
+                  {/* Poster */}
+                  <div className="relative aspect-[2/3] bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+                    <Image
+                      src={show.poster}
+                      alt={show.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300" />
+                    <div className="absolute top-4 left-4 flex gap-2">
                       <span
                         className="px-3 py-1 bg-black/60 backdrop-blur-sm text-xs font-bold rounded-full uppercase cinema-rating-badge"
                         style={{ color: '#ffffff !important' } as any}
                       >
-                        Série
+                        {show.rating}
                       </span>
-                    )}
-                  </div>
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button
-                      onClick={() => setSelectedShow(show.id === selectedShow ? null : show.id)}
-                      className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
-                    >
-                      <Info className="w-8 h-8 text-black" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="mb-4">
-                    <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-purple-500 transition-colors">
-                      {show.title}
-                    </h3>
-                    <p className="text-white/60 text-sm mb-2">{show.subtitle}</p>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
-                        {show.genre}
-                      </span>
-                      <span className="px-2 py-1 bg-white/10 text-white/60 text-xs rounded-full">
-                        {show.duration}
-                      </span>
-                    </div>
-                    <p className="text-white/70 text-sm">{show.episodes}</p>
-                  </div>
-
-                  {/* Sessions */}
-                  <div className="border-t border-border pt-4">
-                    <p className="text-white font-semibold mb-3 text-sm uppercase">Sessions disponibles</p>
-                    <div className="space-y-2">
-                      {show.sessions.map((session, idx) => (
-                        <button
-                          key={idx}
-                          disabled={session.status === 'full'}
-                          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all cinema-session-button ${
-                            session.status === 'full'
-                              ? 'opacity-50 cursor-not-allowed'
-                              : 'bg-black/40 hover:bg-purple-500/20'
-                          }`}
+                      {show.type === 'series' && (
+                        <span
+                          className="px-3 py-1 bg-black/60 backdrop-blur-sm text-xs font-bold rounded-full uppercase cinema-rating-badge"
+                          style={{ color: '#ffffff !important' } as any}
                         >
-                          <span className="text-white font-bold">{session.time}</span>
-                          <span
-                            className={`px-3 py-1 text-xs font-bold rounded-full cinema-status-badge !text-white ${getStatusColor(session.status)}`}
-                          >
-                            {getStatusText(session.status)}
-                          </span>
-                        </button>
-                      ))}
+                          Série
+                        </span>
+                      )}
+                    </div>
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        onClick={() => setSelectedShow(show.id === selectedShow ? null : show.id)}
+                        className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
+                      >
+                        <Info className="w-8 h-8 text-black" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="mb-4">
+                      <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-purple-500 transition-colors">
+                        {show.title}
+                      </h3>
+                      <p className="text-white/60 text-sm mb-2">{show.subtitle}</p>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
+                          {show.genre}
+                        </span>
+                        <span className="px-2 py-1 bg-white/10 text-white/60 text-xs rounded-full">
+                          {show.duration}
+                        </span>
+                      </div>
+                      <p className="text-white/70 text-sm">{show.episodes}</p>
+                    </div>
+
+                    {/* Sessions */}
+                    <div className="border-t border-border pt-4">
+                      <p className="text-white font-semibold mb-3 text-sm uppercase">Sessions disponibles</p>
+                      <div className="space-y-2">
+                        {show.sessions.length === 0 ? (
+                          <p className="text-white/60 text-sm text-center py-4">Aucune séance programmée</p>
+                        ) : (
+                          show.sessions.map((session, idx) => (
+                            <button
+                              key={idx}
+                              disabled={session.status === 'full'}
+                              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all cinema-session-button ${
+                                session.status === 'full'
+                                  ? 'opacity-50 cursor-not-allowed'
+                                  : 'bg-black/40 hover:bg-purple-500/20'
+                              }`}
+                            >
+                              <span className="text-white font-bold">{session.time}</span>
+                              <span
+                                className={`px-3 py-1 text-xs font-bold rounded-full cinema-status-badge !text-white ${getStatusColor(session.status)}`}
+                              >
+                                {getStatusText(session.status)}
+                              </span>
+                            </button>
+                          ))
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
