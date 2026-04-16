@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
         sessionNumber,
         equipmentId: metadata.equipment_id,
         customerId: customerId || null,
-        scheduledStartAt: startTime,
+        startedAt: startTime,
         scheduledEndAt,
         duration: parseInt(metadata.duration),
         pricingId: pricing.id,
