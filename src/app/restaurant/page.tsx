@@ -18,11 +18,6 @@ interface MenuItem {
   price: number;
   category: string;
   image?: string;
-  ingredients: string[];
-  allergens: string[];
-  isVegetarian: boolean;
-  isVegan: boolean;
-  isSpicy: boolean;
   preparationTime: number;
 }
 
@@ -180,27 +175,6 @@ export default function RestaurantPage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  {(item.isVegetarian || item.isVegan || item.isSpicy) && (
-                    <div className="flex gap-2 px-4 py-2 bg-black/20">
-                      {item.isVegetarian && (
-                        <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
-                          Végétarien
-                        </span>
-                      )}
-                      {item.isVegan && (
-                        <span className="px-2 py-1 bg-green-600/20 text-green-500 text-xs rounded-full">
-                          Vegan
-                        </span>
-                      )}
-                      {item.isSpicy && (
-                        <span className="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full">
-                          Épicé
-                        </span>
-                      )}
                     </div>
                   )}
 
