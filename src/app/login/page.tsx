@@ -15,6 +15,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  // Get redirect parameter from URL on mount
+  const [redirectPath, setRedirectPath] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const redirect = urlParams.get('redirect')
+      if (redirect) {
+        setRedirectPath(redirect)
+      }
+    }
+  }, [])
+
   // Afficher un état de chargement pendant la vérification de la session
   if (status === 'loading') {
     return (
@@ -71,8 +84,34 @@ export default function LoginPage() {
               // Continue with login if check fails
             }
 
-            // Email verified, proceed to account
-            window.location.href = '/account'
+            // Email verified, check for redirect path
+            if (redirectPath) {
+              // Check if there are saved parameters in sessionStorage
+              const savedParams = sessionStorage.getItem('bookingRedirect') ||
+                                sessionStorage.getItem('cartRedirect')
+
+              if (savedParams) {
+                // For booking or cart, restore the full URL with parameters
+                if (redirectPath.includes('/arena/booking/confirm')) {
+                  const bookingParams = sessionStorage.getItem('bookingRedirect')
+                  if (bookingParams) {
+                    window.location.href = redirectPath + bookingParams
+                    sessionStorage.removeItem('bookingRedirect')
+                    return
+                  }
+                } else if (redirectPath.includes('/cart') || redirectPath.includes('/store/cart')) {
+                  sessionStorage.removeItem('cartRedirect')
+                  window.location.href = redirectPath
+                  return
+                }
+              }
+
+              // No saved params, just redirect to the path
+              window.location.href = redirectPath
+            } else {
+              // No redirect, proceed to account
+              window.location.href = '/account'
+            }
           } else {
             // Admin or other role, proceed to dashboard
             window.location.href = '/dashboard'
