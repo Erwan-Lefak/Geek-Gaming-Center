@@ -28,7 +28,7 @@ function BookingConfirmContent() {
     price: 0 as number | undefined,
   })
 
-  const [selectedPayment, setSelectedPayment] = useState<string>('cash')
+  const [selectedPayment, setSelectedPayment] = useState<string>('stripe')
 
   // Check if user is authenticated
   useEffect(() => {
@@ -91,7 +91,35 @@ function BookingConfirmContent() {
     setIsLoading(true)
 
     try {
-      // Check if date is weekend
+      // Handle Stripe payment differently
+      if (selectedPayment === 'stripe') {
+        // Create Stripe checkout session
+        const stripeResponse = await fetch('/api/arena/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            equipment: bookingData.equipment,
+            equipmentId: bookingData.equipmentId,
+            date: bookingData.date,
+            time: bookingData.time,
+            duration: bookingData.duration,
+            price: price,
+          }),
+        })
+
+        if (stripeResponse.ok) {
+          const stripeData = await stripeResponse.json()
+          // Redirect to Stripe Checkout
+          window.location.href = stripeData.data.url
+        } else {
+          const error = await stripeResponse.json()
+          alert(error.error || 'Erreur lors de la création du paiement Stripe')
+          setIsLoading(false)
+        }
+        return
+      }
+
+      // For cash and other payment methods: Check if date is weekend
       const date = new Date(bookingData.date)
       const isWeekend = date.getDay() === 0 || date.getDay() === 6
 
@@ -135,7 +163,9 @@ function BookingConfirmContent() {
       console.error('Payment error:', err)
       alert('Erreur lors de la réservation')
     } finally {
-      setIsLoading(false)
+      if (selectedPayment !== 'stripe') {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -262,14 +292,14 @@ function BookingConfirmContent() {
                     <button
                       key={method.id}
                       onClick={() => setSelectedPayment(method.id)}
-                      disabled={method.id !== 'cash'} // Only cash is available for now
+                      disabled={method.id !== 'cash' && method.id !== 'stripe'} // Cash and Stripe available
                       className={`
                         w-full p-4 rounded-xl border-2 transition-all text-left
                         ${isSelected
                           ? `bg-gradient-to-r ${method.color} border-white/30`
                           : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
                         }
-                        ${method.id !== 'cash' ? 'opacity-50 cursor-not-allowed' : ''}
+                        ${method.id !== 'cash' && method.id !== 'stripe' ? 'opacity-50 cursor-not-allowed' : ''}
                       `}
                     >
                       <div className="flex items-center gap-4">
@@ -287,7 +317,7 @@ function BookingConfirmContent() {
                             <Check className="w-4 h-4 text-green-600" />
                           </div>
                         )}
-                        {method.id !== 'cash' && (
+                        {method.id !== 'cash' && method.id !== 'stripe' && (
                           <span className="text-xs text-yellow-300 bg-yellow-600/20 px-2 py-1 rounded-full">
                             Bientôt disponible
                           </span>
@@ -348,10 +378,10 @@ function BookingConfirmContent() {
             {/* Confirm Button */}
             <button
               onClick={handlePayment}
-              disabled={isLoading || selectedPayment !== 'cash'}
+              disabled={isLoading || (selectedPayment !== 'cash' && selectedPayment !== 'stripe')}
               className={`
                 w-full py-4 rounded-xl font-bold shadow-lg transform transition-all duration-200
-                ${isLoading || selectedPayment !== 'cash'
+                ${isLoading || (selectedPayment !== 'cash' && selectedPayment !== 'stripe')
                   ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50'
                   : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white hover:scale-105 cursor-pointer'
                 }

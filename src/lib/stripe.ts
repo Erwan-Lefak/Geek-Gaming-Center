@@ -156,3 +156,57 @@ export function calculateStripeFee(amount: number): number {
 
   return fixedFeeInXaf + percentageFee;
 }
+
+/**
+ * Create a Stripe Checkout Session for arena/booking reservation
+ * @param bookingDetails - Booking details
+ * @param successUrl - URL to redirect after successful payment
+ * @param cancelUrl - URL to redirect if payment is cancelled
+ * @returns Stripe Checkout Session
+ */
+export async function createArenaBookingSession(
+  bookingDetails: {
+    equipment: string;
+    date: string;
+    time: string;
+    duration: number;
+    price: number;
+    equipmentId: string;
+  },
+  successUrl: string,
+  cancelUrl: string
+) {
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'XAF',
+          product_data: {
+            name: `Réservation - ${bookingDetails.equipment}`,
+            description: `Session de gaming de ${bookingDetails.duration} minutes\nDate: ${bookingDetails.date}\nHeure: ${bookingDetails.time}`,
+          },
+          unit_amount: Math.round(bookingDetails.price),
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    metadata: {
+      type: 'arena_booking',
+      equipment_id: bookingDetails.equipmentId,
+      equipment_name: bookingDetails.equipment,
+      date: bookingDetails.date,
+      time: bookingDetails.time,
+      duration: bookingDetails.duration.toString(),
+      price: bookingDetails.price.toString(),
+    },
+    customer_email: undefined, // Will be set when user auth is implemented
+    billing_address_collection: 'auto',
+  });
+
+  return session;
+}
+

@@ -5,7 +5,7 @@ import { Mail, AlertCircle, Home } from 'lucide-react'
 
 export default function VerifyEmailWarningPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
       {/* Background gaming effect */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2NiA2NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjMzIiBjeT0iMzMiIHI9IjMzIiBmaWxsPSIjZjZmNmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvZz48L3N2Zz4=')] animate-pulse"></div>
