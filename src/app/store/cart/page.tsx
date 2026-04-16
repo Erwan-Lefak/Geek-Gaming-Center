@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { formatFCFA } from '@/lib/currency';
@@ -14,8 +15,34 @@ import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 
 export default function CartPage() {
+  const router = useRouter();
   const { cart, isLoading, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        setIsAuthenticated(response.ok);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      // Store current cart info before redirect
+      sessionStorage.setItem('cartRedirect', 'true');
+      router.push('/login?redirect=' + encodeURIComponent('/store/cart'));
+      return;
+    }
+    router.push('/store/checkout');
+  };
 
   const handleQuantityChange = async (productId: string, newQuantity: number) => {
     if (newQuantity < 0 || newQuantity > 10) return;
@@ -58,7 +85,7 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center pt-[9rem] md:pt-[7rem]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Chargement du panier...</p>
@@ -69,7 +96,7 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 py-4">
           <Breadcrumb
@@ -105,7 +132,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
         <Breadcrumb
@@ -239,13 +266,13 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <Link
-                href="/store/checkout"
+              <button
+                onClick={handleCheckout}
                 className="jelly-button w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all flex items-center justify-center gap-2"
               >
                 Passer la commande
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </button>
 
               <Link
                 href="/store"

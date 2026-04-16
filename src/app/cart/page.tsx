@@ -1,12 +1,39 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/contexts/CartContext'
 
 export default function CartPage() {
+  const router = useRouter()
   const { cart, isLoading, updateQuantity, removeItem } = useCart()
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session')
+        setIsAuthenticated(response.ok)
+      } catch (error) {
+        console.error('Auth check error:', error)
+        setIsAuthenticated(false)
+      }
+    }
+    checkAuth()
+  }, [])
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem('cartRedirect', 'true')
+      router.push('/login?redirect=' + encodeURIComponent('/cart'))
+      return
+    }
+    router.push('/store/checkout')
+  }
 
   // Calculate totals
   const subtotal = cart?.subtotal || 0
@@ -19,7 +46,7 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center pt-[9rem] md:pt-[7rem]">
         <div className="text-white text-xl">Chargement...</div>
       </div>
     )
@@ -28,7 +55,7 @@ export default function CartPage() {
   const cartItems = cart?.items || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black pt-[6.5rem] sm:pt-28">
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black pt-[9rem] md:pt-[7rem] pb-8 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -146,13 +173,13 @@ export default function CartPage() {
                 </div>
 
                 {/* Checkout Button */}
-                <Link
-                  href="/store/checkout"
+                <button
+                  onClick={handleCheckout}
                   className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 text-lg uppercase"
                 >
                   Passer la commande
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </button>
 
                 {/* Security Note */}
                 <p className="text-center text-purple-300 text-xs mt-4">
