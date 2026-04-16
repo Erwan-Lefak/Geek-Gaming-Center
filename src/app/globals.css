@@ -2494,3 +2494,22 @@ p, span, a, button, input, textarea, select, label,
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   letter-spacing: 0.15em !important;
 }
+
+/* ============================================
+   DELETE ACCOUNT MODAL - FORCE RED TEXT
+   Ensure warning text is visible in both light and dark modes
+   ============================================ */
+
+html.light .text-red-900,
+html.light p.text-red-900,
+html.light li.text-red-900,
+html.light *.text-red-900 {
+  color: #7c1d12 !important;
+}
+
+html.dark .text-red-300,
+html.dark p.text-red-300,
+html.dark li.text-red-300,
+html.dark *.text-red-300 {
+  color: #fca5a5 !important;
+}
