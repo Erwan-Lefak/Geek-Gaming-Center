@@ -161,6 +161,12 @@ export async function POST(request: NextRequest) {
     const subtotal = totalAmount;
     const shipping = 0;
 
+    // Log email sending attempt
+    console.log('📧 Attempting to send order confirmation emails...');
+    console.log('Customer Email:', customerEmail);
+    console.log('Order Number:', order.orderNumber);
+    console.log('RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY);
+
     // Send order confirmation to customer
     MailService.sendOrderConfirmation(customerEmail, customerName, {
       orderNumber: order.orderNumber,
@@ -174,7 +180,19 @@ export async function POST(request: NextRequest) {
       shipping,
       total: subtotal,
       shippingAddress,
-    }).catch(err => console.error('Failed to send order confirmation email:', err));
+    })
+      .then(() => {
+        console.log('✅ Order confirmation email sent successfully to:', customerEmail);
+      })
+      .catch((err) => {
+        console.error('❌ Failed to send order confirmation email:', err);
+        console.error('Error details:', {
+          email: customerEmail,
+          orderNumber: order.orderNumber,
+          error: err.message,
+          stack: err.stack,
+        });
+      });
 
     // Send admin notification
     MailService.sendAdminNewOrder({
@@ -192,7 +210,18 @@ export async function POST(request: NextRequest) {
       shipping,
       total: subtotal,
       shippingAddress,
-    }).catch(err => console.error('Failed to send admin order email:', err));
+    })
+      .then(() => {
+        console.log('✅ Admin notification email sent successfully');
+      })
+      .catch((err) => {
+        console.error('❌ Failed to send admin notification email:', err);
+        console.error('Error details:', {
+          orderNumber: order.orderNumber,
+          error: err.message,
+          stack: err.stack,
+        });
+      });
 
     return NextResponse.json({
       success: true,
