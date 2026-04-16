@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
-import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock } from 'lucide-react'
+import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock, Edit, Trash2, Eye } from 'lucide-react'
 import { formatFCFA } from '@/lib/currency'
 
 interface OrderItem {
@@ -97,6 +97,53 @@ export default function OrdersPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order)
+    setShowOrderModal(true)
+  }
+
+  const handleUpdateOrderStatus = async (orderId: string, status: string) => {
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+
+      if (response.ok) {
+        fetchOrders()
+        alert('Statut de la commande mis à jour!')
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la mise à jour')
+      }
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la mise à jour')
+    }
+  }
+
+  const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer la commande "${orderNumber}" ?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        fetchOrders()
+        alert('Commande supprimée avec succès!')
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la suppression')
+      }
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la suppression')
+    }
   }
 
   const handleOrderClick = (order: Order) => {
@@ -302,6 +349,7 @@ export default function OrdersPage() {
                       <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Paiement</TableHead>
                       <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Total</TableHead>
                       <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Date</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white text-right" style={{ color: 'var(--foreground)' }}>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -352,6 +400,37 @@ export default function OrdersPage() {
                         <TableCell className="dark:bg-gray-800">
                           <div className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
                             {formatDate(order.createdAt)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right dark:bg-gray-800">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleViewOrder(order)}
+                              title="Voir détails"
+                              className="dark:text-white dark:hover:bg-gray-700"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleUpdateOrderStatus(order.id, order.status === 'PENDING' ? 'PROCESSING' : 'PENDING')}
+                              title="Changer statut"
+                              className="dark:text-white dark:hover:bg-gray-700"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
+                              title="Supprimer"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

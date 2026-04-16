@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Modal } from '@/components/ui/modal'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Edit, Package, AlertTriangle, X, Upload, Search } from 'lucide-react'
+import { Plus, Edit, Package, AlertTriangle, X, Upload, Search, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 
 interface Product {
@@ -185,6 +185,28 @@ export default function ProductsPage() {
     setShowModal(true)
   }
 
+  const handleDeleteProduct = async (productId: string, productName: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${productName}" ?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        fetchProducts()
+        alert('Produit supprimé avec succès!')
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la suppression')
+      }
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la suppression')
+    }
+  }
+
   const lowStockCount = products.filter(p => {
     const currentStock = p.currentStock || p.stock || 0
     const minStock = p.minStock || 5
@@ -246,10 +268,13 @@ export default function ProductsPage() {
                   {lowStockCount} alertes
                 </Badge>
               )}
-              <Button onClick={() => { setShowModal(true); setSelectedProduct(null) }}>
-                <Plus className="w-4 h-4 mr-2" />
+              <button
+                onClick={() => { setShowModal(true); setSelectedProduct(null) }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
                 Nouveau Produit
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -419,15 +444,25 @@ export default function ProductsPage() {
                             )}
                           </TableCell>
                           <TableCell className="text-right dark:bg-gray-800">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEdit(product)}
-                              className="dark:text-white dark:hover:bg-gray-700"
-                              style={{ color: 'var(--foreground)' }}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleEdit(product)}
+                                className="dark:text-white dark:hover:bg-gray-700"
+                                style={{ color: 'var(--foreground)' }}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteProduct(product.id, product.name)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       )

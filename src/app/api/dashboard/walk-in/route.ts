@@ -9,7 +9,7 @@ const walkInSchema = z.object({
   lastName: z.string().min(1, 'Le nom est requis'),
   email: z.string().email('Email invalide').optional().or(z.literal('')),
   phone: z.string().min(8, 'Le téléphone est requis'),
-  equipmentType: z.string().min(1, 'Le type d\'équipement est requis'),
+  equipmentId: z.string().min(1, 'L\'équipement est requis'),
   duration: z.number().min(60, 'La durée minimum est de 60 minutes'),
   paymentMethod: z.enum(['CASH', 'MOBILE_MONEY_ORANGE', 'MOBILE_MONEY_MTN', 'CARD', 'BANK_TRANSFER']),
   isPaid: z.boolean().default(false),
@@ -53,11 +53,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Trouver un équipement disponible du type demandé
-    const equipment = await prisma.equipment.findFirst({
+    // Récupérer l'équipement spécifique
+    const equipment = await prisma.equipment.findUnique({
       where: {
-        type: validatedData.equipmentType as any,
-        status: 'AVAILABLE',
+        id: validatedData.equipmentId,
       },
       include: {
         pricing: {
@@ -70,7 +69,14 @@ export async function POST(request: NextRequest) {
 
     if (!equipment) {
       return NextResponse.json(
-        { error: 'Aucun équipement disponible de ce type' },
+        { error: 'Équipement non trouvé' },
+        { status: 404 }
+      )
+    }
+
+    if (equipment.status !== 'AVAILABLE') {
+      return NextResponse.json(
+        { error: 'Cet équipement n\'est pas disponible' },
         { status: 400 }
       )
     }

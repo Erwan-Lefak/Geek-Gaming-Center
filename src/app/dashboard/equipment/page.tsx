@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Monitor, Settings, Activity, AlertCircle } from 'lucide-react'
+import { Modal } from '@/components/ui/modal'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Monitor, Settings, Activity, AlertCircle, Plus, Trash2, Edit } from 'lucide-react'
 
 interface Equipment {
   id: string
@@ -22,6 +25,18 @@ export default function EquipmentPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
 
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    type: 'PS5' as const,
+    code: '',
+    status: 'AVAILABLE' as const,
+    healthScore: 100,
+    location: '',
+    hourlyRate: 0,
+  })
+
   useEffect(() => {
     fetchEquipment()
   }, [])
@@ -36,6 +51,60 @@ export default function EquipmentPage() {
       console.error('Error fetching equipment:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCreateEquipment = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const response = await fetch('/api/equipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la création')
+      }
+
+      setShowCreateModal(false)
+      setFormData({
+        name: '',
+        type: 'PS5',
+        code: '',
+        status: 'AVAILABLE',
+        healthScore: 100,
+        location: '',
+        hourlyRate: 0,
+      })
+      fetchEquipment()
+      alert('Équipement créé avec succès!')
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la création')
+    }
+  }
+
+  const handleDeleteEquipment = async (equipmentId: string, equipmentName: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${equipmentName}" ?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/equipment/${equipmentId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la suppression')
+      }
+
+      fetchEquipment()
+      alert('Équipement supprimé avec succès!')
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la suppression')
     }
   }
 
@@ -99,11 +168,20 @@ export default function EquipmentPage() {
       {/* Header */}
       <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Équipements</h1>
-            <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
-              Gestion et maintenance du parc matériel
-            </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Équipements</h1>
+              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
+                Gestion et maintenance du parc matériel
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              Nouvel Équipement
+            </button>
           </div>
         </div>
       </div>
@@ -241,6 +319,14 @@ export default function EquipmentPage() {
                       <Settings className="w-4 h-4 mr-1" />
                       Maintenance
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteEquipment(eq.id, eq.name)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -256,6 +342,173 @@ export default function EquipmentPage() {
           </Card>
         )}
       </div>
+
+      {/* Modal de création d'équipement */}
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="Nouvel Équipement"
+        size="xl"
+      >
+        <form onSubmit={handleCreateEquipment} className="space-y-4 sm:space-y-6">
+          {/* Section: Informations de base */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Informations de base
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="sm:col-span-2">
+                <Label htmlFor="name" className="text-sm">Nom de l'équipement *</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  placeholder="Ex: PS5 - Zone VIP"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="type" className="text-sm">Type d'équipement *</Label>
+                <select
+                  id="type"
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                  required
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <option value="PS5">PlayStation 5</option>
+                  <option value="PS4">PlayStation 4</option>
+                  <option value="XBOX_SERIES_X">Xbox Series X</option>
+                  <option value="PC_GAMING">PC Gaming</option>
+                  <option value="OCULUS_VR">Oculus VR</option>
+                  <option value="VR_PS4">VR PS4</option>
+                  <option value="SIMU_RACING">Simulateur Racing</option>
+                </select>
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="code" className="text-sm">Code unique *</Label>
+                <Input
+                  id="code"
+                  type="text"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  placeholder="Ex: PS5-001"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="location" className="text-sm">Emplacement</Label>
+                <Input
+                  id="location"
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full h-10 sm:h-auto"
+                  placeholder="Ex: Zone A, Étage 1..."
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="hourlyRate" className="text-sm">Taux horaire (FCFA)</Label>
+                <Input
+                  id="hourlyRate"
+                  type="number"
+                  value={formData.hourlyRate}
+                  onChange={(e) => setFormData({ ...formData, hourlyRate: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  className="w-full h-10 sm:h-auto"
+                  placeholder="2000"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: État initial */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              État initial
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="w-full">
+                <Label htmlFor="status" className="text-sm">Statut *</Label>
+                <select
+                  id="status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  required
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <option value="AVAILABLE">Disponible</option>
+                  <option value="MAINTENANCE">En maintenance</option>
+                  <option value="BROKEN">En panne</option>
+                </select>
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="healthScore" className="text-sm">Score de santé (%)</Label>
+                <Input
+                  id="healthScore"
+                  type="number"
+                  value={formData.healthScore}
+                  onChange={(e) => setFormData({ ...formData, healthScore: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  max="100"
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowCreateModal(false)}
+              className="w-full sm:w-auto"
+            >
+              Annuler
+            </Button>
+            <Button type="submit" className="w-full sm:w-auto">
+              Créer l'Équipement
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

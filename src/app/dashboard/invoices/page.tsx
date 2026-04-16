@@ -81,6 +81,41 @@ export default function InvoicesPage() {
     return labels[method] || method
   }
 
+  const handleDownloadInvoice = async (invoiceId: string, invoiceNumber: string) => {
+    try {
+      const response = await fetch(`/api/invoices/${invoiceId}/download`)
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement')
+      }
+
+      // Get the blob from response
+      const blob = await response.blob()
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Facture_${invoiceNumber}.pdf`
+
+      // Trigger download
+      document.body.appendChild(a)
+      a.click()
+
+      // Cleanup
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading invoice:', error)
+      alert('Erreur lors du téléchargement de la facture')
+    }
+  }
+
+  const handleViewInvoice = (invoiceId: string) => {
+    // Open invoice in new tab
+    window.open(`/api/invoices/${invoiceId}/download`, '_blank')
+  }
+
   return (
     <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
@@ -192,10 +227,20 @@ export default function InvoicesPage() {
                         <TableCell>{getStatusBadge(invoice.paymentStatus)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="ghost">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleViewInvoice(invoice.id)}
+                              title="Voir la facture"
+                            >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button size="sm" variant="ghost">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDownloadInvoice(invoice.id, invoice.invoiceNumber)}
+                              title="Télécharger la facture"
+                            >
                               <Download className="w-4 h-4" />
                             </Button>
                           </div>

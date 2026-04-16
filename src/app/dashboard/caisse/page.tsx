@@ -73,6 +73,7 @@ interface Reservation {
 export default function CaissePage() {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [equipment, setEquipment] = useState<Equipment[]>([])
+  const [availableEquipment, setAvailableEquipment] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showWalkInModal, setShowWalkInModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
@@ -84,7 +85,7 @@ export default function CaissePage() {
     lastName: '',
     email: '',
     phone: '',
-    equipmentType: 'PS5',
+    equipmentId: '', // Changed from equipmentType to equipmentId
     duration: 60,
     paymentMethod: 'CASH',
     isPaid: false,
@@ -101,16 +102,19 @@ export default function CaissePage() {
     try {
       setLoading(true)
 
-      const [reservationsRes, equipmentRes] = await Promise.all([
+      const [reservationsRes, equipmentRes, availableEqRes] = await Promise.all([
         fetch(`/api/dashboard/reservations?date=${selectedDate}${statusFilter !== 'all' ? `&status=${statusFilter}` : ''}`),
         fetch('/api/dashboard/equipment/status'),
+        fetch('/api/equipment?status=AVAILABLE'), // Fetch available equipment
       ])
 
       const reservationsData = await reservationsRes.json()
       const equipmentData = await equipmentRes.json()
+      const availableEqData = await availableEqRes.json()
 
       setReservations(reservationsData.reservations || [])
       setEquipment(equipmentData.equipment || [])
+      setAvailableEquipment(availableEqData.equipment || [])
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -137,7 +141,7 @@ export default function CaissePage() {
           lastName: '',
           email: '',
           phone: '',
-          equipmentType: 'PS5',
+          equipmentId: '',
           duration: 60,
           paymentMethod: 'CASH',
           isPaid: false,
@@ -213,7 +217,18 @@ export default function CaissePage() {
     }
   }
 
-  const equipmentTypes = ['PS5', 'PS4', 'XBOX_SERIES_X', 'PC_GAMING', 'OCULUS_VR', 'VR_PS4', 'SIMU_RACING']
+  const getEquipmentLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      PS5: 'PlayStation 5',
+      PS4: 'PlayStation 4',
+      XBOX_SERIES_X: 'Xbox Series X',
+      PC_GAMING: 'PC Gaming',
+      OCULUS_VR: 'Oculus VR',
+      VR_PS4: 'VR PS4',
+      SIMU_RACING: 'Simulateur Racing',
+    }
+    return labels[type] || type
+  }
 
   return (
     <div className="w-full space-y-6 mt-28 lg:mt-20">
@@ -530,170 +545,194 @@ export default function CaissePage() {
         isOpen={showWalkInModal}
         onClose={() => setShowWalkInModal(false)}
         title="Nouveau Client de Passage"
+        size="xl"
       >
-        <form onSubmit={handleWalkInSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">Prénom *</Label>
-              <Input
-                id="firstName"
-                value={walkInForm.firstName}
-                onChange={(e) => setWalkInForm({ ...walkInForm, firstName: e.target.value })}
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Nom *</Label>
-              <Input
-                id="lastName"
-                value={walkInForm.lastName}
-                onChange={(e) => setWalkInForm({ ...walkInForm, lastName: e.target.value })}
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={walkInForm.email}
-                onChange={(e) => setWalkInForm({ ...walkInForm, email: e.target.value })}
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone">Téléphone *</Label>
-              <Input
-                id="phone"
-                value={walkInForm.phone}
-                onChange={(e) => setWalkInForm({ ...walkInForm, phone: e.target.value })}
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="equipmentType">Type d'équipement *</Label>
-              <select
-                id="equipmentType"
-                value={walkInForm.equipmentType}
-                onChange={(e) => setWalkInForm({ ...walkInForm, equipmentType: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              >
-                {equipmentTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="duration">Durée (minutes) *</Label>
-              <select
-                id="duration"
-                value={walkInForm.duration}
-                onChange={(e) => setWalkInForm({ ...walkInForm, duration: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              >
-                <option value={60}>1 heure</option>
-                <option value={120}>2 heures</option>
-                <option value={180}>3 heures</option>
-                <option value={240}>4 heures</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="paymentMethod">Méthode de paiement *</Label>
-              <select
-                id="paymentMethod"
-                value={walkInForm.paymentMethod}
-                onChange={(e) => setWalkInForm({ ...walkInForm, paymentMethod: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-                required
-                style={{
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--foreground)',
-                  borderColor: 'var(--border)'
-                }}
-              >
-                <option value="CASH">Espèces</option>
-                <option value="MOBILE_MONEY_ORANGE">Orange Money</option>
-                <option value="MOBILE_MONEY_MTN">MTN Mobile Money</option>
-                <option value="CARD">Carte bancaire</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                id="isPaid"
-                checked={walkInForm.isPaid}
-                onChange={(e) => setWalkInForm({ ...walkInForm, isPaid: e.target.checked })}
-                className="w-4 h-4"
-              />
-              <Label htmlFor="isPaid">Payé</Label>
-            </div>
-          </div>
-
+        <form onSubmit={handleWalkInSubmit} className="space-y-4 sm:space-y-6">
+          {/* Section: Client */}
           <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Input
-              id="notes"
-              value={walkInForm.notes}
-              onChange={(e) => setWalkInForm({ ...walkInForm, notes: e.target.value })}
-              placeholder="Notes optionnelles..."
-              style={{
-                backgroundColor: 'var(--background)',
-                color: 'var(--foreground)',
-                borderColor: 'var(--border)'
-              }}
-            />
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Client
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="w-full">
+                <Label htmlFor="firstName" className="text-sm">Prénom *</Label>
+                <Input
+                  id="firstName"
+                  value={walkInForm.firstName}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, firstName: e.target.value })}
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="lastName" className="text-sm">Nom *</Label>
+                <Input
+                  id="lastName"
+                  value={walkInForm.lastName}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, lastName: e.target.value })}
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="email" className="text-sm">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={walkInForm.email}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, email: e.target.value })}
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+              <div className="w-full">
+                <Label htmlFor="phone" className="text-sm">Téléphone *</Label>
+                <Input
+                  id="phone"
+                  value={walkInForm.phone}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, phone: e.target.value })}
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          {/* Section: Détails de la session */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Détails de la session
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="w-full">
+                <Label htmlFor="equipmentId" className="text-sm">Équipement disponible *</Label>
+                <select
+                  id="equipmentId"
+                  value={walkInForm.equipmentId}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, equipmentId: e.target.value })}
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  <option value="">Sélectionner un équipement</option>
+                  {availableEquipment.length > 0 ? (
+                    availableEquipment.map(eq => (
+                      <option key={eq.id} value={eq.id}>
+                        {getEquipmentLabel(eq.type)} - {eq.name} ({eq.code})
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Aucun équipement disponible</option>
+                  )}
+                </select>
+                {availableEquipment.length === 0 && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    ⚠️ Aucun équipement disponible - Tous occupés ou en maintenance
+                  </p>
+                )}
+              </div>
+              <div className="w-full">
+                <Label htmlFor="duration" className="text-sm">Durée (minutes) *</Label>
+                <select
+                  id="duration"
+                  value={walkInForm.duration}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, duration: parseInt(e.target.value) })}
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  <option value={60}>1 heure</option>
+                  <option value={120}>2 heures</option>
+                  <option value={180}>3 heures</option>
+                  <option value={240}>4 heures</option>
+                </select>
+              </div>
+              <div className="w-full">
+                <Label htmlFor="paymentMethod" className="text-sm">Méthode de paiement *</Label>
+                <select
+                  id="paymentMethod"
+                  value={walkInForm.paymentMethod}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, paymentMethod: e.target.value })}
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  <option value="CASH">Espèces</option>
+                  <option value="MOBILE_MONEY_ORANGE">Orange Money</option>
+                  <option value="MOBILE_MONEY_MTN">MTN Mobile Money</option>
+                  <option value="CARD">Carte bancaire</option>
+                </select>
+              </div>
+              <div className="w-full flex items-center gap-2 pt-6">
+                <input
+                  type="checkbox"
+                  id="isPaid"
+                  checked={walkInForm.isPaid}
+                  onChange={(e) => setWalkInForm({ ...walkInForm, isPaid: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="isPaid" className="text-sm">Payé</Label>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Notes */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Notes
+            </h3>
+            <div className="w-full">
+              <Input
+                id="notes"
+                value={walkInForm.notes}
+                onChange={(e) => setWalkInForm({ ...walkInForm, notes: e.target.value })}
+                placeholder="Notes optionnelles..."
+                className="w-full h-10 sm:h-auto"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  borderColor: 'var(--border)'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setShowWalkInModal(false)}
-              className="flex-1"
+              className="w-full sm:w-auto"
             >
               Annuler
             </Button>
-            <Button type="submit" className="flex-1">
+            <Button type="submit" className="w-full sm:w-auto">
               Créer Session
             </Button>
           </div>

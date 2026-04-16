@@ -29,6 +29,7 @@ interface MaintenanceTicket {
 
 export default function MaintenancePage() {
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
+  const [equipment, setEquipment] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({
@@ -40,14 +41,25 @@ export default function MaintenancePage() {
 
   useEffect(() => {
     fetchTickets()
+    fetchEquipment()
   }, [])
+
+  const fetchEquipment = async () => {
+    try {
+      const response = await fetch('/api/equipment')
+      const data = await response.json()
+      setEquipment(data.equipment || [])
+    } catch (error) {
+      console.error('Error fetching equipment:', error)
+    }
+  }
 
   const fetchTickets = async () => {
     try {
       setLoading(true)
-      // Simuler des données pour l'instant
-      const mockTickets: MaintenanceTicket[] = []
-      setTickets(mockTickets)
+      const response = await fetch('/api/maintenance/tickets')
+      const data = await response.json()
+      setTickets(data.tickets || [])
     } catch (error) {
       console.error('Error fetching tickets:', error)
     } finally {
@@ -74,9 +86,37 @@ export default function MaintenancePage() {
           priority: 'MEDIUM',
         })
         fetchTickets()
+        fetchEquipment() // Refresh equipment status
+        alert('Ticket créé avec succès!')
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la création')
       }
-    } catch (error) {
-      console.error('Error creating ticket:', error)
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la création')
+    }
+  }
+
+  const handleDeleteTicket = async (ticketId: string, ticketTitle: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le ticket "${ticketTitle}" ?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/maintenance/tickets/${ticketId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        fetchTickets()
+        fetchEquipment() // Refresh equipment status
+        alert('Ticket supprimé avec succès!')
+      } else {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la suppression')
+      }
+    } catch (error: any) {
+      alert(error.message || 'Erreur lors de la suppression')
     }
   }
 
@@ -117,10 +157,13 @@ export default function MaintenancePage() {
                 Tickets et diagnostic des équipements
               </p>
             </div>
-            <Button onClick={() => setShowModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+            <button
+              onClick={() => setShowModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
               Nouveau Ticket
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -143,10 +186,13 @@ export default function MaintenancePage() {
               <p className="text-slate-900 mb-6" style={{ color: 'var(--foreground)' }}>
                 Créez un ticket pour signaler un problème ou planifier une maintenance
               </p>
-              <Button onClick={() => setShowModal(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+              >
+                <Plus className="w-5 h-5" />
                 Créer un Ticket
-              </Button>
+              </button>
             </CardContent>
           </Card>
         ) : (
@@ -182,6 +228,14 @@ export default function MaintenancePage() {
                       <Button size="sm" variant="ghost">
                         Voir détails
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteTicket(ticket.id, ticket.title)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -196,71 +250,102 @@ export default function MaintenancePage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title="Nouveau Ticket de Maintenance"
-        size="md"
+        size="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          {/* Section: Équipement et priorité */}
           <div>
-            <Label htmlFor="equipment">Équipement concerné *</Label>
-            <select
-              id="equipment"
-              value={formData.equipmentId}
-              onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-              required
-            >
-              <option value="">Sélectionner un équipement</option>
-            </select>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Équipement et priorité
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="w-full">
+                <Label htmlFor="equipment" className="text-sm">Équipement concerné *</Label>
+                <select
+                  id="equipment"
+                  value={formData.equipmentId}
+                  onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{ borderColor: 'var(--border)' }}
+                  required
+                >
+                  <option value="">Sélectionner un équipement</option>
+                  {equipment.map(eq => (
+                    <option key={eq.id} value={eq.id}>
+                      {eq.name} ({eq.code}) - {eq.type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="priority" className="text-sm">Priorité</Label>
+                <select
+                  id="priority"
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <option value="LOW">Faible</option>
+                  <option value="MEDIUM">Moyen</option>
+                  <option value="HIGH">Élevé</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
+              </div>
+            </div>
           </div>
 
+          {/* Section: Description du problème */}
           <div>
-            <Label htmlFor="title">Titre du problème *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Ex: Écran défectueux, Manette HS..."
-              required
-            />
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+              Description du problème
+            </h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div className="w-full">
+                <Label htmlFor="title" className="text-sm">Titre du problème *</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Ex: Écran défectueux, Manette HS..."
+                  required
+                  className="w-full h-10 sm:h-auto"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
+                />
+              </div>
+
+              <div className="w-full">
+                <Label htmlFor="description" className="text-sm">Description détaillée</Label>
+                <textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Décrivez le problème en détail..."
+                  className="flex w-full h-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="description">Description détaillée</Label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Décrivez le problème en détail..."
-              className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="priority">Priorité</Label>
-            <select
-              id="priority"
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-            >
-              <option value="LOW">Faible</option>
-              <option value="MEDIUM">Moyen</option>
-              <option value="HIGH">Élevé</option>
-              <option value="URGENT">Urgent</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
+          {/* Actions */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setShowModal(false)}
+              className="w-full sm:w-auto"
             >
               Annuler
             </Button>
-            <Button type="submit">Créer le Ticket</Button>
+            <Button type="submit" className="w-full sm:w-auto">
+              Créer le Ticket
+            </Button>
           </div>
         </form>
       </Modal>

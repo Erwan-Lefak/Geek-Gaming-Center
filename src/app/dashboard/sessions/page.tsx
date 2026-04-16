@@ -544,7 +544,7 @@ export default function SessionsPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title="Nouvelle Session"
-        size="lg"
+        size="xl"
       >
         <SessionForm
           onSubmit={handleCreateSession}

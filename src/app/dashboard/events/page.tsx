@@ -304,9 +304,9 @@ export default function EventsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--background)' }}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--background)' }}>
             <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)' }}>
-              <h2 className="text-2xl font-bold text-slate-800">
+              <h2 className="text-2xl font-bold text-slate-800" style={{ color: 'var(--foreground)' }}>
                 {editingEvent ? 'Modifier' : 'Créer'} un Événement
               </h2>
               <button
@@ -322,139 +322,172 @@ export default function EventsPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-slate-700 font-medium mb-2">Titre *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="Ex: Soirée Cosplay Anime"
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 sm:space-y-6">
+              {/* Section: Informations générales */}
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+                  Informations générales
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Titre *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Ex: Soirée Cosplay Anime"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-slate-700 font-medium mb-2">Description *</label>
-                  <textarea
-                    required
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="Décrivez votre événement..."
-                  />
-                </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Description *</label>
+                    <textarea
+                      required
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Décrivez votre événement..."
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Type *</label>
-                  <select
-                    required
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as EventFilter })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    {Object.entries(eventTypeLabels).map(([value, label]) => (
-                      <option key={value} value={value}>{label}</option>
-                    ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Type *</label>
+                    <select
+                      required
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value as EventFilter })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    >
+                      {Object.entries(eventTypeLabels).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.eventDate}
-                    onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={formData.eventDate}
+                      onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Heure de début *</label>
-                  <input
-                    type="time"
-                    required
-                    value={formData.startTime}
-                    onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Heure de début *</label>
+                    <input
+                      type="time"
+                      required
+                      value={formData.startTime}
+                      onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Heure de fin</label>
-                  <input
-                    type="time"
-                    value={formData.endTime}
-                    onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Prix (FCFA)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="0 = Gratuit"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-medium mb-2">Capacité maximale *</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={formData.maxCapacity}
-                    onChange={(e) => setFormData({ ...formData, maxCapacity: parseInt(e.target.value) || 1 })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-slate-700 font-medium mb-2">Lieu</label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="Ex: Salle Principale"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-slate-700 font-medium mb-2">URL de l'image</label>
-                  <input
-                    type="url"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="https://..."
-                  />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="isPublished"
-                    checked={formData.isPublished}
-                    onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                    className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
-                  />
-                  <label htmlFor="isPublished" className="text-slate-700 font-medium">
-                    Publier l'événement
-                  </label>
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Heure de fin</label>
+                    <input
+                      type="time"
+                      value={formData.endTime}
+                      onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-slate-200">
+              {/* Section: Tarification et capacité */}
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+                  Tarification et capacité
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Prix (FCFA)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="0 = Gratuit"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Capacité maximale *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={formData.maxCapacity}
+                      onChange={(e) => setFormData({ ...formData, maxCapacity: parseInt(e.target.value) || 1 })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Détails supplémentaires */}
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+                  Détails supplémentaires
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>Lieu</label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Ex: Salle Principale"
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground)' }}>URL de l'image</label>
+                    <input
+                      type="url"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                      className="w-full h-10 sm:h-auto px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="https://..."
+                      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2 flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="isPublished"
+                      checked={formData.isPublished}
+                      onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                      className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="isPublished" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                      Publier l'événement
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => {
@@ -462,13 +495,13 @@ export default function EventsPage() {
                     setEditingEvent(null)
                     resetForm()
                   }}
-                  className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors"
+                  className="w-full sm:w-auto px-6 py-3 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
+                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
                 >
                   {editingEvent ? 'Mettre à jour' : 'Créer'}
                 </button>
