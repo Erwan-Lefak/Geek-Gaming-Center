@@ -10,10 +10,12 @@ import { useState } from 'react';
 import { Menu, X, ShoppingCart, User, Search, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { itemCount } = useCart();
 
   // Debug: log when menu state changes
   console.log('mobileMenuOpen:', mobileMenuOpen);
@@ -93,7 +95,7 @@ export default function Header() {
               <Link href="/cart" className="p-2 rounded-lg transition-colors duration-200 relative">
                 <ShoppingCart className="w-5 h-5 text-white" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                  0
+                  {itemCount}
                 </span>
               </Link>
 
