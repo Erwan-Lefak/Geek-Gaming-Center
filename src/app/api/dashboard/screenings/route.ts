@@ -96,18 +96,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate end date
-    // datetime-local sends "YYYY-MM-DDTHH:mm" which is local time
-    // We need to convert it to UTC for storage
+    // datetime-local sends "YYYY-MM-DDTHH:mm" which is meant to be local user time
+    // Vercel server is in UTC, but users are in CEST (UTC+2)
+    // We need to subtract 2 hours from user input to store as UTC
     const parseLocalDateAsUTC = (dateString: string) => {
       const [datePart, timePart] = dateString.split('T')
       const [year, month, day] = datePart.split('-').map(Number)
       const [hour, minute] = timePart.split(':').map(Number)
 
-      // Create date in local timezone
-      const localDate = new Date(year, month - 1, day, hour, minute, 0, 0)
+      // Parse as if it's UTC
+      const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0))
 
-      // Get UTC timestamp by using getTime() which already accounts for timezone
-      return new Date(localDate.getTime())
+      // Subtract 2 hours (CEST = UTC+2, so UTC = CEST - 2h)
+      // This ensures 20:00 user time becomes 18:00 UTC
+      date.setUTCHours(date.getUTCHours() - 2)
+
+      return date
     }
 
     const screenTime = parseLocalDateAsUTC(validatedData.screenTime)
