@@ -14,7 +14,7 @@ const updateOrderSchema = z.object({
 // PATCH /api/admin/orders/[id] - Mettre à jour une commande
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -23,7 +23,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const orderId = params.id
+    const { id: orderId } = await params
     const body = await request.json()
     const data = updateOrderSchema.parse(body)
 
@@ -127,7 +127,7 @@ export async function PATCH(
 // DELETE /api/admin/orders/[id] - Supprimer une commande
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -136,7 +136,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden - Admin only' }, { status: 403 })
     }
 
-    const orderId = params.id
+    const { id: orderId } = await params
 
     // Vérifier que la commande existe
     const order = await prisma.order.findUnique({
