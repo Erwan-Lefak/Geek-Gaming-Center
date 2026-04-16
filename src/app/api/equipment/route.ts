@@ -29,11 +29,6 @@ export async function GET(request: NextRequest) {
     const equipment = await prisma.equipment.findMany({
       where,
       orderBy: [{ type: 'asc' }, { code: 'asc' }],
-      include: {
-        pricing: {
-          orderBy: [{ isWeekend: 'asc' }, { duration: 'asc' }],
-        },
-      },
     } as any)
 
     return NextResponse.json({ equipment } as any)

@@ -189,9 +189,8 @@ export default function BookingPage() {
         if (response.ok) {
           // Transform equipment data
           const transformed = data.equipment.map((eq: any) => {
-            // Get the 1-hour price
-            const pricing1h = eq.pricing?.find((p: any) => p.duration === 60)
-            const pricePerHour = pricing1h ? Number(pricing1h.price) : 0
+            // Get price from default pricing map
+            const pricePerHour = equipmentPrices[eq.name] || 0
 
             return {
               id: eq.id,
