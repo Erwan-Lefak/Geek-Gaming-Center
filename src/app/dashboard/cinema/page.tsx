@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2, Film, Calendar, Clock, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Film, Calendar, Clock, X, Upload } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
 
 interface Movie {
@@ -105,6 +105,32 @@ export default function CinemaPage() {
       console.error('Error fetching screenings:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    try {
+      const formData = new FormData()
+      formData.append('files', files[0]) // Only upload one poster
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const imageUrl = data.files[0].url
+        setMovieForm({ ...movieForm, posterUrl: imageUrl })
+      } else {
+        alert('Erreur lors de l\'upload de l\'image')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Erreur lors de l\'upload de l\'image')
     }
   }
 
@@ -634,16 +660,52 @@ export default function CinemaPage() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              URL de l'affiche
+              Affiche du film
             </label>
-            <input
-              type="url"
-              value={movieForm.posterUrl}
-              onChange={(e) => setMovieForm({ ...movieForm, posterUrl: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
-              placeholder="https://..."
-            />
+            <div className="mt-2 space-y-3">
+              {/* Upload button */}
+              <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-fit">
+                <Upload className="w-4 h-4" />
+                <span>Importer une affiche</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePosterUpload}
+                />
+              </label>
+
+              {/* Preview */}
+              {movieForm.posterUrl && (
+                <div className="relative w-32 h-48 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <img
+                    src={movieForm.posterUrl}
+                    alt="Aperçu de l'affiche"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMovieForm({ ...movieForm, posterUrl: '' })}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+
+              {/* Fallback URL input */}
+              <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                Ou entrez l'URL directement :
+              </div>
+              <input
+                type="url"
+                value={movieForm.posterUrl}
+                onChange={(e) => setMovieForm({ ...movieForm, posterUrl: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 text-sm"
+                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                placeholder="https://exemple.com/image.jpg"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
