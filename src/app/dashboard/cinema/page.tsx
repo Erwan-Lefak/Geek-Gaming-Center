@@ -68,7 +68,7 @@ export default function CinemaPage() {
     actors: [] as string[],
     language: 'VF',
     isActive: true,
-    nowShowing: false,
+    nowShowing: true, // Changed to true by default so new films appear on /cinema page
     comingSoon: false,
   })
 
@@ -294,7 +294,7 @@ export default function CinemaPage() {
       actors: [],
       language: 'VF',
       isActive: true,
-      nowShowing: false,
+      nowShowing: true, // Changed to true by default
       comingSoon: false,
     })
   }
