@@ -42,52 +42,52 @@ function VerifyEmailContent() {
   }, [searchParams])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Background gaming effect */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2NiA2NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjMzIiBjeT0iMzMiIHI9IjMzIiBmaWxsPSIjZjZmNmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvZz48L3N2Zz4=')] animate-pulse"></div>
       </div>
 
-      <div className="relative z-10 max-w-md w-full">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
+      <div className="relative z-10 w-full max-w-4xl mx-auto">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 lg:p-16">
           {/* Icon */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             {status === 'loading' && (
-              <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center">
-                <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
+              <div className="w-24 h-24 bg-purple-600/20 rounded-full flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
               </div>
             )}
             {status === 'success' && (
-              <div className="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-green-400" />
+              <div className="w-24 h-24 bg-green-600/20 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 text-green-400" />
               </div>
             )}
             {status === 'error' && (
-              <div className="w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center">
-                <XCircle className="w-10 h-10 text-red-400" />
+              <div className="w-24 h-24 bg-red-600/20 rounded-full flex items-center justify-center">
+                <XCircle className="w-12 h-12 text-red-400" />
               </div>
             )}
           </div>
 
           {/* Message */}
-          <h1 className="text-2xl font-bold text-white text-center mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white text-center mb-6">
             {status === 'loading' && 'Vérification en cours...'}
             {status === 'success' && 'Email Vérifié !'}
             {status === 'error' && 'Échec de la Vérification'}
           </h1>
 
-          <p className="text-purple-300 text-center mb-8">
+          <p className="text-purple-300 text-center mb-8 text-base">
             {status === 'loading' && 'Veuillez patienter pendant que nous vérifions votre email...'}
             {status === 'success' && message}
             {status === 'error' && message}
           </p>
 
           {/* Action Button */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             {status === 'success' && (
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all"
+                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all text-lg"
               >
                 Se Connecter
               </Link>
@@ -96,13 +96,13 @@ function VerifyEmailContent() {
               <>
                 <Link
                   href="/register"
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all text-lg"
                 >
                   Créer un Compte
                 </Link>
                 <Link
                   href="/arena"
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all text-lg"
                 >
                   Retour à l'Accueil
                 </Link>
@@ -113,15 +113,15 @@ function VerifyEmailContent() {
 
         {/* Additional Info */}
         {status === 'success' && (
-          <div className="mt-6 text-center">
-            <p className="text-purple-300 text-sm">
+          <div className="mt-8 text-center">
+            <p className="text-purple-300 text-base">
               Vous pouvez maintenant vous connecter avec votre email et mot de passe.
             </p>
           </div>
         )}
         {status === 'error' && (
-          <div className="mt-6 text-center">
-            <p className="text-purple-300 text-sm">
+          <div className="mt-8 text-center">
+            <p className="text-purple-300 text-base">
               Le lien de vérification a peut-être expiré. Veuillez vous réinscrire pour recevoir un nouveau lien.
             </p>
           </div>
@@ -134,18 +134,18 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center px-4">
-        <div className="relative z-10 max-w-md w-full">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center">
-                <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="relative z-10 w-full max-w-4xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 lg:p-16">
+            <div className="flex justify-center mb-8">
+              <div className="w-24 h-24 bg-purple-600/20 rounded-full flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-white text-center mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white text-center mb-6">
               Chargement...
             </h1>
-            <p className="text-purple-300 text-center">
+            <p className="text-purple-300 text-center text-base">
               Veuillez patienter pendant que nous vérifions votre email...
             </p>
           </div>
