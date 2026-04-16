@@ -2500,11 +2500,41 @@ p, span, a, button, input, textarea, select, label,
    Ensure warning text is visible in both light and dark modes
    ============================================ */
 
+/* Force all red text colors in light mode */
 html.light .text-red-900,
 html.light p.text-red-900,
 html.light li.text-red-900,
 html.light *.text-red-900 {
   color: #7c1d12 !important;
+}
+
+html.light .text-red-800,
+html.light p.text-red-800,
+html.light li.text-red-800,
+html.light *.text-red-800 {
+  color: #9f1239 !important;
+}
+
+html.light .text-red-700,
+html.light p.text-red-700,
+html.light li.text-red-700,
+html.light *.text-red-700 {
+  color: #b91c1c !important;
+}
+
+/* Specifically target the warning box in the delete modal */
+html.light .bg-red-50 p,
+html.light .bg-red-50 .text-red-800,
+html.light .bg-red-50 .text-red-900,
+html.light .bg-red-50 .text-red-700 {
+  color: #7c1d12 !important;
+}
+
+html.dark .bg-red-50 p,
+html.dark .bg-red-50 .text-red-800,
+html.dark .bg-red-50 .text-red-900,
+html.dark .bg-red-50 .text-red-700 {
+  color: #fecaca !important;
 }
 
 html.dark .text-red-300,
