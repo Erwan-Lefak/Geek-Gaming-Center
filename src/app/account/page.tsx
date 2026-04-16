@@ -955,10 +955,10 @@ export default function AccountPage() {
             )}
           </div>
 
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-900 text-sm" style={{ color: 'var(--foreground)' }}>
             Cette action est <strong>irréversible</strong>. Toutes vos données seront définitivement supprimées :
           </p>
-          <ul className="text-gray-600 text-sm list-disc list-inside space-y-1 ml-2">
+          <ul className="text-gray-900 text-sm list-disc list-inside space-y-1 ml-2" style={{ color: 'var(--foreground)' }}>
             <li>Historique des réservations</li>
             <li>Commandes et achats</li>
             <li>Informations personnelles</li>
