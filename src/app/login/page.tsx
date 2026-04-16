@@ -42,20 +42,39 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Email ou mot de passe incorrect')
       } else if (result?.ok) {
-        // Login successful - wait for session and redirect based on role
+        // Login successful - wait for session and check email verification
         setLoading(true)
         // Wait for session to be established
         await new Promise(resolve => setTimeout(resolve, 500))
 
-        // Get the session to determine redirect
+        // Get the session to check email verification and determine redirect
         const response = await fetch('/api/auth/session')
         if (response.ok) {
           const sessionData = await response.json()
           const userRole = sessionData?.user?.role
+          const userId = sessionData?.user?.id
 
-          if (userRole === 'CUSTOMER') {
+          // For customers, check if email is verified
+          if (userRole === 'CUSTOMER' && userId) {
+            try {
+              const checkResponse = await fetch(`/api/auth/check-email-verification?userId=${userId}`)
+              if (checkResponse.ok) {
+                const checkData = await checkResponse.json()
+                if (!checkData.emailVerified) {
+                  // Email not verified - redirect to warning page
+                  window.location.href = '/verify-email-warning'
+                  return
+                }
+              }
+            } catch (err) {
+              console.error('Error checking email verification:', err)
+              // Continue with login if check fails
+            }
+
+            // Email verified, proceed to account
             window.location.href = '/account'
           } else {
+            // Admin or other role, proceed to dashboard
             window.location.href = '/dashboard'
           }
         } else {

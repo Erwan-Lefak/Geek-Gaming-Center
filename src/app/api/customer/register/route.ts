@@ -35,17 +35,19 @@ export async function POST(request: NextRequest) {
 
     const customer = await registerCustomer(customerData)
 
-    // Send welcome email to customer
+    // Send welcome email to customer with verification link
     try {
       const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL
         ? `${process.env.NEXTAUTH_URL || process.env.VERCEL_URL}`
         : 'http://localhost:3000'
 
+      const verificationUrl = `${baseUrl}/verify-email?token=${customer.verificationToken}`
+
       await MailService.sendWelcomeEmail(
         customer.email,
         customer.firstName,
         customer.lastName,
-        `${baseUrl}/login`
+        verificationUrl
       )
     } catch (emailError) {
       console.error('Error sending welcome email:', emailError)

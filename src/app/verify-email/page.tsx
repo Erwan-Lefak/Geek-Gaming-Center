@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
-function VerifyEmailContent() {
-  const searchParams = useSearchParams()
+export default function VerifyEmailPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
 
@@ -15,123 +17,116 @@ function VerifyEmailContent() {
 
       if (!token) {
         setStatus('error')
-        setMessage('Token de vérification manquant')
+        setMessage('Lien de vérification invalide')
         return
       }
 
       try {
-        const response = await fetch('/api/auth/verify-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token })
-        })
-
-        const data = await response.json()
+        const response = await fetch(`/api/auth/verify-email?token=${token}`)
 
         if (response.ok) {
           setStatus('success')
-          setMessage(data.message)
+          setMessage('Email vérifié avec succès !')
         } else {
+          const data = await response.json()
           setStatus('error')
-          setMessage(data.error || 'Erreur lors de la vérification')
+          setMessage(data.error || 'Lien de vérification invalide ou expiré')
         }
       } catch (error) {
         setStatus('error')
-        setMessage('Erreur de connexion au serveur')
+        setMessage('Erreur lors de la vérification de l\'email')
       }
     }
 
     verifyEmail()
   }, [searchParams])
 
-  if (status === 'loading') {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Vérification...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (status === 'success') {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Email vérifié !</h1>
-            <p className="text-gray-600 text-sm">{message}</p>
-          </div>
-
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
-            <p className="text-sm font-medium text-blue-900 mb-1">✉️ Prochaine étape :</p>
-            <p className="text-xs text-gray-700">
-              Vérifie maintenant ton téléphone avec le code qui t'a été envoyé par SMS.
-            </p>
-          </div>
-
-          <button
-            onClick={() => router.push('/verify-phone')}
-            className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
-          >
-            Vérifier mon téléphone
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (status === 'error') {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur de vérification</h1>
-            <p className="text-gray-600 text-sm">{message}</p>
-          </div>
-
-          <div className="bg-red-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-red-800">
-              Le lien de vérification est peut-être expiré (24h) ou invalide.
-            </p>
-          </div>
-
-          <button
-            onClick={() => router.push('/register')}
-            className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors"
-          >
-            Retour à l'inscription
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  return null
-}
-
-export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement...</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center px-4">
+      {/* Background gaming effect */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2NiA2NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjMzIiBjeT0iMzMiIHI9IjMzIiBmaWxsPSIjZjZmNmZmIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvZz48L3N2Zz4=')] animate-pulse"></div>
       </div>
-    }>
-      <VerifyEmailContent />
-    </Suspense>
+
+      <div className="relative z-10 max-w-md w-full">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
+          {/* Icon */}
+          <div className="flex justify-center mb-6">
+            {status === 'loading' && (
+              <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center">
+                <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
+              </div>
+            )}
+            {status === 'success' && (
+              <div className="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-green-400" />
+              </div>
+            )}
+            {status === 'error' && (
+              <div className="w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center">
+                <XCircle className="w-10 h-10 text-red-400" />
+              </div>
+            )}
+          </div>
+
+          {/* Message */}
+          <h1 className="text-2xl font-bold text-white text-center mb-4">
+            {status === 'loading' && 'Vérification en cours...'}
+            {status === 'success' && 'Email Vérifié !'}
+            {status === 'error' && 'Échec de la Vérification'}
+          </h1>
+
+          <p className="text-purple-300 text-center mb-8">
+            {status === 'loading' && 'Veuillez patienter pendant que nous vérifions votre email...'}
+            {status === 'success' && message}
+            {status === 'error' && message}
+          </p>
+
+          {/* Action Button */}
+          <div className="flex flex-col gap-4">
+            {status === 'success' && (
+              <Link
+                href="/login"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all"
+              >
+                Se Connecter
+              </Link>
+            )}
+            {status === 'error' && (
+              <>
+                <Link
+                  href="/register"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition-all"
+                >
+                  Créer un Compte
+                </Link>
+                <Link
+                  href="/arena"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition-all"
+                >
+                  Retour à l'Accueil
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        {status === 'success' && (
+          <div className="mt-6 text-center">
+            <p className="text-purple-300 text-sm">
+              Vous pouvez maintenant vous connecter avec votre email et mot de passe.
+            </p>
+          </div>
+        )}
+        {status === 'error' && (
+          <div className="mt-6 text-center">
+            <p className="text-purple-300 text-sm">
+              Le lien de vérification a peut-être expiré. Veuillez vous réinscrire pour recevoir un nouveau lien.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

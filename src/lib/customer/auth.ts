@@ -47,6 +47,10 @@ export async function registerCustomer(data: CustomerData) {
     throw new Error('Configuration système incorrecte')
   }
 
+  // Generate email verification token
+  const verificationToken = crypto.randomBytes(32).toString('hex')
+  const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
   const customer = await prisma.customer.create({
     data: {
       firstName: data.firstName,
@@ -60,6 +64,8 @@ export async function registerCustomer(data: CustomerData) {
       cgvAcceptedAt: new Date(),
       is_active: true,
       password: hashedPassword,
+      email_verification_token: verificationToken,
+      email_verification_expires: verificationExpires,
       createdById: defaultUser.id,
     },
   } as any)
@@ -70,6 +76,7 @@ export async function registerCustomer(data: CustomerData) {
     lastName: customer.lastName,
     email: customer.email,
     phone: customer.phone,
+    verificationToken,
   }
 }
 
@@ -226,4 +233,50 @@ export async function resetPassword(token: string, newPassword: string) {
   } as any)
 
   return { success: true }
+}
+
+/**
+ * Verify email with token
+ */
+export async function verifyEmail(token: string) {
+  const customer = await prisma.customer.findFirst({
+    where: {
+      email_verification_token: token,
+      email_verification_expires: {
+        gte: new Date(),
+      },
+    },
+  } as any)
+
+  if (!customer) {
+    throw new Error('Lien de vérification invalide ou expiré')
+  }
+
+  await prisma.customer.update({
+    where: { id: customer.id },
+    data: {
+      email_verified: new Date(),
+      email_verification_token: null,
+      email_verification_expires: null,
+    },
+  } as any)
+
+  return {
+    success: true,
+    email: customer.email,
+  }
+}
+
+/**
+ * Check if customer email is verified
+ */
+export async function isEmailVerified(customerId: string): Promise<boolean> {
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    select: {
+      email_verified: true,
+    },
+  })
+
+  return customer?.email_verified !== null
 }
