@@ -102,19 +102,32 @@ export async function checkAvailability(
     if (hour === startHour) {
       // Première heure: seulement le créneau de début (9:30 ou 12:00)
       const timeKey = `${hour}:${startMinute === 0 ? '00' : startMinute}`
+      // Vérifier si ce créneau est libre pour l'équipement demandé (ou pour tous les équipements)
+      const isAvailable = equipmentId
+        ? !bookedSlots.has(`${equipmentId}-${timeKey}`)
+        : true // Si pas d'équipement spécifié, on ne peut pas déterminer la disponibilité
       slots.push({
         time: timeKey,
-        available: true, // TODO: Vérifier avec bookedSlots
+        available: isAvailable,
       })
     } else {
       // Autres heures: deux créneaux (:00 et :30)
+      const timeKey00 = `${hour}:00`
+      const timeKey30 = `${hour}:30`
+      const isAvailable00 = equipmentId
+        ? !bookedSlots.has(`${equipmentId}-${timeKey00}`)
+        : true
+      const isAvailable30 = equipmentId
+        ? !bookedSlots.has(`${equipmentId}-${timeKey30}`)
+        : true
+
       slots.push({
-        time: `${hour}:00`,
-        available: true,
+        time: timeKey00,
+        available: isAvailable00,
       })
       slots.push({
-        time: `${hour}:30`,
-        available: true,
+        time: timeKey30,
+        available: isAvailable30,
       })
     }
   }
