@@ -85,6 +85,20 @@ async function createOrder(session: any) {
   // Calculate amounts
   const totalAmount = session.amount_total / 100; // Convert from cents to XAF
 
+  // Format shipping address from Stripe session
+  const shippingAddress = session.shipping_details?.address
+    ? [
+        session.shipping_details.address.line1,
+        session.shipping_details.address.line2,
+        session.shipping_details.address.city,
+        session.shipping_details.address.postal_code,
+        session.shipping_details.address.state,
+        session.shipping_details.address.country,
+      ]
+        .filter(Boolean)
+        .join(', ')
+    : null;
+
   // Generate order number
   const orderNumber = generateOrderNumber();
 
@@ -97,6 +111,7 @@ async function createOrder(session: any) {
       totalAmount,
       paymentMethod: 'CARD',
       paymentStatus: 'PAID',
+      shippingAddress,
       items: {
         create: items.map((item: any) => ({
           productId: item.productId || 'unknown',
@@ -166,13 +181,8 @@ export async function POST(request: NextRequest) {
           const shipping = 0;
           const total = subtotal;
 
-          // Format shipping address
-          const shippingAddress = session.shipping_details
-            ? `${session.shipping_details.address?.line1 || ''}\n` +
-              `${session.shipping_details.address?.city || ''}\n` +
-              `${session.shipping_details.address?.postal_code || ''}\n` +
-              `${session.shipping_details.address?.country || ''}`
-            : 'Adresse non renseignée';
+          // Use the same shipping address that was saved in the order
+          const shippingAddress = order.shippingAddress || 'Adresse non renseignée';
 
           // Send order confirmation to customer
           MailService.sendOrderConfirmation(customerEmail, customerName, {
