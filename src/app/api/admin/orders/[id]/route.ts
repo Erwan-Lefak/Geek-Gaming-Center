@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 // Schéma de mise à jour de commande
 const updateOrderSchema = z.object({
-  status: z.enum(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED']).optional(),
+  status: z.enum(['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED']).optional(),
   paymentStatus: z.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).optional(),
   notes: z.string().optional(),
   shippingAddress: z.string().optional(),
@@ -48,11 +48,7 @@ export async function PATCH(
     if (data.shippingAddress) updateData.shippingAddress = data.shippingAddress
 
     // Dates automatiques
-    if (data.status === 'SHIPPED' && existingOrder.status !== 'SHIPPED') {
-      updateData.shippedAt = new Date()
-    }
-
-    if (data.status === 'DELIVERED' && existingOrder.status !== 'DELIVERED') {
+    if (data.status === 'COMPLETED' && existingOrder.status !== 'COMPLETED') {
       updateData.deliveredAt = new Date()
     }
 
@@ -150,12 +146,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Commande non trouvée' }, { status: 404 })
     }
 
-    // Protection: ne pas supprimer les commandes payées et expédiées
-    if (order.paymentStatus === 'PAID' && ['SHIPPED', 'DELIVERED'].includes(order.status)) {
+    // Protection: ne pas supprimer les commandes payées et complétées
+    if (order.paymentStatus === 'PAID' && ['COMPLETED'].includes(order.status)) {
       return NextResponse.json(
         {
           error: 'Impossible de supprimer cette commande',
-          details: 'Les commandes payées et expédiées ne peuvent être supprimées',
+          details: 'Les commandes payées et complétées ne peuvent être supprimées',
         },
         { status: 400 }
       )

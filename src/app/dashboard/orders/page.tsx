@@ -46,6 +46,7 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
   const [showCreateOrderModal, setShowCreateOrderModal] = useState(false)
+  const [showEditOrderModal, setShowEditOrderModal] = useState(false)
   const [orderForm, setOrderForm] = useState({
     customerId: '',
     customerEmail: '',
@@ -55,7 +56,7 @@ export default function OrdersPage() {
     items: [] as Array<{ productId: string; name: string; quantity: number; price: number }>,
     totalAmount: 0,
     paymentMethod: 'CASH' as 'CASH' | 'CARD' | 'MOBILE_MONEY',
-    status: 'PENDING' as 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED',
+    status: 'PENDING' as 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'READY' | 'COMPLETED',
     shippingAddress: '',
   })
 
@@ -80,9 +81,9 @@ export default function OrdersPage() {
     const statusConfig: Record<string, { label: string; variant: any }> = {
       PENDING: { label: 'En attente', variant: 'warning' },
       CONFIRMED: { label: 'Confirmée', variant: 'success' },
-      PROCESSING: { label: 'En traitement', variant: 'info' },
-      SHIPPED: { label: 'Expédiée', variant: 'default' },
-      DELIVERED: { label: 'Livrée', variant: 'success' },
+      PREPARING: { label: 'En préparation', variant: 'info' },
+      READY: { label: 'Prête', variant: 'default' },
+      COMPLETED: { label: 'Terminée', variant: 'success' },
       CANCELLED: { label: 'Annulée', variant: 'danger' },
     }
 
@@ -116,6 +117,28 @@ export default function OrdersPage() {
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order)
     setShowOrderModal(true)
+  }
+
+  const handleEditOrder = (order: Order) => {
+    setSelectedOrder(order)
+    setOrderForm({
+      customerId: order.customer.id,
+      customerEmail: order.customer.email,
+      customerFirstName: order.customer.firstName,
+      customerLastName: order.customer.lastName,
+      customerPhone: order.customer.phone || '',
+      items: order.items.map(item => ({
+        productId: item.id,
+        name: item.productName,
+        quantity: item.quantity,
+        price: item.unitPrice,
+      })),
+      totalAmount: order.totalAmount,
+      paymentMethod: order.paymentMethod as any,
+      status: order.status as any,
+      shippingAddress: order.shippingAddress || '',
+    })
+    setShowEditOrderModal(true)
   }
 
   const handleUpdateOrderStatus = async (orderId: string, status: string) => {
@@ -253,6 +276,43 @@ export default function OrdersPage() {
     } catch (error) {
       console.error('Error creating order:', error)
       alert('Erreur lors de la création de la commande')
+    }
+  }
+
+  const handleUpdateOrder = async () => {
+    if (!selectedOrder) return
+
+    try {
+      if (!orderForm.customerEmail || orderForm.items.length === 0) {
+        alert('Veuillez remplir tous les champs obligatoires')
+        return
+      }
+
+      const response = await fetch(`/api/admin/orders/${selectedOrder.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: orderForm.customerEmail,
+          customerFirstName: orderForm.customerFirstName,
+          customerLastName: orderForm.customerLastName,
+          customerPhone: orderForm.customerPhone,
+          status: orderForm.status,
+          shippingAddress: orderForm.shippingAddress,
+        }),
+      })
+
+      if (response.ok) {
+        await fetchOrders()
+        setShowEditOrderModal(false)
+        setSelectedOrder(null)
+        alert('Commande mise à jour avec succès !')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors de la mise à jour de la commande')
+      }
+    } catch (error) {
+      console.error('Error updating order:', error)
+      alert('Erreur lors de la mise à jour de la commande')
     }
   }
 
@@ -401,9 +461,9 @@ export default function OrdersPage() {
                 <option value="all">Tous les statuts</option>
                 <option value="PENDING">En attente</option>
                 <option value="CONFIRMED">Confirmée</option>
-                <option value="PROCESSING">En traitement</option>
-                <option value="SHIPPED">Expédiée</option>
-                <option value="DELIVERED">Livrée</option>
+                <option value="PREPARING">En préparation</option>
+                <option value="READY">Prête</option>
+                <option value="COMPLETED">Terminée</option>
                 <option value="CANCELLED">Annulée</option>
               </select>
             </div>
@@ -523,8 +583,8 @@ export default function OrdersPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleUpdateOrderStatus(order.id, order.status === 'PENDING' ? 'PROCESSING' : 'PENDING')}
-                              title="Changer statut"
+                              onClick={() => handleEditOrder(order)}
+                              title="Modifier"
                               className="dark:text-white dark:hover:bg-gray-700"
                             >
                               <Edit className="w-4 h-4" />
@@ -856,9 +916,9 @@ export default function OrdersPage() {
                 >
                   <option value="PENDING">En attente</option>
                   <option value="CONFIRMED">Confirmée</option>
-                  <option value="PROCESSING">En traitement</option>
-                  <option value="SHIPPED">Expédiée</option>
-                  <option value="DELIVERED">Livrée</option>
+                  <option value="PREPARING">En préparation</option>
+                  <option value="READY">Prête</option>
+                  <option value="COMPLETED">Terminée</option>
                 </select>
               </div>
             </div>
@@ -877,6 +937,180 @@ export default function OrdersPage() {
               className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700"
             >
               Créer la Commande
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Order Modal */}
+      <Modal
+        isOpen={showEditOrderModal}
+        onClose={() => {
+          setShowEditOrderModal(false)
+          setSelectedOrder(null)
+        }}
+        title={`Modifier la commande ${selectedOrder?.orderNumber}`}
+        size="xl"
+      >
+        <div className="space-y-6">
+          {/* Customer Info */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <User className="w-5 h-5" />
+              Informations Client
+            </h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
+                  <Input
+                    type="text"
+                    value={orderForm.customerFirstName}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerFirstName: e.target.value })}
+                    placeholder="Jean"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+                  <Input
+                    type="text"
+                    value={orderForm.customerLastName}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerLastName: e.target.value })}
+                    placeholder="Dupont"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                  <Input
+                    type="email"
+                    value={orderForm.customerEmail}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
+                    placeholder="client@example.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
+                  <Input
+                    type="tel"
+                    value={orderForm.customerPhone}
+                    onChange={(e) => setOrderForm({ ...orderForm, customerPhone: e.target.value })}
+                    placeholder="+237 6 00 00 00 00"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse de livraison</label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  rows={3}
+                  value={orderForm.shippingAddress}
+                  onChange={(e) => setOrderForm({ ...orderForm, shippingAddress: e.target.value })}
+                  placeholder="Adresse complète de livraison"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Order Items (read-only) */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <Package className="w-5 h-5" />
+              Articles ({orderForm.items.length})
+            </h3>
+
+            {orderForm.items.length === 0 ? (
+              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Package className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
+                <p className="text-gray-500 dark:text-gray-400">Aucun article</p>
+              </div>
+            ) : (
+              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y dark:divide-gray-700">
+                    {orderForm.items.map((item, index) => (
+                      <tr key={index} className="dark:bg-gray-800">
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.name}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {item.quantity}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.price)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                          {formatFCFA(item.quantity * item.price)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        Total
+                      </td>
+                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                        {formatFCFA(orderForm.totalAmount)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Status */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <CreditCard className="w-5 h-5" />
+              Statut
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut de la commande</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  value={orderForm.status}
+                  onChange={(e) => setOrderForm({ ...orderForm, status: e.target.value as any })}
+                >
+                  <option value="PENDING">En attente</option>
+                  <option value="CONFIRMED">Confirmée</option>
+                  <option value="PREPARING">En préparation</option>
+                  <option value="READY">Prête</option>
+                  <option value="COMPLETED">Terminée</option>
+                  <option value="CANCELLED">Annulée</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 pt-4 border-t dark:border-gray-700">
+            <Button
+              onClick={() => {
+                setShowEditOrderModal(false)
+                setSelectedOrder(null)
+              }}
+              className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleUpdateOrder}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700"
+            >
+              Mettre à jour
             </Button>
           </div>
         </div>
