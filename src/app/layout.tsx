@@ -164,6 +164,11 @@ export default function RootLayout({
                       À Propos
                     </a>
                   </li>
+                  <li>
+                    <a href="/contact" className="text-white hover:text-primary-400 transition-colors">
+                      Contact
+                    </a>
+                  </li>
                 </ul>
               </div>
 
@@ -172,8 +177,8 @@ export default function RootLayout({
                 <h3 className="font-semibold mb-4 text-white">Contact</h3>
                 <ul className="space-y-2 text-sm text-white">
                   <li>
-                    <a href="mailto:support@geekgamingcenter.com" className="hover:text-primary-400 transition-colors">
-                      support@geekgamingcenter.com
+                    <a href="mailto:support@geek-gaming-center.cam" className="hover:text-primary-400 transition-colors">
+                      support@geek-gaming-center.cam
                     </a>
                   </li>
                   <li>

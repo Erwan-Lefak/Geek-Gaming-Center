@@ -18,6 +18,7 @@ export interface SendEmailOptions {
   templateType?: string
   data?: EmailData
   from?: string
+  replyTo?: string
 }
 
 // Initialize Resend (only if API key is available)
@@ -136,7 +137,8 @@ export class MailService {
         subject: customSubject,
         templateType,
         data = {},
-        from = DEFAULT_FROM
+        from = DEFAULT_FROM,
+        replyTo: customReplyTo
       } = options
 
       // Get template if templateType is provided
@@ -181,7 +183,7 @@ export class MailService {
         to: Array.isArray(to) ? to : [to],
         subject,
         html: finalHtml,
-        replyTo: REPLY_TO,
+        replyTo: customReplyTo || REPLY_TO,
         // Add headers to improve deliverability
         headers: {
           'X-Priority': '1',

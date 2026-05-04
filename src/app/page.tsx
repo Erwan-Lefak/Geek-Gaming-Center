@@ -151,9 +151,9 @@ export default function HomePage() {
 
       {/* Collections Section - 4 Panels in 2x2 Grid */}
       <section className="bg-black py-16 px-4 sm:px-8 md:px-16 lg:px-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full mx-auto max-w-7xl">
           {/* Panel 1: Salle de Jeux */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full rounded-3xl">
             <Image
               src="/section-salle-de-jeux.jpg"
               alt="Salle de Jeux"
@@ -180,7 +180,7 @@ export default function HomePage() {
           </div>
 
           {/* Panel 2: Boutique */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full rounded-3xl">
             <Image
               src="/section-boutique.jpg"
               alt="Boutique"
@@ -207,7 +207,7 @@ export default function HomePage() {
           </div>
 
           {/* Panel 3: Restaurant */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full rounded-3xl">
             <Image
               src="/geek-gaming-center-restaurant.png"
               alt="Restaurant"
@@ -234,7 +234,7 @@ export default function HomePage() {
           </div>
 
           {/* Panel 4: Cinéma */}
-          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full">
+          <div className="relative overflow-hidden group cursor-pointer aspect-square w-full rounded-3xl">
             <Image
               src="/cinema-latest.png"
               alt="Cinéma"

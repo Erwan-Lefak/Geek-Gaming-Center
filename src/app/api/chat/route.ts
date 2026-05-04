@@ -194,7 +194,7 @@ function getFallbackResponse(message: string): string {
 
   // Contact
   if (lowerMessage.includes('contact') || lowerMessage.includes('téléphone') || lowerMessage.includes('appeler')) {
-    return "📞 Nous contacter :\n\n• Téléphone : +237 600 000 000\n• Email : contact@geekgamingcenter.cm\n\nOu passez nous voir directement à Mvog Ada !"
+    return "📞 Nous contacter :\n\n• Téléphone : +237 6 79 70 22 98\n• Email : support@geek-gaming-center.cam\n\nOu passez nous voir directement à Mvog Ada !"
   }
 
   // Réponse par défaut
