@@ -46,7 +46,7 @@ export default function StoreContactPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black">
       {/* Header */}
-      <div className="pt-8 pb-4 px-4 sm:px-6 md:px-8">
+      <div className="mt-[8.5rem] md:mt-[6rem] pb-4 px-4 sm:px-6 md:px-8">
         <div className="container mx-auto">
           <Link
             href="/store"
@@ -55,9 +55,7 @@ export default function StoreContactPage() {
             <ArrowLeft className="w-4 h-4" />
             Retour à la boutique
           </Link>
-          <h1 className="text-[2.5rem] sm:text-[3rem] md:text-[3.5rem] font-bold leading-[0.8] kinetic-text text-white uppercase italic">
-            Nous Contacter
-          </h1>
+          <h1 className="hidden" aria-hidden="true">Nous Contacter</h1>
           <p className="text-white/70 mt-4 text-lg">
             Une question, une suggestion ou un problème ? N&apos;hésitez pas à nous écrire !
           </p>
