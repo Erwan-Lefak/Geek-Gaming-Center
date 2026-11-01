@@ -1,16 +1,31 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Plus, Edit, Package, AlertTriangle, X, Upload, Search, Trash2 } from 'lucide-react'
+import {
+  Plus,
+  Edit,
+  Package,
+  AlertTriangle,
+  X,
+  Upload,
+  Search,
+  Trash2,
+} from 'lucide-react'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashCard,
+  DashEmpty,
+  DashBadge,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+  dashTableHeadCls,
+} from '../components/dash-ui'
 
 interface Product {
   id: string
@@ -82,29 +97,28 @@ export default function ProductsPage() {
     if (!files || files.length === 0) return
 
     try {
-      const formData = new FormData()
+      const uploadData = new FormData()
 
       // Upload each file
       for (let i = 0; i < files.length; i++) {
-        formData.append('files', files[i])
+        uploadData.append('files', files[i])
       }
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        body: uploadData,
       })
 
       if (response.ok) {
         const data = await response.json()
         const newImages = data.files.map((f: any) => f.url)
 
-        // Set first image as thumbnail if not set
-        if (!formData.thumbnail && newImages.length > 0) {
-          setFormData(prev => ({ ...prev, thumbnail: newImages[0] }))
-        }
-
-        // Add to images array
-        setFormData(prev => ({ ...prev, images: [...prev.images, ...newImages] }))
+        // Ajoute les images ; la première devient la miniature si aucune n'était définie
+        setFormData(prev => ({
+          ...prev,
+          thumbnail: prev.thumbnail || newImages[0] || '',
+          images: [...prev.images, ...newImages],
+        }))
       }
     } catch (error) {
       console.error('Error uploading images:', error)
@@ -112,18 +126,17 @@ export default function ProductsPage() {
   }
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }))
-
-    // Update thumbnail if it was the removed image
-    if (formData.thumbnail === formData.images[index]) {
-      setFormData(prev => ({
+    setFormData(prev => {
+      const images = prev.images.filter((_, i) => i !== index)
+      return {
         ...prev,
-        thumbnail: formData.images[0] || ''
-      }))
-    }
+        images,
+        thumbnail:
+          prev.thumbnail === prev.images[index]
+            ? images[0] || ''
+            : prev.thumbnail,
+      }
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -247,375 +260,353 @@ export default function ProductsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1
-                className="text-2xl font-bold text-gray-900 dark:text-white"
-                style={{ color: 'var(--foreground)' }}
-              >
-                Gestion des Stocks
-              </h1>
-              <p
-                className="text-sm text-gray-600 dark:text-gray-300 mt-1"
-                style={{ color: 'var(--foreground)' }}
-              >
-                Catalogue produits et inventaire boutique
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              {lowStockCount > 0 && (
-                <Badge variant="danger" className="flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />
-                  {lowStockCount} alertes
-                </Badge>
-              )}
-              <button
-                onClick={() => { setShowModal(true); setSelectedProduct(null) }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-              >
-                <Plus className="w-5 h-5" />
-                Nouveau Produit
-              </button>
-            </div>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Gestion des stocks"
+        description="Catalogue produits et inventaire boutique"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {lowStockCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/15 px-3 py-1.5 text-xs font-semibold text-rose-300">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {lowStockCount} alerte{lowStockCount > 1 ? 's' : ''} stock
+              </span>
+            )}
+            <button
+              onClick={() => { setShowModal(true); setSelectedProduct(null) }}
+              className={dashBtnPrimaryCls}
+            >
+              <Plus className="h-4 w-4" />
+              Nouveau produit
+            </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <Input
+      <DashCard
+        title={`${filteredProducts.length} produit${filteredProducts.length !== 1 ? 's' : ''}`}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <div className="relative min-w-[220px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <input
                 type="text"
-                placeholder="Rechercher par nom, SKU ou catégorie..."
+                placeholder="Nom, SKU ou catégorie…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10"
+                className={cn(dashInputCls, 'pl-9')}
               />
             </div>
-
-            {/* Category Filter */}
-            <div className="w-full md:w-48">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Toutes catégories</option>
-                {categories.filter(c => c !== 'all').map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Stock Filter */}
-            <div className="w-full md:w-48">
-              <select
-                value={stockFilter}
-                onChange={(e) => setStockFilter(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Tous les stocks</option>
-                <option value="low">Stock bas</option>
-                <option value="out">Rupture de stock</option>
-              </select>
-            </div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className={cn(dashSelectCls, 'w-auto')}
+            >
+              <option value="all">Toutes catégories</option>
+              {categories.filter(c => c !== 'all').map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+            <select
+              value={stockFilter}
+              onChange={(e) => setStockFilter(e.target.value)}
+              className={cn(dashSelectCls, 'w-auto')}
+            >
+              <option value="all">Tous les stocks</option>
+              <option value="low">Stock bas</option>
+              <option value="out">Rupture de stock</option>
+            </select>
           </div>
+        }
+      >
+        {loading && products.length === 0 ? (
+          <div className="py-12 text-center text-sm text-slate-500">Chargement des produits…</div>
+        ) : filteredProducts.length === 0 ? (
+          <DashEmpty
+            icon={Package}
+            title={
+              searchQuery || categoryFilter !== 'all' || stockFilter !== 'all'
+                ? 'Aucun produit ne correspond à votre recherche'
+                : 'Aucun produit trouvé'
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto dash-scroll">
+            <table className="w-full min-w-[900px] text-sm">
+              <thead>
+                <tr>
+                  <th className={dashTableHeadCls}>Image</th>
+                  <th className={dashTableHeadCls}>Produit</th>
+                  <th className={dashTableHeadCls}>Catégorie</th>
+                  <th className={dashTableHeadCls}>Stock</th>
+                  <th className={dashTableHeadCls}>Prix achat</th>
+                  <th className={dashTableHeadCls}>Prix vente</th>
+                  <th className={dashTableHeadCls}>Marge</th>
+                  <th className={cn(dashTableHeadCls, 'text-right')}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product) => {
+                  // Handle both old (price, stock) and new (sellingPrice, currentStock, costPrice) field names
+                  const sellingPrice = product.sellingPrice || product.price || 0
+                  const costPrice = product.costPrice || 0
+                  const currentStock = product.currentStock || product.stock || 0
+                  const minStock = product.minStock || 5
+                  const thumbnail = product.thumbnail || product.image
 
-          {/* Results count */}
-          <div className="mt-3 text-sm text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
-            {filteredProducts.length} produit{filteredProducts.length !== 1 ? 's' : ''} trouvé{filteredProducts.length !== 1 ? 's' : ''}
+                  const margin = costPrice > 0 ? ((sellingPrice - costPrice) / costPrice * 100).toFixed(0) : '0'
+                  const isLowStock = currentStock <= minStock
+                  const isOut = currentStock === 0
+                  const isValidThumbnail = thumbnail && thumbnail !== 'N/A' && thumbnail !== '' && typeof thumbnail === 'string'
+
+                  return (
+                    <tr
+                      key={product.id}
+                      className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="py-3 pr-4">
+                        {isValidThumbnail ? (
+                          <div className="relative h-12 w-12 overflow-hidden rounded-lg bg-white/5">
+                            <Image
+                              src={thumbnail}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/5">
+                            <Package className="h-5 w-5 text-slate-600" />
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="font-medium text-slate-200">{product.name}</div>
+                        {product.sku && (
+                          <div className="text-xs text-slate-500">SKU : {product.sku}</div>
+                        )}
+                        {product.brand && (
+                          <div className="text-xs text-slate-500">Marque : {product.brand}</div>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <DashBadge label={product.category} />
+                        {product.subcategory && (
+                          <div className="mt-1 text-xs text-slate-500">{product.subcategory}</div>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              'font-medium tabular-nums',
+                              isOut ? 'text-rose-400' : isLowStock ? 'text-amber-400' : 'text-slate-200'
+                            )}
+                          >
+                            {currentStock}
+                          </span>
+                          {isLowStock && (
+                            <DashBadge label={isOut ? 'Rupture' : 'Stock bas'} tone={isOut ? 'rose' : 'amber'} />
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500">Min : {minStock}</div>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400 tabular-nums">
+                        {costPrice > 0 ? Number(costPrice).toLocaleString('fr-FR') : '—'}
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-slate-200 tabular-nums">
+                        {Number(sellingPrice).toLocaleString('fr-FR')} FCFA
+                      </td>
+                      <td className="py-3 pr-4">
+                        {costPrice > 0 ? (
+                          <DashBadge
+                            label={`${margin}%`}
+                            tone={parseFloat(margin) > 30 ? 'emerald' : 'amber'}
+                          />
+                        ) : (
+                          <span className="text-slate-600">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            title="Modifier"
+                            className={dashBtnGhostCls}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product.id, product.name)}
+                            title="Supprimer"
+                            className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
+        )}
+      </DashCard>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-                Chargement des produits...
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-                {searchQuery || categoryFilter !== 'all' || stockFilter !== 'all'
-                  ? 'Aucun produit ne correspond à votre recherche'
-                  : 'Aucun produit trouvé'}
-              </div>
-            ) : (
-              <div className="rounded-md border dark:border-gray-700">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="dark:border-gray-700 dark:bg-gray-800">
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Image</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Produit</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Catégorie</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Stock</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Prix Achat</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Prix Vente</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Marge</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white text-right" style={{ color: 'var(--foreground)' }}>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredProducts.map((product) => {
-                      // Handle both old (price, stock) and new (sellingPrice, currentStock, costPrice) field names
-                      const sellingPrice = product.sellingPrice || product.price || 0
-                      const costPrice = product.costPrice || 0
-                      const currentStock = product.currentStock || product.stock || 0
-                      const minStock = product.minStock || 5
-                      const thumbnail = product.thumbnail || product.image
-
-                      const margin = costPrice > 0 ? ((sellingPrice - costPrice) / costPrice * 100).toFixed(0) : '0'
-                      const isLowStock = currentStock <= minStock
-                      const isValidThumbnail = thumbnail && thumbnail !== 'N/A' && thumbnail !== '' && typeof thumbnail === 'string'
-
-                      return (
-                        <TableRow key={product.id} className="dark:border-gray-700 dark:bg-gray-800">
-                          <TableCell className="dark:bg-gray-800">
-                            {isValidThumbnail ? (
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                <Image
-                                  src={thumbnail}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover"
-                                  unoptimized
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <Package className="w-6 h-6 text-gray-400 dark:text-gray-300" />
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            <div className="flex items-center gap-2">
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>{product.name}</div>
-                                {product.sku && (
-                                  <div className="text-xs text-gray-600 dark:text-gray-300">SKU: {product.sku}</div>
-                                )}
-                                {product.brand && (
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">Marque: {product.brand}</div>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            <div>
-                              <Badge variant="default" style={{ color: 'var(--foreground)', backgroundColor: 'rgba(255,255,255,0.1)' }}>{product.category}</Badge>
-                              {product.subcategory && (
-                                <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">{product.subcategory}</div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-medium ${isLowStock ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`} style={{ color: isLowStock ? '' : 'var(--foreground)' }}>
-                                {currentStock}
-                              </span>
-                              {isLowStock && (
-                                <Badge variant="danger" className="text-xs">
-                                  Stock bas
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
-                              Min: {minStock}
-                            </div>
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            <span className="text-gray-900 dark:text-white" style={{ color: costPrice > 0 ? 'var(--foreground)' : 'var(--foreground)' }}>{costPrice > 0 ? Number(costPrice).toLocaleString('fr-FR') : '-'}</span> <span className="text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>FCFA</span>
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            <span className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>{Number(sellingPrice).toLocaleString('fr-FR')}</span> <span className="text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>FCFA</span>
-                          </TableCell>
-                          <TableCell className="dark:bg-gray-800">
-                            {costPrice > 0 ? (
-                              <Badge variant={parseFloat(margin) > 30 ? 'success' : 'warning'}>
-                                {margin}%
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary">-</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right dark:bg-gray-800">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEdit(product)}
-                                className="dark:text-white dark:hover:bg-gray-700"
-                                style={{ color: 'var(--foreground)' }}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteProduct(product.id, product.name)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Modal */}
+      {/* Modal : produit */}
       <Modal
         isOpen={showModal}
         onClose={() => {
           setShowModal(false)
           setSelectedProduct(null)
         }}
-        title={selectedProduct ? 'Modifier le Produit' : 'Nouveau Produit'}
+        title={selectedProduct ? 'Modifier le produit' : 'Nouveau produit'}
         size="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">Nom du produit *</Label>
-            <Input
+            <label htmlFor="name" className="mb-1 block text-sm text-slate-400">
+              Nom du produit <span className="text-rose-400">*</span>
+            </label>
+            <input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              className={dashInputCls}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="sku">SKU</Label>
-              <Input
+              <label htmlFor="sku" className="mb-1 block text-sm text-slate-400">SKU</label>
+              <input
                 id="sku"
                 value={formData.sku}
                 onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                className={dashInputCls}
               />
             </div>
             <div>
-              <Label htmlFor="category">Catégorie *</Label>
-              <Input
+              <label htmlFor="category" className="mb-1 block text-sm text-slate-400">
+                Catégorie <span className="text-rose-400">*</span>
+              </label>
+              <input
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 required
+                className={dashInputCls}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="subcategory">Sous-catégorie</Label>
-              <Input
+              <label htmlFor="subcategory" className="mb-1 block text-sm text-slate-400">Sous-catégorie</label>
+              <input
                 id="subcategory"
                 value={formData.subcategory}
                 onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                className={dashInputCls}
               />
             </div>
             <div>
-              <Label htmlFor="brand">Marque</Label>
-              <Input
+              <label htmlFor="brand" className="mb-1 block text-sm text-slate-400">Marque</label>
+              <input
                 id="brand"
                 value={formData.brand}
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                className={dashInputCls}
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
+            <label htmlFor="description" className="mb-1 block text-sm text-slate-400">Description</label>
+            <textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
+              className={dashInputCls}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="costPrice">Prix d'achat (FCFA) *</Label>
-              <Input
+              <label htmlFor="costPrice" className="mb-1 block text-sm text-slate-400">
+                Prix d&apos;achat (FCFA) <span className="text-rose-400">*</span>
+              </label>
+              <input
                 id="costPrice"
                 type="number"
                 value={formData.costPrice}
                 onChange={(e) => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
                 required
+                className={dashInputCls}
               />
             </div>
             <div>
-              <Label htmlFor="sellingPrice">Prix de vente (FCFA) *</Label>
-              <Input
+              <label htmlFor="sellingPrice" className="mb-1 block text-sm text-slate-400">
+                Prix de vente (FCFA) <span className="text-rose-400">*</span>
+              </label>
+              <input
                 id="sellingPrice"
                 type="number"
                 value={formData.sellingPrice}
                 onChange={(e) => setFormData({ ...formData, sellingPrice: parseFloat(e.target.value) })}
                 required
+                className={dashInputCls}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="currentStock">Stock actuel</Label>
-              <Input
+              <label htmlFor="currentStock" className="mb-1 block text-sm text-slate-400">Stock actuel</label>
+              <input
                 id="currentStock"
                 type="number"
                 value={formData.currentStock}
                 onChange={(e) => setFormData({ ...formData, currentStock: parseInt(e.target.value) })}
+                className={dashInputCls}
               />
             </div>
             <div>
-              <Label htmlFor="minStock">Stock minimum</Label>
-              <Input
+              <label htmlFor="minStock" className="mb-1 block text-sm text-slate-400">Stock minimum</label>
+              <input
                 id="minStock"
                 type="number"
                 value={formData.minStock}
                 onChange={(e) => setFormData({ ...formData, minStock: parseInt(e.target.value) })}
+                className={dashInputCls}
               />
             </div>
           </div>
 
           <div>
-            <Label>Images du produit</Label>
+            <label className="mb-1 block text-sm text-slate-400">Images du produit</label>
             <div className="mt-2 space-y-4">
-              <div className="flex items-center gap-2">
-                <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <Upload className="w-4 h-4" />
-                  <span>Choisir des images</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              </div>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-primary-500/40 hover:text-primary-300">
+                <Upload className="h-4 w-4" />
+                Choisir des images
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </label>
 
-              {/* Thumbnail selection */}
+              {/* Sélection de la miniature */}
               {formData.images.length > 0 && (
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-300">Image principale (miniature)</Label>
-                  <div className="mt-2 grid grid-cols-4 gap-2">
+                  <p className="mb-2 text-sm text-slate-500">Image principale (miniature)</p>
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
                     {formData.images.map((image, index) => {
                       const isValidImage = image && image !== 'N/A' && image !== '' && typeof image === 'string'
                       if (!isValidImage) return null
@@ -623,14 +614,15 @@ export default function ProductsPage() {
                       return (
                         <div
                           key={index}
-                          className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                          className={cn(
+                            'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all',
                             formData.thumbnail === image
-                              ? 'border-primary-500 ring-2 ring-primary-200'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
+                              ? 'border-primary-400 ring-2 ring-primary-500/30'
+                              : 'border-white/10 hover:border-white/25'
+                          )}
                           onClick={() => setFormData({ ...formData, thumbnail: image })}
                         >
-                          <div className="relative w-full aspect-square">
+                          <div className="relative aspect-square w-full">
                             <Image
                               src={image}
                               alt={`Produit ${index + 1}`}
@@ -638,23 +630,23 @@ export default function ProductsPage() {
                               className="object-cover"
                               unoptimized
                             />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            removeImage(index)
-                          }}
-                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                        {formData.thumbnail === image && (
-                          <div className="absolute bottom-1 left-1 px-2 py-1 bg-primary-500 text-white text-xs rounded">
-                            Principale
                           </div>
-                        )}
-                      </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeImage(index)
+                            }}
+                            className="absolute right-1 top-1 rounded-full bg-rose-500 p-1 text-white transition-colors hover:bg-rose-400"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                          {formData.thumbnail === image && (
+                            <div className="absolute bottom-1 left-1 rounded bg-primary-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                              Principale
+                            </div>
+                          )}
+                        </div>
                       )
                     })}
                   </div>
@@ -663,17 +655,17 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button
+          <div className="flex justify-end gap-3 border-t border-white/5 pt-4">
+            <button
               type="button"
-              variant="ghost"
               onClick={() => setShowModal(false)}
+              className={dashBtnOutlineCls}
             >
               Annuler
-            </Button>
-            <Button type="submit">
-              {selectedProduct ? 'Mettre à jour' : 'Créer le Produit'}
-            </Button>
+            </button>
+            <button type="submit" className={dashBtnPrimaryCls}>
+              {selectedProduct ? 'Mettre à jour' : 'Créer le produit'}
+            </button>
           </div>
         </form>
       </Modal>

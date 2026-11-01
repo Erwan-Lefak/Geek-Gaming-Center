@@ -3,6 +3,19 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, Film, Calendar, Clock, X, Upload } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashCard,
+  DashEmpty,
+  DashBadge,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+  dashTableHeadCls,
+} from '../components/dash-ui'
 
 interface Movie {
   id: string
@@ -126,11 +139,11 @@ export default function CinemaPage() {
         const imageUrl = data.files[0].url
         setMovieForm({ ...movieForm, posterUrl: imageUrl })
       } else {
-        alert('Erreur lors de l\'upload de l\'image')
+        alert("Erreur lors de l'upload de l'image")
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Erreur lors de l\'upload de l\'image')
+      alert("Erreur lors de l'upload de l'image")
     }
   }
 
@@ -337,233 +350,216 @@ export default function CinemaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-2 border-primary-500 border-b-transparent" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>Cinéma</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>Gestion des films et des séances</p>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Cinéma"
+        description="Gestion des films et des séances"
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => {
+                setActiveTab('movies')
+                setShowMovieModal(true)
+                resetMovieForm()
+                setSelectedMovie(null)
+              }}
+              className={dashBtnPrimaryCls}
+            >
+              <Film className="h-4 w-4" />
+              Nouveau film
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('screenings')
+                setShowScreeningModal(true)
+                resetScreeningForm()
+              }}
+              className={dashBtnOutlineCls}
+            >
+              <Calendar className="h-4 w-4" />
+              Nouvelle séance
+            </button>
           </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setActiveTab('movies')
-              setShowMovieModal(true)
-              resetMovieForm()
-              setSelectedMovie(null)
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-          >
-            <Film size={20} />
-            Nouveau Film
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('screenings')
-              setShowScreeningModal(true)
-              resetScreeningForm()
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            <Calendar size={20} />
-            Nouvelle Séance
-          </button>
-        </div>
-      </div>
+        }
+      />
+
+      {/* Onglets */}
+      <div className="flex gap-1.5 border-b border-white/5 pb-2">
+        <button
+          onClick={() => setActiveTab('movies')}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+            activeTab === 'movies'
+              ? 'bg-primary-500/15 text-primary-300'
+              : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+          )}
+        >
+          <Film className="h-4 w-4" />
+          Films <span className="tabular-nums">({movies.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('screenings')}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+            activeTab === 'screenings'
+              ? 'bg-primary-500/15 text-primary-300'
+              : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+          )}
+        >
+          <Calendar className="h-4 w-4" />
+          Séances <span className="tabular-nums">({screenings.length})</span>
+        </button>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="border-b mb-6" style={{ borderColor: 'var(--border)' }}>
-          <nav className="flex gap-8">
-            <button
-              onClick={() => setActiveTab('movies')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'movies'
-                  ? 'border-purple-600 text-purple-600'
-                  : 'border-transparent hover:text-gray-700'
-              }`}
-              style={{ color: activeTab === 'movies' ? undefined : 'var(--muted-foreground)' }}
-            >
-              Films ({movies.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('screenings')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'screenings'
-                  ? 'border-purple-600 text-purple-600'
-                  : 'border-transparent hover:text-gray-700'
-              }`}
-              style={{ color: activeTab === 'screenings' ? undefined : 'var(--muted-foreground)' }}
-            >
-              Séances ({screenings.length})
-            </button>
-          </nav>
-        </div>
-
-        {/* Movies Tab */}
-        {activeTab === 'movies' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Onglet Films */}
+      {activeTab === 'movies' && (
+        movies.length === 0 ? (
+          <div className="dash-card">
+            <DashEmpty icon={Film} title="Aucun film enregistré" hint="Ajoutez votre premier film" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {movies.map((movie) => (
-              <div
-                key={movie.id}
-                className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                style={{ backgroundColor: 'var(--card)' }}
-              >
+              <div key={movie.id} className="dash-card flex flex-col overflow-hidden">
                 {movie.posterUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={movie.posterUrl}
                     alt={movie.title}
-                    className="w-full h-64 object-cover"
+                    className="h-64 w-full object-cover"
                   />
                 )}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-bold flex-1" style={{ color: 'var(--foreground)' }}>{movie.title}</h3>
-                    <span className="ml-2 px-2 py-1 text-xs font-medium rounded bg-purple-100 text-purple-800">
-                      {movie.rating}
-                    </span>
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="mb-1.5 flex items-start justify-between gap-2">
+                    <h3 className="flex-1 font-semibold text-slate-100">{movie.title}</h3>
+                    <DashBadge label={movie.rating ?? '—'} tone="violet" />
                   </div>
-                  <p className="text-sm mb-2" style={{ color: 'var(--muted-foreground)' }}>{movie.genre}</p>
-                  <div className="flex items-center gap-2 text-sm mb-3" style={{ color: 'var(--muted-foreground)' }}>
-                    <Clock size={16} />
-                    <span>{movie.duration} min</span>
+                  <p className="mb-2 text-xs text-slate-500">{movie.genre}</p>
+                  <div className="mb-3 flex items-center gap-2 text-sm text-slate-400">
+                    <Clock className="h-4 w-4" />
+                    {movie.duration} min
                   </div>
-                  <div className="flex flex-wrap gap-1 mb-3">
+                  <div className="mb-3 flex flex-wrap gap-1.5">
                     {movie.nowShowing && (
-                      <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800">
-                        À l'affiche
-                      </span>
+                      <DashBadge label="À l'affiche" tone="emerald" />
                     )}
                     {movie.comingSoon && (
-                      <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
-                        Bientôt
-                      </span>
+                      <DashBadge label="Bientôt" tone="sky" />
                     )}
                     {!movie.isActive && (
-                      <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-800">
-                        Inactif
-                      </span>
+                      <DashBadge label="Inactif" tone="slate" />
                     )}
                   </div>
-                  <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>
+                  <p className="mb-4 text-sm text-slate-500">
                     {movie._count.screenings} séance{movie._count.screenings > 1 ? 's' : ''}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="mt-auto flex gap-2 border-t border-white/5 pt-3">
                     <button
                       onClick={() => handleEditMovie(movie)}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700"
+                      className={cn(dashBtnOutlineCls, 'flex-1 justify-center py-2 text-xs')}
                     >
-                      <Pencil size={16} />
+                      <Pencil className="h-3.5 w-3.5" />
                       Modifier
                     </button>
                     <button
                       onClick={() => handleDeleteMovie(movie)}
-                      className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                      title="Supprimer"
+                      className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
                     >
-                      <Trash2 size={16} />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        )}
+        )
+      )}
 
-        {/* Screenings Tab */}
-        {activeTab === 'screenings' && (
-          <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
-            <table className="min-w-full divide-y" style={{ borderColor: 'var(--border)' }}>
-              <thead className="bg-gray-50" style={{ backgroundColor: 'var(--muted)' }}>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Film
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Date & Heure
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Salle
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Places
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Prix
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Réservations
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--card)' }}>
-                {screenings.map((screening) => (
-                  <tr key={screening.id} className="hover:bg-gray-50" style={{ hover: { backgroundColor: 'var(--muted)' } }}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{screening.movie.title}</div>
-                      <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>{screening.movie.duration} min</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm" style={{ color: 'var(--foreground)' }}>
-                        {new Date(screening.screenTime).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </div>
-                      <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                        {new Date(screening.screenTime).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--foreground)' }}>
-                      Salle {screening.screenNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm" style={{ color: 'var(--foreground)' }}>
-                        {screening.availableSeats} / {screening.totalSeats}
-                      </div>
-                      <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                        disponibles
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--foreground)' }}>
-                      {screening.price} FCFA
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--foreground)' }}>
-                      {screening._count.bookings}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteScreening(screening)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Supprimer
-                      </button>
-                    </td>
+      {/* Onglet Séances */}
+      {activeTab === 'screenings' && (
+        <DashCard title={`${screenings.length} séance${screenings.length > 1 ? 's' : ''}`}>
+          {screenings.length === 0 ? (
+            <DashEmpty icon={Calendar} title="Aucune séance programmée" />
+          ) : (
+            <div className="overflow-x-auto dash-scroll">
+              <table className="w-full min-w-[760px] text-sm">
+                <thead>
+                  <tr>
+                    <th className={dashTableHeadCls}>Film</th>
+                    <th className={dashTableHeadCls}>Date & heure</th>
+                    <th className={dashTableHeadCls}>Salle</th>
+                    <th className={dashTableHeadCls}>Places</th>
+                    <th className={dashTableHeadCls}>Prix</th>
+                    <th className={dashTableHeadCls}>Réservations</th>
+                    <th className={cn(dashTableHeadCls, 'text-right')}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {screenings.map((screening) => (
+                    <tr
+                      key={screening.id}
+                      className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="py-3 pr-4">
+                        <div className="font-medium text-slate-200">{screening.movie.title}</div>
+                        <div className="text-xs text-slate-500">{screening.movie.duration} min</div>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="text-slate-200">
+                          {new Date(screening.screenTime).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {new Date(screening.screenTime).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400">
+                        Salle {screening.screenNumber}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="text-slate-200 tabular-nums">
+                          {screening.availableSeats} / {screening.totalSeats}
+                        </div>
+                        <div className="text-xs text-slate-500">disponibles</div>
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-slate-200 tabular-nums">
+                        {screening.price} FCFA
+                      </td>
+                      <td className="py-3 pr-4 text-slate-300 tabular-nums">
+                        {screening._count.bookings}
+                      </td>
+                      <td className="py-3 text-right">
+                        <button
+                          onClick={() => handleDeleteScreening(screening)}
+                          className="text-xs font-medium text-rose-400 hover:text-rose-300"
+                        >
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </DashCard>
+      )}
 
-      {/* Movie Modal */}
+      {/* Modal : film */}
       <Modal
         isOpen={showMovieModal}
         onClose={() => {
@@ -571,73 +567,62 @@ export default function CinemaPage() {
           setSelectedMovie(null)
           resetMovieForm()
         }}
-        title={selectedMovie ? 'Modifier le Film' : 'Nouveau Film'}
+        title={selectedMovie ? 'Modifier le film' : 'Nouveau film'}
         size="xl"
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Titre *
+            <label className="mb-1 block text-sm text-slate-400">
+              Titre <span className="text-rose-400">*</span>
             </label>
             <input
               type="text"
               value={movieForm.title}
               onChange={(e) => setMovieForm({ ...movieForm, title: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Description
-            </label>
+            <label className="mb-1 block text-sm text-slate-400">Description</label>
             <textarea
               value={movieForm.description}
               onChange={(e) => setMovieForm({ ...movieForm, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Durée (minutes) *
+              <label className="mb-1 block text-sm text-slate-400">
+                Durée (minutes) <span className="text-rose-400">*</span>
               </label>
               <input
                 type="number"
                 value={movieForm.duration}
                 onChange={(e) => setMovieForm({ ...movieForm, duration: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Genre
-              </label>
+              <label className="mb-1 block text-sm text-slate-400">Genre</label>
               <input
                 type="text"
                 value={movieForm.genre}
                 onChange={(e) => setMovieForm({ ...movieForm, genre: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
-                placeholder="Action, Comédie, Drama..."
+                className={dashInputCls}
+                placeholder="Action, Comédie, Drama…"
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Classification
-              </label>
+              <label className="mb-1 block text-sm text-slate-400">Classification</label>
               <select
                 value={movieForm.rating}
                 onChange={(e) => setMovieForm({ ...movieForm, rating: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashSelectCls}
               >
                 <option value="Tout public">Tout public</option>
                 <option value="-12">-12 ans</option>
@@ -646,27 +631,21 @@ export default function CinemaPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Langue
-              </label>
+              <label className="mb-1 block text-sm text-slate-400">Langue</label>
               <input
                 type="text"
                 value={movieForm.language}
                 onChange={(e) => setMovieForm({ ...movieForm, language: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Affiche du film
-            </label>
+            <label className="mb-1 block text-sm text-slate-400">Affiche du film</label>
             <div className="mt-2 space-y-3">
-              {/* Upload button */}
-              <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-fit">
-                <Upload className="w-4 h-4" />
-                <span>Importer une affiche</span>
+              <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-primary-500/40 hover:text-primary-300">
+                <Upload className="h-4 w-4" />
+                Importer une affiche
                 <input
                   type="file"
                   accept="image/*"
@@ -675,121 +654,110 @@ export default function CinemaPage() {
                 />
               </label>
 
-              {/* Preview */}
               {movieForm.posterUrl && (
-                <div className="relative w-32 h-48 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div className="relative h-48 w-32 overflow-hidden rounded-lg border border-white/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={movieForm.posterUrl}
                     alt="Aperçu de l'affiche"
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                   <button
                     type="button"
                     onClick={() => setMovieForm({ ...movieForm, posterUrl: '' })}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    className="absolute right-1 top-1 rounded-full bg-rose-500 p-1 text-white hover:bg-rose-400"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="h-3 w-3" />
                   </button>
                 </div>
               )}
 
-              {/* Fallback URL input */}
-              <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                Ou entrez l'URL directement :
-              </div>
+              <div className="text-xs text-slate-500">Ou entrez l&apos;URL directement :</div>
               <input
                 type="url"
                 value={movieForm.posterUrl}
                 onChange={(e) => setMovieForm({ ...movieForm, posterUrl: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 text-sm"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={cn(dashInputCls, 'text-sm')}
                 placeholder="https://exemple.com/image.jpg"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              URL de la bande-annonce
-            </label>
+            <label className="mb-1 block text-sm text-slate-400">URL de la bande-annonce</label>
             <input
               type="url"
               value={movieForm.trailerUrl}
               onChange={(e) => setMovieForm({ ...movieForm, trailerUrl: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
-              placeholder="https://youtube.com/..."
+              className={dashInputCls}
+              placeholder="https://youtube.com/…"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <label className="flex items-center">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={movieForm.isActive}
                 onChange={(e) => setMovieForm({ ...movieForm, isActive: e.target.checked })}
-                className="mr-2"
+                className="h-4 w-4 rounded border-white/20 bg-white/5"
               />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>Actif</span>
+              <span className="text-sm text-slate-300">Actif</span>
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={movieForm.nowShowing}
                 onChange={(e) => setMovieForm({ ...movieForm, nowShowing: e.target.checked })}
-                className="mr-2"
+                className="h-4 w-4 rounded border-white/20 bg-white/5"
               />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>À l'affiche</span>
+              <span className="text-sm text-slate-300">À l&apos;affiche</span>
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={movieForm.comingSoon}
                 onChange={(e) => setMovieForm({ ...movieForm, comingSoon: e.target.checked })}
-                className="mr-2"
+                className="h-4 w-4 rounded border-white/20 bg-white/5"
               />
-              <span className="text-sm" style={{ color: 'var(--foreground)' }}>Bientôt</span>
+              <span className="text-sm text-slate-300">Bientôt</span>
             </label>
           </div>
         </div>
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSaveMovie}
-            className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-          >
-            {selectedMovie ? 'Mettre à jour' : 'Créer'}
-          </button>
+        <div className="mt-6 flex justify-end gap-3 border-t border-white/5 pt-4">
           <button
             onClick={() => {
               setShowMovieModal(false)
               setSelectedMovie(null)
               resetMovieForm()
             }}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+            className={dashBtnOutlineCls}
           >
             Annuler
+          </button>
+          <button onClick={handleSaveMovie} className={dashBtnPrimaryCls}>
+            {selectedMovie ? 'Mettre à jour' : 'Créer'}
           </button>
         </div>
       </Modal>
 
-      {/* Screening Modal */}
+      {/* Modal : séance */}
       <Modal
         isOpen={showScreeningModal}
         onClose={() => {
           setShowScreeningModal(false)
           resetScreeningForm()
         }}
-        title="Nouvelle Séance"
+        title="Nouvelle séance"
         size="xl"
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Film *
+            <label className="mb-1 block text-sm text-slate-400">
+              Film <span className="text-rose-400">*</span>
             </label>
             <select
               value={screeningForm.movieId}
               onChange={(e) => setScreeningForm({ ...screeningForm, movieId: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashSelectCls}
               required
             >
               <option value="">Sélectionner un film</option>
@@ -801,81 +769,70 @@ export default function CinemaPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Date et heure *
+            <label className="mb-1 block text-sm text-slate-400">
+              Date et heure <span className="text-rose-400">*</span>
             </label>
             <input
               type="datetime-local"
               value={screeningForm.screenTime}
               onChange={(e) => setScreeningForm({ ...screeningForm, screenTime: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Salle
-              </label>
+              <label className="mb-1 block text-sm text-slate-400">Salle</label>
               <input
                 type="number"
                 value={screeningForm.screenNumber}
                 onChange={(e) => setScreeningForm({ ...screeningForm, screenNumber: parseInt(e.target.value) })}
                 min="1"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Places totales
-              </label>
+              <label className="mb-1 block text-sm text-slate-400">Places totales</label>
               <input
                 type="number"
                 value={screeningForm.totalSeats}
                 onChange={(e) => setScreeningForm({ ...screeningForm, totalSeats: parseInt(e.target.value) })}
                 min="1"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Prix (FCFA) *
+            <label className="mb-1 block text-sm text-slate-400">
+              Prix (FCFA) <span className="text-rose-400">*</span>
             </label>
             <input
               type="number"
               value={screeningForm.price}
               onChange={(e) => setScreeningForm({ ...screeningForm, price: parseInt(e.target.value) })}
               min="0"
-              className="w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
               required
             />
           </div>
         </div>
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSaveScreening}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Créer
-          </button>
+        <div className="mt-6 flex justify-end gap-3 border-t border-white/5 pt-4">
           <button
             onClick={() => {
               setShowScreeningModal(false)
               resetScreeningForm()
             }}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+            className={dashBtnOutlineCls}
           >
             Annuler
+          </button>
+          <button onClick={handleSaveScreening} className={dashBtnPrimaryCls}>
+            Créer
           </button>
         </div>
       </Modal>
 
-      {/* Delete Movie Confirmation Modal */}
+      {/* Modal : confirmation suppression film */}
       <Modal
         isOpen={showDeleteMovieModal}
         onClose={() => {
@@ -883,43 +840,42 @@ export default function CinemaPage() {
           setSelectedMovie(null)
         }}
         title="Confirmer la suppression"
-        size="xl"
+        size="md"
       >
         <div className="space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
-            <p className="text-red-800 text-sm">
+          <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-4">
+            <p className="mb-2 font-medium text-rose-300">⚠️ Attention</p>
+            <p className="text-sm text-rose-200/80">
               Vous êtes sur le point de supprimer le film :
             </p>
-            <p className="text-red-900 font-bold mt-2">
-              {selectedMovie?.title}
-            </p>
+            <p className="mt-2 font-bold text-rose-100">{selectedMovie?.title}</p>
           </div>
 
-          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            Cette action est irréversible. Toutes les séances associées à ce film seront également supprimées.
+          <p className="text-sm text-slate-400">
+            Cette action est irréversible. Toutes les séances associées à ce film seront
+            également supprimées.
           </p>
 
-          <div className="flex gap-3 justify-end pt-4">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               onClick={() => {
                 setShowDeleteMovieModal(false)
                 setSelectedMovie(null)
               }}
               disabled={isDeleting}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className={dashBtnOutlineCls}
             >
               Annuler
             </button>
             <button
               onClick={handleDeleteMovieConfirm}
               disabled={isDeleting}
-              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDeleting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Suppression...
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Suppression…
                 </>
               ) : (
                 'Supprimer définitivement'
@@ -929,7 +885,7 @@ export default function CinemaPage() {
         </div>
       </Modal>
 
-      {/* Delete Screening Confirmation Modal */}
+      {/* Modal : confirmation suppression séance */}
       <Modal
         isOpen={showDeleteScreeningModal}
         onClose={() => {
@@ -937,18 +893,16 @@ export default function CinemaPage() {
           setSelectedScreening(null)
         }}
         title="Confirmer la suppression"
-        size="xl"
+        size="md"
       >
         <div className="space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
-            <p className="text-red-800 text-sm">
+          <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-4">
+            <p className="mb-2 font-medium text-rose-300">⚠️ Attention</p>
+            <p className="text-sm text-rose-200/80">
               Vous êtes sur le point de supprimer la séance de :
             </p>
-            <p className="text-red-900 font-bold mt-2">
-              {selectedScreening?.movie.title}
-            </p>
-            <p className="text-red-700 text-sm mt-1">
+            <p className="mt-2 font-bold text-rose-100">{selectedScreening?.movie.title}</p>
+            <p className="mt-1 text-sm text-rose-200/70">
               {new Date(selectedScreening?.screenTime || '').toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'long',
@@ -959,30 +913,30 @@ export default function CinemaPage() {
             </p>
           </div>
 
-          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+          <p className="text-sm text-slate-400">
             Cette action est irréversible. La séance sera définitivement supprimée.
           </p>
 
-          <div className="flex gap-3 justify-end pt-4">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               onClick={() => {
                 setShowDeleteScreeningModal(false)
                 setSelectedScreening(null)
               }}
               disabled={isDeleting}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className={dashBtnOutlineCls}
             >
               Annuler
             </button>
             <button
               onClick={handleDeleteScreeningConfirm}
               disabled={isDeleting}
-              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDeleting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Suppression...
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Suppression…
                 </>
               ) : (
                 'Supprimer définitivement'

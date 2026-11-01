@@ -97,6 +97,14 @@ export const equipmentStatusMeta: Record<string, StatusMeta> = {
   RETIRED: { label: 'Retiré', tone: 'slate' },
 }
 
+export const customerStatusMeta: Record<string, StatusMeta> = {
+  NEW: { label: 'Nouveau', tone: 'sky' },
+  REGULAR: { label: 'Régulier', tone: 'slate' },
+  VIP: { label: 'VIP', tone: 'emerald' },
+  INACTIVE: { label: 'Inactif', tone: 'amber' },
+  BLOCKED: { label: 'Bloqué', tone: 'rose' },
+}
+
 export function StatusBadge({
   status,
   meta,

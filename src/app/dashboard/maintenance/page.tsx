@@ -1,14 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
-import { Wrench, Plus, AlertCircle, Clock, Trash2 } from 'lucide-react'
+import { Wrench, Plus, Clock, Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashCard,
+  DashEmpty,
+  DashBadge,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+} from '../components/dash-ui'
 
 interface MaintenanceTicket {
   id: string
@@ -25,6 +31,21 @@ interface MaintenanceTicket {
   assignedTo?: {
     name: string
   }
+}
+
+const priorityMeta: Record<string, { label: string; tone: 'slate' | 'amber' | 'rose' }> = {
+  LOW: { label: 'Faible', tone: 'slate' },
+  MEDIUM: { label: 'Moyen', tone: 'amber' },
+  HIGH: { label: 'Élevé', tone: 'rose' },
+  URGENT: { label: 'Urgent', tone: 'rose' },
+}
+
+const ticketStatusMeta: Record<string, { label: string; tone: 'sky' | 'amber' | 'emerald' | 'slate' }> = {
+  OPEN: { label: 'Ouvert', tone: 'sky' },
+  IN_PROGRESS: { label: 'En cours', tone: 'amber' },
+  WAITING_PARTS: { label: 'Attente pièces', tone: 'amber' },
+  RESOLVED: { label: 'Résolu', tone: 'emerald' },
+  CLOSED: { label: 'Fermé', tone: 'slate' },
 }
 
 export default function MaintenancePage() {
@@ -120,153 +141,106 @@ export default function MaintenancePage() {
     }
   }
 
-  const getPriorityBadge = (priority: string) => {
-    const priorityConfig: Record<string, { label: string; variant: any }> = {
-      LOW: { label: 'Faible', variant: 'default' },
-      MEDIUM: { label: 'Moyen', variant: 'warning' },
-      HIGH: { label: 'Élevé', variant: 'danger' },
-      URGENT: { label: 'Urgent', variant: 'danger' },
-    }
-
-    const config = priorityConfig[priority] || priorityConfig.MEDIUM
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any }> = {
-      OPEN: { label: 'Ouvert', variant: 'info' },
-      IN_PROGRESS: { label: 'En cours', variant: 'warning' },
-      WAITING_PARTS: { label: 'Attente pièces', variant: 'warning' },
-      RESOLVED: { label: 'Résolu', variant: 'success' },
-      CLOSED: { label: 'Fermé', variant: 'default' },
-    }
-
-    const config = statusConfig[status] || statusConfig.OPEN
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Maintenance</h1>
-              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
-                Tickets et diagnostic des équipements
-              </p>
-            </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              Nouveau Ticket
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Maintenance"
+        description="Tickets et diagnostic des équipements"
+        actions={
+          <button onClick={() => setShowModal(true)} className={dashBtnPrimaryCls}>
+            <Plus className="h-4 w-4" />
+            Nouveau ticket
+          </button>
+        }
+      />
+
+      {loading && tickets.length === 0 ? (
+        <div className="dash-card py-12 text-center text-sm text-slate-500">Chargement…</div>
+      ) : tickets.length === 0 ? (
+        <div className="dash-card">
+          <DashEmpty
+            icon={Wrench}
+            title="Aucun ticket de maintenance"
+            hint="Créez un ticket pour signaler un problème ou planifier une maintenance"
+          />
+          <div className="flex justify-center pb-6">
+            <button onClick={() => setShowModal(true)} className={dashBtnPrimaryCls}>
+              <Plus className="h-4 w-4" />
+              Créer un ticket
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        {loading ? (
-          <Card>
-            <CardContent className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
-              Chargement...
-            </CardContent>
-          </Card>
-        ) : tickets.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-16">
-              <Wrench className="w-16 h-16 text-slate-900 mx-auto mb-4" style={{ color: 'var(--foreground)' }} />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2" style={{ color: 'var(--foreground)' }}>
-                Aucun ticket de maintenance
-              </h3>
-              <p className="text-slate-900 mb-6" style={{ color: 'var(--foreground)' }}>
-                Créez un ticket pour signaler un problème ou planifier une maintenance
-              </p>
-              <button
-                onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-              >
-                <Plus className="w-5 h-5" />
-                Créer un Ticket
-              </button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {tickets.map((ticket) => (
-              <Card key={ticket.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-slate-900" style={{ color: 'var(--foreground)' }}>
-                          {ticket.ticketNumber} - {ticket.title}
-                        </h3>
-                        {getPriorityBadge(ticket.priority)}
-                        {getStatusBadge(ticket.status)}
-                      </div>
-
-                      <p className="text-slate-900 mb-3" style={{ color: 'var(--foreground)' }}>{ticket.description}</p>
-
-                      <div className="flex items-center gap-6 text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>
-                        <div className="flex items-center gap-1">
-                          <Wrench className="w-4 h-4" />
-                          {ticket.equipment.name} ({ticket.equipment.code})
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
-                        </div>
-                      </div>
+      ) : (
+        <div className="grid gap-4">
+          {tickets.map((ticket) => {
+            const priority = priorityMeta[ticket.priority] ?? priorityMeta.MEDIUM
+            const status = ticketStatusMeta[ticket.status] ?? ticketStatusMeta.OPEN
+            return (
+              <DashCard key={ticket.id} className="p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-base font-semibold text-slate-100">
+                        {ticket.ticketNumber} — {ticket.title}
+                      </h3>
+                      <DashBadge label={priority.label} tone={priority.tone} />
+                      <DashBadge label={status.label} tone={status.tone} />
                     </div>
 
-                    <div className="flex gap-2 ml-4">
-                      <Button size="sm" variant="ghost">
-                        Voir détails
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteTicket(ticket.id, ticket.title)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                    <p className="mb-3 text-sm text-slate-400">{ticket.description}</p>
+
+                    <div className="flex flex-wrap items-center gap-5 text-sm text-slate-500">
+                      <div className="flex items-center gap-1.5">
+                        <Wrench className="h-4 w-4" />
+                        {ticket.equipment.name} ({ticket.equipment.code})
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4" />
+                        {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
+                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Modal New Ticket */}
+                  <div className="flex shrink-0 gap-1">
+                    <button className={cn(dashBtnGhostCls, 'px-3 text-xs')}>Détails</button>
+                    <button
+                      onClick={() => handleDeleteTicket(ticket.id, ticket.title)}
+                      title="Supprimer"
+                      className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </DashCard>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Modal : nouveau ticket */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Nouveau Ticket de Maintenance"
+        title="Nouveau ticket de maintenance"
         size="xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Section: Équipement et priorité */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Équipement et priorité */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+            <h3 className="mb-3 text-base font-semibold text-slate-100">
               Équipement et priorité
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div className="w-full">
-                <Label htmlFor="equipment" className="text-sm">Équipement concerné *</Label>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              <div>
+                <label htmlFor="equipment" className="mb-1 block text-sm text-slate-400">
+                  Équipement concerné <span className="text-rose-400">*</span>
+                </label>
                 <select
                   id="equipment"
                   value={formData.equipmentId}
                   onChange={(e) => setFormData({ ...formData, equipmentId: e.target.value })}
-                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  style={{ borderColor: 'var(--border)' }}
+                  className={dashSelectCls}
                   required
                 >
                   <option value="">Sélectionner un équipement</option>
@@ -278,14 +252,13 @@ export default function MaintenancePage() {
                 </select>
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="priority" className="text-sm">Priorité</Label>
+              <div>
+                <label htmlFor="priority" className="mb-1 block text-sm text-slate-400">Priorité</label>
                 <select
                   id="priority"
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  style={{ borderColor: 'var(--border)' }}
+                  className={dashSelectCls}
                 >
                   <option value="LOW">Faible</option>
                   <option value="MEDIUM">Moyen</option>
@@ -296,56 +269,49 @@ export default function MaintenancePage() {
             </div>
           </div>
 
-          {/* Section: Description du problème */}
+          {/* Description du problème */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+            <h3 className="mb-3 text-base font-semibold text-slate-100">
               Description du problème
             </h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div className="w-full">
-                <Label htmlFor="title" className="text-sm">Titre du problème *</Label>
-                <Input
+              <div>
+                <label htmlFor="title" className="mb-1 block text-sm text-slate-400">
+                  Titre du problème <span className="text-rose-400">*</span>
+                </label>
+                <input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Ex: Écran défectueux, Manette HS..."
+                  placeholder="Ex : Écran défectueux, Manette HS…"
                   required
-                  className="w-full h-10 sm:h-auto"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
+                  className={dashInputCls}
                 />
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="description" className="text-sm">Description détaillée</Label>
+              <div>
+                <label htmlFor="description" className="mb-1 block text-sm text-slate-400">
+                  Description détaillée
+                </label>
                 <textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Décrivez le problème en détail..."
-                  className="flex w-full h-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[100px]"
-                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
+                  placeholder="Décrivez le problème en détail…"
+                  className={cn(dashInputCls, 'min-h-[100px]')}
                 />
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowModal(false)}
-              className="w-full sm:w-auto"
-            >
+          <div className="flex flex-col-reverse gap-3 border-t border-white/5 pt-4 sm:flex-row sm:justify-end">
+            <button type="button" onClick={() => setShowModal(false)} className={dashBtnOutlineCls}>
               Annuler
-            </Button>
-            <Button type="submit" className="w-full sm:w-auto">
-              Créer le Ticket
-            </Button>
+            </button>
+            <button type="submit" className={dashBtnPrimaryCls}>
+              Créer le ticket
+            </button>
           </div>
         </form>
       </Modal>

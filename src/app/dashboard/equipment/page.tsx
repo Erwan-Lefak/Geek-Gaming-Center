@@ -1,13 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Monitor, Settings, Activity, AlertCircle, Plus, Trash2, Edit } from 'lucide-react'
+import {
+  Monitor,
+  Settings,
+  Activity,
+  AlertCircle,
+  Plus,
+  Trash2,
+  Gamepad2,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashStat,
+  DashEmpty,
+  StatusBadge,
+  equipmentStatusMeta,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+} from '../components/dash-ui'
 
 interface Equipment {
   id: string
@@ -108,29 +124,10 @@ export default function EquipmentPage() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any; icon: any }> = {
-      AVAILABLE: { label: 'Disponible', variant: 'success', icon: Activity },
-      IN_USE: { label: 'En cours', variant: 'info', icon: Monitor },
-      RESERVED: { label: 'Réservé', variant: 'warning', icon: AlertCircle },
-      MAINTENANCE: { label: 'Maintenance', variant: 'danger', icon: Settings },
-      BROKEN: { label: 'Panne', variant: 'danger', icon: AlertCircle },
-    }
-
-    const config = statusConfig[status] || statusConfig.AVAILABLE
-    const Icon = config.icon
-    return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
-        <Icon className="w-3 h-3" />
-        {config.label}
-      </Badge>
-    )
-  }
-
-  const getHealthScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 50) return 'text-yellow-600'
-    return 'text-red-600'
+  const getHealthTone = (score: number) => {
+    if (score >= 80) return 'text-emerald-400'
+    if (score >= 50) return 'text-amber-400'
+    return 'text-rose-400'
   }
 
   const getEquipmentTypeLabel = (type: string) => {
@@ -155,235 +152,181 @@ export default function EquipmentPage() {
     return acc
   }, {} as Record<string, number>)
 
-  if (loading) {
+  if (loading && equipment.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Chargement...</div>
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-sm text-slate-500">Chargement…</div>
       </div>
     )
   }
 
+  const filterBtn = (key: string, label: string, count: number) => (
+    <button
+      key={key}
+      onClick={() => setFilter(key)}
+      className={cn(
+        'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+        filter === key
+          ? 'bg-primary-500/15 text-primary-300'
+          : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+      )}
+    >
+      {label} <span className="tabular-nums">({count})</span>
+    </button>
+  )
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Équipements</h1>
-              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
-                Gestion et maintenance du parc matériel
-              </p>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              Nouvel Équipement
-            </button>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Équipements"
+        description="Gestion et maintenance du parc matériel"
+        actions={
+          <button onClick={() => setShowCreateModal(true)} className={dashBtnPrimaryCls}>
+            <Plus className="h-4 w-4" />
+            Nouvel équipement
+          </button>
+        }
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <DashStat icon={Gamepad2} label="Total" value={equipment.length} tone="violet" />
+        <DashStat icon={Activity} label="Disponibles" value={statusCounts.AVAILABLE || 0} tone="emerald" />
+        <DashStat icon={Monitor} label="En cours" value={statusCounts.IN_USE || 0} tone="sky" />
+        <DashStat icon={Settings} label="Maintenance" value={statusCounts.MAINTENANCE || 0} tone="amber" />
+        <DashStat icon={AlertCircle} label="En panne" value={statusCounts.BROKEN || 0} tone="rose" />
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>{equipment.length}</div>
-                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Total</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{statusCounts.AVAILABLE || 0}</div>
-                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Disponibles</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{statusCounts.IN_USE || 0}</div>
-                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>En cours</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">{statusCounts.MAINTENANCE || 0}</div>
-                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Maintenance</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{statusCounts.BROKEN || 0}</div>
-                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>En panne</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Filtres */}
+      <div className="flex flex-wrap gap-1.5">
+        {filterBtn('all', 'Tous', equipment.length)}
+        {filterBtn('AVAILABLE', 'Disponibles', statusCounts.AVAILABLE || 0)}
+        {filterBtn('IN_USE', 'En cours', statusCounts.IN_USE || 0)}
+        {filterBtn('MAINTENANCE', 'Maintenance', statusCounts.MAINTENANCE || 0)}
+        {filterBtn('BROKEN', 'En panne', statusCounts.BROKEN || 0)}
+      </div>
 
-        {/* Filter Buttons */}
-        <div className="flex gap-2 mb-6">
-          <Button
-            size="sm"
-            variant={filter === 'all' ? 'default' : 'ghost'}
-            onClick={() => setFilter('all')}
-          >
-            Tous ({equipment.length})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'AVAILABLE' ? 'default' : 'ghost'}
-            onClick={() => setFilter('AVAILABLE')}
-          >
-            Disponibles ({statusCounts.AVAILABLE || 0})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'IN_USE' ? 'default' : 'ghost'}
-            onClick={() => setFilter('IN_USE')}
-          >
-            En cours ({statusCounts.IN_USE || 0})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'MAINTENANCE' ? 'default' : 'ghost'}
-            onClick={() => setFilter('MAINTENANCE')}
-          >
-            Maintenance ({statusCounts.MAINTENANCE || 0})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'BROKEN' ? 'default' : 'ghost'}
-            onClick={() => setFilter('BROKEN')}
-          >
-            En panne ({statusCounts.BROKEN || 0})
-          </Button>
+      {/* Grille des équipements */}
+      {filteredEquipment.length === 0 ? (
+        <div className="dash-card">
+          <DashEmpty icon={Gamepad2} title="Aucun équipement trouvé" />
         </div>
-
-        {/* Equipment Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredEquipment.map((eq) => (
-            <Card key={eq.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{eq.name}</CardTitle>
-                    <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>{getEquipmentTypeLabel(eq.type)}</p>
-                  </div>
-                  {getStatusBadge(eq.status)}
+            <div key={eq.id} className="dash-card flex flex-col p-5">
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <div>
+                  <h3 className="font-semibold text-slate-100">{eq.name}</h3>
+                  <p className="mt-0.5 text-sm text-slate-500">
+                    {getEquipmentTypeLabel(eq.type)}
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-900" style={{ color: 'var(--foreground)' }}>Code</span>
-                    <span className="font-medium">{eq.code}</span>
+                <StatusBadge status={eq.status} meta={equipmentStatusMeta} />
+              </div>
+
+              <div className="flex-1 space-y-2.5 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Code</span>
+                  <span className="font-medium text-slate-200">{eq.code}</span>
+                </div>
+
+                {eq.location && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Emplacement</span>
+                    <span className="font-medium text-slate-200">{eq.location}</span>
                   </div>
+                )}
 
-                  {eq.location && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-900" style={{ color: 'var(--foreground)' }}>Emplacement</span>
-                      <span className="font-medium">{eq.location}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-900" style={{ color: 'var(--foreground)' }}>Santé</span>
-                    <span className={`font-bold ${getHealthScoreColor(eq.healthScore)}`}>
+                <div>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-slate-500">Santé</span>
+                    <span className={cn('font-bold tabular-nums', getHealthTone(eq.healthScore))}>
                       {eq.healthScore}%
                     </span>
                   </div>
-
-                  {eq.lastMaintenance && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-900" style={{ color: 'var(--foreground)' }}>Dernière maintenance</span>
-                      <span className="text-slate-900" style={{ color: 'var(--foreground)' }}>
-                        {new Date(eq.lastMaintenance).toLocaleDateString('fr-FR')}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="pt-3 border-t flex gap-2">
-                    <Button size="sm" variant="ghost" className="flex-1">
-                      <Settings className="w-4 h-4 mr-1" />
-                      Maintenance
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteEquipment(eq.id, eq.name)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+                    <div
+                      className={cn(
+                        'h-full rounded-full',
+                        eq.healthScore >= 80
+                          ? 'bg-emerald-400'
+                          : eq.healthScore >= 50
+                            ? 'bg-amber-400'
+                            : 'bg-rose-400'
+                      )}
+                      style={{ width: `${eq.healthScore}%` }}
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                {eq.lastMaintenance && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Dernière maintenance</span>
+                    <span className="text-slate-300">
+                      {new Date(eq.lastMaintenance).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex gap-2 border-t border-white/5 pt-3">
+                <button className={cn(dashBtnOutlineCls, 'flex-1 justify-center py-2 text-xs')}>
+                  <Settings className="h-3.5 w-3.5" />
+                  Maintenance
+                </button>
+                <button
+                  onClick={() => handleDeleteEquipment(eq.id, eq.name)}
+                  title="Supprimer"
+                  className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           ))}
         </div>
+      )}
 
-        {filteredEquipment.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
-              Aucun équipement trouvé
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Modal de création d'équipement */}
+      {/* Modal : nouvel équipement */}
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Nouvel Équipement"
+        title="Nouvel équipement"
         size="xl"
       >
-        <form onSubmit={handleCreateEquipment} className="space-y-4 sm:space-y-6">
-          {/* Section: Informations de base */}
+        <form onSubmit={handleCreateEquipment} className="space-y-6">
+          {/* Informations de base */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
+            <h3 className="mb-3 text-base font-semibold text-slate-100">
               Informations de base
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               <div className="sm:col-span-2">
-                <Label htmlFor="name" className="text-sm">Nom de l'équipement *</Label>
-                <Input
+                <label htmlFor="name" className="mb-1 block text-sm text-slate-400">
+                  Nom de l&apos;équipement <span className="text-rose-400">*</span>
+                </label>
+                <input
                   id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full h-10 sm:h-auto"
-                  placeholder="Ex: PS5 - Zone VIP"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
+                  className={dashInputCls}
+                  placeholder="Ex : PS5 - Zone VIP"
                 />
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="type" className="text-sm">Type d'équipement *</Label>
+              <div>
+                <label htmlFor="type" className="mb-1 block text-sm text-slate-400">
+                  Type d&apos;équipement <span className="text-rose-400">*</span>
+                </label>
                 <select
                   id="type"
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                   required
-                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  style={{ borderColor: 'var(--border)' }}
+                  className={dashSelectCls}
                 >
                   <option value="PS5">PlayStation 5</option>
                   <option value="PS4">PlayStation 4</option>
@@ -395,76 +338,64 @@ export default function EquipmentPage() {
                 </select>
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="code" className="text-sm">Code unique *</Label>
-                <Input
+              <div>
+                <label htmlFor="code" className="mb-1 block text-sm text-slate-400">
+                  Code unique <span className="text-rose-400">*</span>
+                </label>
+                <input
                   id="code"
                   type="text"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                   required
-                  className="w-full h-10 sm:h-auto"
-                  placeholder="Ex: PS5-001"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
+                  className={dashInputCls}
+                  placeholder="Ex : PS5-001"
                 />
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="location" className="text-sm">Emplacement</Label>
-                <Input
+              <div>
+                <label htmlFor="location" className="mb-1 block text-sm text-slate-400">Emplacement</label>
+                <input
                   id="location"
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full h-10 sm:h-auto"
-                  placeholder="Ex: Zone A, Étage 1..."
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
+                  className={dashInputCls}
+                  placeholder="Ex : Zone A, Étage 1…"
                 />
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="hourlyRate" className="text-sm">Taux horaire (FCFA)</Label>
-                <Input
+              <div>
+                <label htmlFor="hourlyRate" className="mb-1 block text-sm text-slate-400">
+                  Taux horaire (FCFA)
+                </label>
+                <input
                   id="hourlyRate"
                   type="number"
                   value={formData.hourlyRate}
                   onChange={(e) => setFormData({ ...formData, hourlyRate: parseInt(e.target.value) || 0 })}
                   min="0"
-                  className="w-full h-10 sm:h-auto"
+                  className={dashInputCls}
                   placeholder="2000"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Section: État initial */}
+          {/* État initial */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--foreground)' }}>
-              État initial
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div className="w-full">
-                <Label htmlFor="status" className="text-sm">Statut *</Label>
+            <h3 className="mb-3 text-base font-semibold text-slate-100">État initial</h3>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              <div>
+                <label htmlFor="status" className="mb-1 block text-sm text-slate-400">
+                  Statut <span className="text-rose-400">*</span>
+                </label>
                 <select
                   id="status"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                   required
-                  className="w-full h-10 sm:h-auto px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  style={{ borderColor: 'var(--border)' }}
+                  className={dashSelectCls}
                 >
                   <option value="AVAILABLE">Disponible</option>
                   <option value="MAINTENANCE">En maintenance</option>
@@ -472,9 +403,11 @@ export default function EquipmentPage() {
                 </select>
               </div>
 
-              <div className="w-full">
-                <Label htmlFor="healthScore" className="text-sm">Score de santé (%)</Label>
-                <Input
+              <div>
+                <label htmlFor="healthScore" className="mb-1 block text-sm text-slate-400">
+                  Score de santé (%)
+                </label>
+                <input
                   id="healthScore"
                   type="number"
                   value={formData.healthScore}
@@ -482,30 +415,20 @@ export default function EquipmentPage() {
                   min="0"
                   max="100"
                   required
-                  className="w-full h-10 sm:h-auto"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)'
-                  }}
+                  className={dashInputCls}
                 />
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowCreateModal(false)}
-              className="w-full sm:w-auto"
-            >
+          <div className="flex flex-col-reverse gap-3 border-t border-white/5 pt-4 sm:flex-row sm:justify-end">
+            <button type="button" onClick={() => setShowCreateModal(false)} className={dashBtnOutlineCls}>
               Annuler
-            </Button>
-            <Button type="submit" className="w-full sm:w-auto">
-              Créer l'Équipement
-            </Button>
+            </button>
+            <button type="submit" className={dashBtnPrimaryCls}>
+              Créer l&apos;équipement
+            </button>
           </div>
         </form>
       </Modal>

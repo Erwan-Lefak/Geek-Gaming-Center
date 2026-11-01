@@ -2,14 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Modal } from '@/components/ui/modal'
 import { CustomerForm } from '@/components/forms/CustomerForm'
-import { Search, Plus, Edit, Eye, Trash2 } from 'lucide-react'
+import { Search, Plus, Edit, Eye, Trash2, Users } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashCard,
+  DashEmpty,
+  StatusBadge,
+  customerStatusMeta,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+  dashTableHeadCls,
+} from '../components/dash-ui'
 
 interface Customer {
   id: string
@@ -23,6 +32,12 @@ interface Customer {
   visitCount: number
   lastVisit?: string
   createdAt: string
+  address?: string
+  city?: string
+  dateOfBirth?: string
+  howDidYouFindUs?: string
+  howDidYouFindUsDetails?: string
+  notes?: string
 }
 
 export default function CustomersPage() {
@@ -38,7 +53,6 @@ export default function CustomersPage() {
   const [showModal, setShowModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
-  const [formError, setFormError] = useState('')
   const [customerFormError, setCustomerFormError] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -153,212 +167,171 @@ export default function CustomersPage() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any }> = {
-      NEW: { label: 'Nouveau', variant: 'info' },
-      REGULAR: { label: 'Régulier', variant: 'default' },
-      VIP: { label: 'VIP', variant: 'success' },
-      INACTIVE: { label: 'Inactif', variant: 'warning' },
-      BLOCKED: { label: 'Bloqué', variant: 'danger' },
-    }
-
-    const config = statusConfig[status] || statusConfig.NEW
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ color: 'var(--foreground)' }}>Clients</h1>
-              <p className="text-sm text-slate-900 mt-1" style={{ color: 'var(--foreground)' }}>
-                Gestion des clients du Geek Gaming Center
-              </p>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Clients"
+        description="Fichier clients du Geek Gaming Center"
+        actions={
+          <button
+            onClick={() => {
+              setShowModal(true)
+              setSelectedCustomer(null)
+              setCustomerFormError('')
+            }}
+            className={dashBtnPrimaryCls}
+          >
+            <Plus className="h-4 w-4" />
+            Nouveau client
+          </button>
+        }
+      />
+
+      <DashCard
+        action={
+          <div className="flex flex-wrap gap-2">
+            <div className="relative min-w-[220px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <input
+                placeholder="Nom, email, téléphone…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={cn(dashInputCls, 'pl-9')}
+                onKeyPress={(e) => e.key === 'Enter' && fetchCustomers()}
+              />
             </div>
-            <Button
-              onClick={() => {
-                setShowModal(true)
-                setSelectedCustomer(null)
-                setCustomerFormError('')
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value)
+                setPage(1)
               }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+              className={cn(dashSelectCls, 'w-auto')}
             >
-              <Plus className="w-5 h-5" />
-              Nouveau Client
-            </Button>
+              <option value="">Tous les statuts</option>
+              <option value="NEW">Nouveaux</option>
+              <option value="REGULAR">Réguliers</option>
+              <option value="VIP">VIP</option>
+              <option value="INACTIVE">Inactifs</option>
+            </select>
           </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-900" style={{ color: 'var(--foreground)' }} />
-                  <Input
-                    placeholder="Rechercher par nom, email, téléphone..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10"
-                    onKeyPress={(e) => e.key === 'Enter' && fetchCustomers()}
-                    style={{
-                      backgroundColor: 'var(--background)',
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)'
-                    }}
-                  />
-                </div>
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value)
-                  setPage(1)
-                }}
-                className="h-10 px-3 rounded-md border border-slate-200 bg-white text-sm"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}
-              >
-                <option value="">Tous les statuts</option>
-                <option value="NEW">Nouveaux</option>
-                <option value="REGULAR">Réguliers</option>
-                <option value="VIP">VIP</option>
-                <option value="INACTIVE">Inactifs</option>
-              </select>
+        }
+      >
+        {loading && customers.length === 0 ? (
+          <div className="py-12 text-center text-sm text-slate-500">Chargement des clients…</div>
+        ) : customers.length === 0 ? (
+          <DashEmpty
+            icon={Users}
+            title="Aucun client trouvé"
+            hint={search ? 'Essayez une autre recherche' : undefined}
+          />
+        ) : (
+          <>
+            <div className="overflow-x-auto dash-scroll">
+              <table className="w-full min-w-[820px] text-sm">
+                <thead>
+                  <tr>
+                    <th className={dashTableHeadCls}>Client</th>
+                    <th className={dashTableHeadCls}>Contact</th>
+                    <th className={dashTableHeadCls}>Statut</th>
+                    <th className={dashTableHeadCls}>Visites</th>
+                    <th className={dashTableHeadCls}>Total dépensé</th>
+                    <th className={dashTableHeadCls}>Dernière visite</th>
+                    <th className={cn(dashTableHeadCls, 'text-right')}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.map((customer) => (
+                    <tr
+                      key={customer.id}
+                      className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="py-3 pr-4">
+                        <div className="font-medium text-slate-200">
+                          {customer.firstName} {customer.lastName}
+                        </div>
+                        {customer.email && (
+                          <div className="text-xs text-slate-500">{customer.email}</div>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400">{customer.phone}</td>
+                      <td className="py-3 pr-4">
+                        <StatusBadge status={customer.status} meta={customerStatusMeta} />
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="text-slate-200">{customer.visitCount} visite(s)</div>
+                        <div className="text-xs text-slate-500">
+                          {Number(customer.totalHours).toFixed(1)}h
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-slate-200 tabular-nums">
+                        {customer.totalSpent.toLocaleString('fr-FR')} FCFA
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400">
+                        {customer.lastVisit
+                          ? new Date(customer.lastVisit).toLocaleDateString('fr-FR')
+                          : 'Jamais'}
+                      </td>
+                      <td className="py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <button
+                            onClick={() => router.push(`/dashboard/customers/${customer.id}`)}
+                            title="Voir"
+                            className={dashBtnGhostCls}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(customer)}
+                            title="Modifier"
+                            className={dashBtnGhostCls}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(customer)}
+                            title="Supprimer"
+                            className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
-                Chargement des clients...
-              </div>
-            ) : customers.length === 0 ? (
-              <div className="text-center py-12 text-slate-900" style={{ color: 'var(--foreground)' }}>
-                Aucun client trouvé
-              </div>
-            ) : (
-              <>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Visites</TableHead>
-                        <TableHead>Total Dépensé</TableHead>
-                        <TableHead>Dernière Visite</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {customers.map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium text-slate-900" style={{ color: 'var(--foreground)' }}>
-                                {customer.firstName} {customer.lastName}
-                              </div>
-                              {customer.email && (
-                                <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>{customer.email}</div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">{customer.phone}</div>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                          <TableCell>
-                            <div className="text-sm">{customer.visitCount} visite(s)</div>
-                            <div className="text-xs text-slate-900" style={{ color: 'var(--foreground)' }}>{Number(customer.totalHours).toFixed(1)}h</div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm font-medium">
-                              {customer.totalSpent.toLocaleString('fr-FR')} FCFA
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {customer.lastVisit ? (
-                              <div className="text-sm">
-                                {new Date(customer.lastVisit).toLocaleDateString('fr-FR')}
-                              </div>
-                            ) : (
-                              <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>Jamais</div>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => router.push(`/dashboard/customers/${customer.id}`)}
-                                title="Voir"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEdit(customer)}
-                                title="Modifier"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteClick(customer)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                title="Supprimer"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  Page {page} sur {totalPages}
                 </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="text-sm text-slate-900" style={{ color: 'var(--foreground)' }}>
-                      Page {page} sur {totalPages}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                      >
-                        Précédent
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages}
-                      >
-                        Suivant
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className={cn(dashBtnOutlineCls, 'px-3 py-1.5 text-xs disabled:opacity-40')}
+                  >
+                    Précédent
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className={cn(dashBtnOutlineCls, 'px-3 py-1.5 text-xs disabled:opacity-40')}
+                  >
+                    Suivant
+                  </button>
+                </div>
+              </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </>
+        )}
+      </DashCard>
 
-      {/* Modal */}
+      {/* Modal : création / édition */}
       <Modal
         isOpen={showModal}
         onClose={() => {
@@ -366,7 +339,7 @@ export default function CustomersPage() {
           setSelectedCustomer(null)
           setCustomerFormError('')
         }}
-        title={selectedCustomer ? 'Modifier le Client' : 'Nouveau Client'}
+        title={selectedCustomer ? 'Modifier le client' : 'Nouveau client'}
         size="xl"
       >
         <CustomerForm
@@ -388,13 +361,13 @@ export default function CustomersPage() {
             howDidYouFindUsDetails: selectedCustomer.howDidYouFindUsDetails || undefined,
             notes: selectedCustomer.notes || undefined,
           } : undefined}
-          submitLabel={selectedCustomer ? 'Mettre à jour' : 'Créer le Client'}
+          submitLabel={selectedCustomer ? 'Mettre à jour' : 'Créer le client'}
           includePassword={false}
           error={customerFormError}
         />
       </Modal>
 
-      {/* Delete Confirmation Modal */}
+      {/* Modal : confirmation de suppression */}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => {
@@ -402,46 +375,47 @@ export default function CustomersPage() {
           setSelectedCustomer(null)
         }}
         title="Confirmer la suppression"
-        size="xl"
+        size="md"
       >
         <div className="space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-900 font-medium mb-2">⚠️ Attention</p>
-            <p className="text-red-800 text-sm">
+          <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-4">
+            <p className="mb-2 font-medium text-rose-300">⚠️ Attention</p>
+            <p className="text-sm text-rose-200/80">
               Vous êtes sur le point de supprimer le client :
             </p>
-            <p className="text-red-900 font-bold mt-2">
+            <p className="mt-2 font-bold text-rose-100">
               {selectedCustomer?.firstName} {selectedCustomer?.lastName}
             </p>
             {selectedCustomer?.email && (
-              <p className="text-red-700 text-sm mt-1">{selectedCustomer.email}</p>
+              <p className="mt-1 text-sm text-rose-200/70">{selectedCustomer.email}</p>
             )}
           </div>
 
-          <p className="text-gray-600 text-sm">
-            Cette action est irréversible. Toutes les données associées à ce client seront définitivement supprimées.
+          <p className="text-sm text-slate-400">
+            Cette action est irréversible. Toutes les données associées à ce client
+            seront définitivement supprimées.
           </p>
 
-          <div className="flex gap-3 justify-end pt-4">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               onClick={() => {
                 setShowDeleteModal(false)
                 setSelectedCustomer(null)
               }}
               disabled={isDeleting}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className={dashBtnOutlineCls}
             >
               Annuler
             </button>
             <button
               onClick={handleDeleteConfirm}
               disabled={isDeleting}
-              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDeleting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Suppression...
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Suppression…
                 </>
               ) : (
                 'Supprimer définitivement'

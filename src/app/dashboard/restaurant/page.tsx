@@ -1,8 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2, Utensils, ShoppingCart } from 'lucide-react'
+import { Plus, Pencil, Trash2, Utensils, ShoppingCart, UtensilsCrossed } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
+import { cn } from '@/lib/utils'
+import {
+  DashPageHeader,
+  DashCard,
+  DashEmpty,
+  StatusBadge,
+  orderStatusMeta,
+  paymentStatusMeta,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+  dashTableHeadCls,
+} from '../components/dash-ui'
 
 interface MenuItem {
   id: string
@@ -39,7 +54,6 @@ export default function RestaurantPage() {
 
   // Modal states
   const [showMenuItemModal, setShowMenuItemModal] = useState(false)
-  const [showOrderModal, setShowOrderModal] = useState(false)
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null)
 
   // Menu Item form state
@@ -160,155 +174,170 @@ export default function RestaurantPage() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64">Chargement...</div>
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-500">
+        Chargement…
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>Restaurant</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>Gestion du menu et des commandes</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setShowMenuItemModal(true)
-                resetMenuItemForm()
-                setSelectedMenuItem(null)
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-            >
-              <Utensils size={20} />
-              Nouveau Plat
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-              <ShoppingCart size={20} />
-              Nouvelle Commande
-            </button>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Restaurant"
+        description="Gestion du menu et des commandes"
+        actions={
+          <button
+            onClick={() => {
+              setShowMenuItemModal(true)
+              resetMenuItemForm()
+              setSelectedMenuItem(null)
+            }}
+            className={dashBtnPrimaryCls}
+          >
+            <Plus className="h-4 w-4" />
+            Nouveau plat
+          </button>
+        }
+      />
+
+      {/* Onglets */}
+      <div className="flex gap-1.5 border-b border-white/5 pb-2">
+        <button
+          onClick={() => setActiveTab('menu')}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+            activeTab === 'menu'
+              ? 'bg-primary-500/15 text-primary-300'
+              : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+          )}
+        >
+          <UtensilsCrossed className="h-4 w-4" />
+          Menu <span className="tabular-nums">({menuItems.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('orders')}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+            activeTab === 'orders'
+              ? 'bg-primary-500/15 text-primary-300'
+              : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+          )}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Commandes <span className="tabular-nums">({orders.length})</span>
+        </button>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="border-b mb-6" style={{ borderColor: 'var(--border)' }}>
-          <nav className="flex gap-8">
-            <button
-              onClick={() => setActiveTab('menu')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'menu'
-                  ? 'border-orange-600 text-orange-600'
-                  : 'border-transparent'
-              }`}
-              style={{ color: activeTab === 'menu' ? undefined : 'var(--muted-foreground)' }}
-            >
-              Menu ({menuItems.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'orders'
-                  ? 'border-orange-600 text-orange-600'
-                  : 'border-transparent'
-              }`}
-              style={{ color: activeTab === 'orders' ? undefined : 'var(--muted-foreground)' }}
-            >
-              Commandes ({orders.length})
-            </button>
-          </nav>
-        </div>
-
-        {/* Menu Tab */}
-        {activeTab === 'menu' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Onglet Menu */}
+      {activeTab === 'menu' && (
+        menuItems.length === 0 ? (
+          <div className="dash-card">
+            <DashEmpty icon={Utensils} title="Aucun plat au menu" hint="Créez votre premier plat" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {menuItems.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-lg shadow-md p-4"
-                style={{ backgroundColor: 'var(--card)' }}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{item.name}</h3>
-                  <span className="text-lg font-bold text-orange-600">{item.price} FCFA</span>
+              <div key={item.id} className="dash-card flex flex-col p-5">
+                <div className="mb-1.5 flex items-start justify-between gap-2">
+                  <h3 className="font-semibold text-slate-100">{item.name}</h3>
+                  <span className="shrink-0 font-semibold text-amber-300 tabular-nums">
+                    {item.price.toLocaleString('fr-FR')} FCFA
+                  </span>
                 </div>
-                <p className="text-sm mb-2" style={{ color: 'var(--muted-foreground)' }}>{item.category}</p>
-                <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>{item.description}</p>
-                <div className="flex gap-2">
+                <p className="mb-1 text-xs text-slate-500">{item.category}</p>
+                {item.description && (
+                  <p className="mb-3 line-clamp-2 flex-1 text-sm text-slate-400">{item.description}</p>
+                )}
+                <div className="mb-3 flex items-center gap-2 text-xs text-slate-500">
+                  <span>⏱ {item.preparationTime} min</span>
+                  <span
+                    className={cn(
+                      'rounded-md px-2 py-0.5 text-[11px] font-medium',
+                      item.isAvailable
+                        ? 'bg-emerald-500/15 text-emerald-300'
+                        : 'bg-rose-500/15 text-rose-300'
+                    )}
+                  >
+                    {item.isAvailable ? 'Disponible' : 'Indisponible'}
+                  </span>
+                </div>
+                <div className="flex gap-2 border-t border-white/5 pt-3">
                   <button
                     onClick={() => handleEditMenuItem(item)}
-                    className="flex-1 px-3 py-2 text-sm bg-orange-600 text-white rounded hover:bg-orange-700"
+                    className={cn(dashBtnOutlineCls, 'flex-1 justify-center py-2 text-xs')}
                   >
-                    <Pencil size={16} className="inline mr-1" />
+                    <Pencil className="h-3.5 w-3.5" />
                     Modifier
                   </button>
                   <button
                     onClick={() => handleDeleteMenuItem(item.id, item.name)}
-                    className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                    title="Supprimer"
+                    className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        )}
+        )
+      )}
 
-        {/* Orders Tab */}
-        {activeTab === 'orders' && (
-          <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)' }}>
-            <table className="min-w-full divide-y" style={{ borderColor: 'var(--border)' }}>
-              <thead className="bg-gray-50" style={{ backgroundColor: 'var(--muted)' }}>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--muted-foreground)' }}>
-                    N° Commande
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--muted-foreground)' }}>
-                    Table
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--muted-foreground)' }}>
-                    Statut
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--muted-foreground)' }}>
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--muted-foreground)' }}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--card)' }}>
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                      {order.orderNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--foreground)' }}>
-                      {order.tableNumber || (order.isTakeAway ? 'À emporter' : '-')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--foreground)' }}>
-                      {order.total} FCFA
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-orange-600 hover:text-orange-900">Voir détails</button>
-                    </td>
+      {/* Onglet Commandes */}
+      {activeTab === 'orders' && (
+        <DashCard title={`${orders.length} commande${orders.length > 1 ? 's' : ''}`}>
+          {orders.length === 0 ? (
+            <DashEmpty icon={ShoppingCart} title="Aucune commande restaurant" />
+          ) : (
+            <div className="overflow-x-auto dash-scroll">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead>
+                  <tr>
+                    <th className={dashTableHeadCls}>N° commande</th>
+                    <th className={dashTableHeadCls}>Table</th>
+                    <th className={dashTableHeadCls}>Statut</th>
+                    <th className={dashTableHeadCls}>Paiement</th>
+                    <th className={dashTableHeadCls}>Total</th>
+                    <th className={cn(dashTableHeadCls, 'text-right')}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr
+                      key={order.id}
+                      className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="py-3 pr-4 font-medium text-slate-200">
+                        {order.orderNumber}
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400">
+                        {order.tableNumber || (order.isTakeAway ? 'À emporter' : '—')}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <StatusBadge status={order.status} meta={orderStatusMeta} />
+                      </td>
+                      <td className="py-3 pr-4">
+                        <StatusBadge status={order.paymentStatus} meta={paymentStatusMeta} />
+                      </td>
+                      <td className="py-3 pr-4 font-medium text-slate-200 tabular-nums">
+                        {Number(order.total).toLocaleString('fr-FR')} FCFA
+                      </td>
+                      <td className="py-3 text-right">
+                        <button className="text-xs font-medium text-primary-300 hover:text-primary-200">
+                          Voir détails
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </DashCard>
+      )}
 
-      {/* Menu Item Modal */}
+      {/* Modal : plat */}
       <Modal
         isOpen={showMenuItemModal}
         onClose={() => {
@@ -316,45 +345,40 @@ export default function RestaurantPage() {
           setSelectedMenuItem(null)
           resetMenuItemForm()
         }}
-        title={selectedMenuItem ? 'Modifier le Plat' : 'Nouveau Plat'}
+        title={selectedMenuItem ? 'Modifier le plat' : 'Nouveau plat'}
         size="xl"
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Nom du plat *
+            <label className="mb-1 block text-sm text-slate-400">
+              Nom du plat <span className="text-rose-400">*</span>
             </label>
             <input
               type="text"
               value={menuItemForm.name}
               onChange={(e) => setMenuItemForm({ ...menuItemForm, name: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-              Description
-            </label>
+            <label className="mb-1 block text-sm text-slate-400">Description</label>
             <textarea
               value={menuItemForm.description}
               onChange={(e) => setMenuItemForm({ ...menuItemForm, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              className={dashInputCls}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Catégorie *
+              <label className="mb-1 block text-sm text-slate-400">
+                Catégorie <span className="text-rose-400">*</span>
               </label>
               <select
                 value={menuItemForm.category}
                 onChange={(e) => setMenuItemForm({ ...menuItemForm, category: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashSelectCls}
                 required
               >
                 <option value="">Sélectionner</option>
@@ -366,59 +390,54 @@ export default function RestaurantPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
-                Prix (FCFA) *
+              <label className="mb-1 block text-sm text-slate-400">
+                Prix (FCFA) <span className="text-rose-400">*</span>
               </label>
               <input
                 type="number"
                 value={menuItemForm.price}
                 onChange={(e) => setMenuItemForm({ ...menuItemForm, price: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
                 required
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--foreground)' }}>
+              <label className="mb-1 block text-sm text-slate-400">
                 Temps de préparation (min)
               </label>
               <input
                 type="number"
                 value={menuItemForm.preparationTime}
                 onChange={(e) => setMenuItemForm({ ...menuItemForm, preparationTime: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className={dashInputCls}
               />
             </div>
           </div>
-          <label className="flex items-center">
+          <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={menuItemForm.isAvailable}
               onChange={(e) => setMenuItemForm({ ...menuItemForm, isAvailable: e.target.checked })}
-              className="mr-2"
+              className="h-4 w-4 rounded border-white/20 bg-white/5"
             />
-            <span className="text-sm" style={{ color: 'var(--foreground)' }}>Disponible</span>
+            <span className="text-sm text-slate-300">Disponible</span>
           </label>
         </div>
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSaveMenuItem}
-            className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-          >
-            {selectedMenuItem ? 'Mettre à jour' : 'Créer'}
-          </button>
+        <div className="mt-6 flex justify-end gap-3 border-t border-white/5 pt-4">
           <button
             onClick={() => {
               setShowMenuItemModal(false)
               setSelectedMenuItem(null)
               resetMenuItemForm()
             }}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+            className={dashBtnOutlineCls}
           >
             Annuler
+          </button>
+          <button onClick={handleSaveMenuItem} className={dashBtnPrimaryCls}>
+            {selectedMenuItem ? 'Mettre à jour' : 'Créer'}
           </button>
         </div>
       </Modal>
