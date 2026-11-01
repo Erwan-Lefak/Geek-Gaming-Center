@@ -164,7 +164,7 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn('font-medium', labelClassName)}>
+        <div className={cn('font-medium text-foreground', labelClassName)}>
           {labelFormatter(value, payload)}
         </div>
       )
@@ -174,7 +174,7 @@ function ChartTooltipContent({
       return null
     }
 
-    return <div className={cn('font-medium', labelClassName)}>{value}</div>
+    return <div className={cn('font-medium text-foreground', labelClassName)}>{value}</div>
   }, [
     label,
     labelFormatter,
@@ -311,7 +311,7 @@ function ChartLegendContent({
             <div
               key={index}
               className={cn(
-                'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
+                'flex items-center gap-1.5 text-foreground [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
               )}
             >
               {itemConfig?.icon && !hideIcon ? (

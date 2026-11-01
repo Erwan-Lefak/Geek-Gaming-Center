@@ -88,6 +88,13 @@
    public, qui gère ses propres couleurs.
    ============================================ */
 
+/* Couleur de texte par défaut du dashboard : les éléments sans classe
+   de couleur explicite (libellés de graphiques, tooltips…) héritent
+   sinon du body du site public, qui reste gris clair. */
+.dash-scope {
+  color: var(--foreground);
+}
+
 html.light .dash-scope {
   --background: #ffffff;
   --foreground: #0f172a;
