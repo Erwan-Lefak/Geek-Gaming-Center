@@ -110,13 +110,24 @@ html.light .dash-scope {
   --color-slate-500: #64748b;
   --color-slate-600: #94a3b8;
 
-  /* Badges / accents : version -600 pour le contraste sur clair */
-  --color-primary-300: #0284c7;
-  --color-emerald-300: #059669;
-  --color-amber-300: #d97706;
+  /* Badges / accents : versions plus foncées pour le contraste sur clair.
+     NB : la palette "primary" du projet passe par @theme inline, ses
+     utilitaires référencent donc var(--primary-*) directement — on
+     override les variables runtime, pas les --color-*. */
+  --primary-200: #0369a1;
+  --primary-300: #0284c7;
+  --primary-400: #0284c7;
+
+  --color-emerald-300: #047857;
+  --color-emerald-400: #059669;
+  --color-amber-300: #b45309;
+  --color-amber-400: #b45309;
   --color-rose-300: #e11d48;
+  --color-rose-400: #dc2626;
+  --color-rose-200: #be123c;
+  --color-rose-100: #881337;
   --color-sky-300: #0369a1;
-  --color-violet-300: #7c3aed;
+  --color-violet-300: #6d28d9;
   --color-cyan-300: #0e7490;
 
   /* Palette graphiques plus foncée */
