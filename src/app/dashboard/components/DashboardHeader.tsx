@@ -7,8 +7,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, ExternalLink, Menu } from 'lucide-react'
+import { Bell, ExternalLink, Menu, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/contexts/ThemeContext'
 import { getPageMeta, roleColors, roleLabels } from './nav'
 import type { SidebarUser } from './AppSidebar'
 
@@ -25,9 +26,10 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname()
   const page = getPageMeta(pathname)
+  const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b border-white/5 bg-(--dash-bg)/80 backdrop-blur-xl">
       <div className="flex w-full items-center justify-between gap-3 px-4 lg:px-6">
         {/* Gauche : triggers + titre */}
         <div className="flex min-w-0 items-center gap-2">
@@ -75,11 +77,24 @@ export function DashboardHeader({
           </Link>
 
           <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Passer en mode jour' : 'Passer en mode nuit'}
+            aria-label={theme === 'dark' ? 'Passer en mode jour' : 'Passer en mode nuit'}
+            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-100"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </button>
+
+          <button
             className="relative rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-100"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#0a0a0f]" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-(--dash-bg)" />
           </button>
 
           {user && (

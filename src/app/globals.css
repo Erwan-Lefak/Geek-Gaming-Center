@@ -73,7 +73,73 @@
   --chart-3: #34d399;
   --chart-4: #fbbf24;
   --chart-5: #f87171;
+
+  /* Dashboard shell (bascule avec le mode clair, voir html.light .dash-scope) */
+  --dash-bg: #0a0a0f;
+  --dash-surface: #12121a;
+  --dash-border: #1e1e2e;
+  --dash-scrollbar: rgba(255, 255, 255, 0.14);
 }
+
+/* ============================================
+   DASHBOARD - MODE JOUR (classe .light sur <html>)
+   Le dashboard est scopé via .dash-scope : on
+   rebascule les variables sans toucher au site
+   public, qui gère ses propres couleurs.
+   ============================================ */
+
+html.light .dash-scope {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --color-border: #e2e8f0;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  /* Coques du dashboard */
+  --dash-bg: #f8fafc;
+  --dash-surface: #ffffff;
+  --dash-border: #e2e8f0;
+  --dash-scrollbar: rgba(15, 23, 42, 0.18);
+
+  /* Textes : échelle slate inversée pour rester lisible sur fond clair */
+  --color-slate-50: #020617;
+  --color-slate-100: #0f172a;
+  --color-slate-200: #1e293b;
+  --color-slate-300: #334155;
+  --color-slate-400: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-600: #94a3b8;
+
+  /* Badges / accents : version -600 pour le contraste sur clair */
+  --color-primary-300: #0284c7;
+  --color-emerald-300: #059669;
+  --color-amber-300: #d97706;
+  --color-rose-300: #e11d48;
+  --color-sky-300: #0369a1;
+  --color-violet-300: #7c3aed;
+  --color-cyan-300: #0e7490;
+
+  /* Palette graphiques plus foncée */
+  --chart-1: #0284c7;
+  --chart-2: #7c3aed;
+  --chart-3: #059669;
+  --chart-4: #d97706;
+  --chart-5: #dc2626;
+}
+
+/* Les teintes "white/x" deviennent des teintes sombres translucides en mode jour */
+html.light .dash-scope .border-white\/5 { border-color: rgb(15 23 42 / 0.08); }
+html.light .dash-scope .border-white\/10 { border-color: rgb(15 23 42 / 0.15); }
+html.light .dash-scope .border-white\/20 { border-color: rgb(15 23 42 / 0.25); }
+html.light .dash-scope .border-white\/\[0\.03\] { border-color: rgb(15 23 42 / 0.06); }
+html.light .dash-scope .bg-white\/5 { background-color: rgb(15 23 42 / 0.05); }
+html.light .dash-scope .bg-white\/10 { background-color: rgb(15 23 42 / 0.1); }
+html.light .dash-scope .bg-white\/\[0\.02\] { background-color: rgb(15 23 42 / 0.02); }
+html.light .dash-scope .bg-white\/\[0\.03\] { background-color: rgb(15 23 42 / 0.04); }
+html.light .dash-scope .bg-white\/\[0\.04\] { background-color: rgb(15 23 42 / 0.05); }
+html.light .dash-scope .hover\:bg-white\/5:hover { background-color: rgb(15 23 42 / 0.06); }
+html.light .dash-scope .hover\:bg-white\/\[0\.02\]:hover { background-color: rgb(15 23 42 / 0.03); }
+html.light .dash-scope .hover\:border-white\/25:hover { border-color: rgb(15 23 42 / 0.35); }
 
 /* --- Dark Mode (Default for Gaming) --- */
 @media (prefers-color-scheme: dark) {
@@ -221,7 +287,7 @@ main, div, section, article {
 
 .dash-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  scrollbar-color: var(--dash-scrollbar) transparent;
 }
 
 .dash-scroll::-webkit-scrollbar {
@@ -233,24 +299,24 @@ main, div, section, article {
 }
 
 .dash-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--dash-scrollbar);
   border-radius: 999px;
-}
-
-.dash-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Carte de dashboard (fond surface + bord discret, hover subtil) */
 .dash-card {
-  background: var(--dark-surface);
-  border: 1px solid var(--dark-border);
+  background: var(--dash-surface);
+  border: 1px solid var(--dash-border);
   border-radius: 0.75rem;
   transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .dash-card:hover {
-  border-color: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+html.light .dash-scope .dash-card:hover {
+  border-color: rgba(2, 132, 199, 0.35);
 }
 
 @media (max-width: 640px) {

@@ -223,7 +223,7 @@ export function AppSidebar({
       {/* ======= Desktop (fixe, repliable en mode icône) ======= */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/5 bg-[#0d0d14]/95 backdrop-blur-xl transition-[width] duration-200 ease-linear lg:flex',
+          'fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/5 bg-(--dash-surface)/95 backdrop-blur-xl transition-[width] duration-200 ease-linear lg:flex',
           collapsed ? 'w-[68px]' : 'w-64'
         )}
       >
@@ -250,7 +250,7 @@ export function AppSidebar({
             onClick={onCloseMobile}
             aria-hidden
           />
-          <aside className="fixed inset-y-0 left-0 flex w-72 flex-col border-r border-white/10 bg-[#0d0d14] shadow-2xl">
+          <aside className="fixed inset-y-0 left-0 flex w-72 flex-col border-r border-white/10 bg-(--dash-surface) shadow-2xl">
             {brand(false)}
             <NavItems
               collapsed={false}

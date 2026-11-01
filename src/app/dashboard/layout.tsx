@@ -81,7 +81,7 @@ export default function DashboardLayout({
   // État de chargement pendant la récupération de la session
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="dash-scope flex min-h-screen items-center justify-center bg-(--dash-bg)">
         <div className="text-center">
           <div className="mx-auto mb-4 h-14 w-14 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
           <p className="font-medium text-slate-500">Chargement…</p>
@@ -95,7 +95,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="dash-scope min-h-screen bg-(--dash-bg)">
       <AppSidebar
         user={user}
         collapsed={collapsed}
