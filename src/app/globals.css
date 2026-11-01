@@ -62,6 +62,17 @@
   --glass-bg: rgba(18, 18, 26, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: 20px;
+
+  /* Semantic tokens (dashboard / shadcn-style) */
+  --muted: #16161f;
+  --muted-foreground: #8e8ea3;
+
+  /* Chart palette - alignée sur le thème Cyber Neon */
+  --chart-1: #38bdf8;
+  --chart-2: #a78bfa;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #f87171;
 }
 
 /* --- Dark Mode (Default for Gaming) --- */
@@ -100,6 +111,18 @@ main, div, section, article {
   --color-surface: var(--dark-surface);
   --color-elevated: var(--dark-elevated);
   --color-border: var(--dark-border);
+
+  /* Foreground / muted (dashboard cards, charts) */
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
 
   /* Primary Colors */
   --color-primary-50: var(--primary-50);
@@ -190,6 +213,44 @@ main, div, section, article {
   .glass-card {
     padding: 1rem;
   }
+}
+
+/* ============================================
+   DASHBOARD - SCROLLBAR & CARD UTILITIES
+   ============================================ */
+
+.dash-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.dash-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dash-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Carte de dashboard (fond surface + bord discret, hover subtil) */
+.dash-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--dark-border);
+  border-radius: 0.75rem;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.dash-card:hover {
+  border-color: rgba(56, 189, 248, 0.25);
 }
 
 @media (max-width: 640px) {

@@ -157,14 +157,14 @@ export default function EquipmentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen mt-28 lg:mt-20 flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
         <div className="text-slate-900" style={{ color: 'var(--foreground)' }}>Chargement...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen mt-28 lg:mt-20" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <div className="bg-white border-b" style={{ backgroundColor: 'var(--background)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

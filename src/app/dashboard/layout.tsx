@@ -1,52 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+/**
+ * Layout Dashboard - coquille plein écran inspirée de
+ * next-shadcn-admin-dashboard : sidebar repliable + header sticky.
+ */
+
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
+import { cn } from '@/lib/utils'
+import { AppSidebar } from './components/AppSidebar'
+import { DashboardHeader } from './components/DashboardHeader'
 
-const navigation = [
-  { name: 'Tableau de bord', href: '/dashboard', icon: '📊', roles: ['CASHIER', 'TECHNICIAN', 'MANAGER', 'SHAREHOLDER', 'ADMIN'] },
-  { name: 'Caisse', href: '/dashboard/caisse', icon: '💰', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
-  { name: 'Clients', href: '/dashboard/customers', icon: '👥', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
-  { name: 'Sessions', href: '/dashboard/sessions', icon: '🎮', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
-  { name: 'Commandes', href: '/dashboard/orders', icon: '🛒', roles: ['MANAGER', 'ADMIN', 'SHAREHOLDER'] },
-  { name: 'Factures', href: '/dashboard/invoices', icon: '📄', roles: ['CASHIER', 'MANAGER', 'ADMIN', 'SHAREHOLDER'] },
-  { name: 'Produits', href: '/dashboard/products', icon: '📦', roles: ['MANAGER', 'ADMIN'] },
-  { name: 'Équipements', href: '/dashboard/equipment', icon: '🔧', roles: ['TECHNICIAN', 'MANAGER', 'ADMIN'] },
-  { name: 'Cinéma', href: '/dashboard/cinema', icon: '🎬', roles: ['MANAGER', 'ADMIN'] },
-  { name: 'Restaurant', href: '/dashboard/restaurant', icon: '🍽️', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
-  { name: 'Événements', href: '/dashboard/events', icon: '🎉', roles: ['CASHIER', 'MANAGER', 'ADMIN'] },
-  { name: 'Maintenance', href: '/dashboard/maintenance', icon: '🔨', roles: ['TECHNICIAN', 'MANAGER', 'ADMIN'] },
-  { name: 'Rapports', href: '/dashboard/reports', icon: '📈', roles: ['MANAGER', 'SHAREHOLDER', 'ADMIN'] },
-]
-
-const roleLabels: Record<string, string> = {
-  CASHIER: 'Caissière',
-  TECHNICIAN: 'Technicien',
-  MANAGER: 'Gérant',
-  SHAREHOLDER: 'Actionnaire',
-  ADMIN: 'Administrateur',
-}
-
-const roleColors: Record<string, string> = {
-  CASHIER: 'from-green-500 to-emerald-500',
-  TECHNICIAN: 'from-orange-500 to-amber-500',
-  MANAGER: 'from-blue-500 to-cyan-500',
-  SHAREHOLDER: 'from-purple-500 to-pink-500',
-  ADMIN: 'from-red-500 to-rose-500',
-}
+const SIDEBAR_COLLAPSED_KEY = 'ggc-sidebar-collapsed'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
   const router = useRouter()
   const { data: session, status } = useSession()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
 
   const user = session?.user
     ? {
@@ -63,316 +39,89 @@ export default function DashboardLayout({
     }
   }, [status, router])
 
-  // Afficher un état de chargement si la session n'est pas encore chargée
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Chargement...</p>
-        </div>
-      </div>
-    )
-  }
+  // Restaurer l'état replié de la sidebar (persisté)
+  useEffect(() => {
+    try {
+      setCollapsed(
+        localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'
+      )
+    } catch {
+      /* localStorage indisponible : on garde l'état déplié */
+    }
+  }, [])
 
-  // Rediriger si pas de session
-  if (status === 'unauthenticated') {
-    return null
-  }
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next))
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
+  }, [])
+
+  // Raccourci Ctrl+B / ⌘B comme sur la démo shadcn
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        toggleCollapsed()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [toggleCollapsed])
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/login' })
   }
 
-  const filteredNav = navigation.filter(item =>
-    user ? item.roles.includes(user.role) : true
-  )
-
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Sidebar pour mobile */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-          <div
-            className="fixed inset-y-0 left-0 w-72 shadow-2xl"
-            style={{
-              background: 'var(--background)',
-              borderRight: '1px solid var(--border)'
-            }}
-          >
-            <div className="flex flex-col h-full">
-              {/* Logo */}
-              <div
-                className="p-6 border-b"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-xl">⚡</span>
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>GGC CRM</h1>
-                    <p className="text-xs" style={{ color: 'var(--foreground)', opacity: 0.7 }}>Geek Gaming Center</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                {filteredNav.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
-                      style={
-                        isActive
-                          ? { background: 'linear-gradient(to right, #9333ea, #db2777)', color: 'white' }
-                          : { color: 'var(--foreground)' }
-                      }
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'transparent'
-                        }
-                      }}
-                    >
-                      <span className="text-xl">{item.icon}</span>
-                      <span className="font-medium">{item.name}</span>
-                    </Link>
-                  )
-                })}
-              </nav>
-
-              {/* User info */}
-              {user && (
-                <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
-                  <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${roleColors[user.role]} flex items-center justify-center`}>
-                        <span className="text-white font-bold">
-                          {user.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{user.name}</p>
-                        <p className="text-xs truncate" style={{ color: 'var(--foreground)', opacity: 0.7 }}>{roleLabels[user.role]}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--foreground)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-                      }}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      Déconnexion
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Sidebar Desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:top-24 lg:flex lg:w-72 lg:flex-col lg:h-[calc(100vh-6rem)]">
-        <div
-          className="flex flex-col flex-grow shadow-2xl overflow-y-auto"
-          style={{
-            background: 'var(--background)',
-            borderRight: '1px solid var(--border)'
-          }}
-        >
-          {/* Logo */}
-          <div className="p-6 border-b" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>GGC CRM</h1>
-                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.7 }}>Geek Gaming Center</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {filteredNav.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
-                  style={
-                    isActive
-                      ? { background: 'linear-gradient(to right, #9333ea, #db2777)', color: 'white' }
-                      : { color: 'var(--foreground)' }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                    }
-                  }}
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              )
-            })}
-          </nav>
-
-          {/* User info */}
-          {user && (
-            <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
-              <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${roleColors[user.role]} flex items-center justify-center`}>
-                    <span className="text-white font-bold text-lg">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{user.name}</p>
-                    <p className="text-xs truncate" style={{ color: 'var(--foreground)', opacity: 0.7 }}>{roleLabels[user.role]}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--foreground)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-                  }}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Déconnexion
-                </button>
-              </div>
-            </div>
-          )}
+  // État de chargement pendant la récupération de la session
+  if (status === 'loading') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-14 w-14 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+          <p className="font-medium text-slate-500">Chargement…</p>
         </div>
       </div>
+    )
+  }
 
-      {/* Main Content */}
+  if (status === 'unauthenticated') {
+    return null
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <AppSidebar
+        user={user}
+        collapsed={collapsed}
+        onToggleCollapse={toggleCollapsed}
+        mobileOpen={sidebarOpen}
+        onCloseMobile={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
+
       <div
-        className="lg:pl-72 flex-1 flex flex-col min-h-screen pt-34 lg:pt-24"
-        style={{
-          backgroundColor: 'var(--background)'
-        }}
+        className={cn(
+          'flex min-h-screen flex-col transition-[padding] duration-200 ease-linear',
+          collapsed ? 'lg:pl-[68px]' : 'lg:pl-64'
+        )}
       >
-        {/* Top Bar - Fixed below the top margin */}
-        <header
-          className="fixed top-34 lg:top-24 right-0 left-0 lg:left-72 z-40 border-b border-slate-200 dark:border-slate-700"
-          style={{
-            backgroundColor: 'var(--background)',
-            color: 'var(--foreground)'
-          }}
-        >
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* Mobile menu button */}
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    style={{ color: 'var(--foreground)' }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
+        <DashboardHeader
+          user={user}
+          onToggleCollapse={toggleCollapsed}
+          onOpenMobile={() => setSidebarOpen(true)}
+        />
 
-                {/* Page title */}
-                <div>
-                  <h2
-                    className="text-xl font-bold"
-                    style={{
-                      color: 'var(--foreground)'
-                    }}
-                  >
-                    {navigation.find(n => n.href === pathname)?.name || 'Tableau de bord'}
-                  </h2>
-                </div>
-              </div>
+        <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">{children}</main>
 
-              {/* Right side */}
-              <div className="flex items-center gap-4">
-                {/* Notifications */}
-                <button className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                  <svg
-                    className="w-6 h-6"
-                    style={{ color: 'var(--foreground)' }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
-
-                {/* User badge mobile */}
-                {user && (
-                  <div className="lg:hidden flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${roleColors[user.role]} flex items-center justify-center`}>
-                      <span className="text-white font-bold text-sm">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="w-full px-4 sm:px-6 lg:px-8 py-6 border-t border-slate-200 dark:border-slate-700">
-          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
-            <p>© 2026 Geek Gaming Center - Système de Gestion CRM</p>
-            <p className="mt-1">Yaoundé, Cameroun 🇨🇲</p>
-          </div>
+        <footer className="border-t border-white/5 px-4 py-5 text-center text-xs text-slate-600 lg:px-8">
+          <p>© 2026 Geek Gaming Center — Système de gestion CRM</p>
+          <p className="mt-0.5">Yaoundé, Cameroun 🇨🇲</p>
         </footer>
       </div>
     </div>

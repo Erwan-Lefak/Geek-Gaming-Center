@@ -7,6 +7,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ShoppingCart, User, Search, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -16,6 +17,13 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { itemCount } = useCart();
+  const pathname = usePathname();
+
+  // Le dashboard CRM a sa propre coquille plein écran :
+  // pas de header ni de barre d'annonce du site public.
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
 
   // Debug: log when menu state changes
   console.log('mobileMenuOpen:', mobileMenuOpen);

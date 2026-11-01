@@ -9,13 +9,33 @@ import { CartItem } from '@/types/cart';
 /**
  * Initialize Stripe instance with secret key
  * Uses latest API version
+ *
+ * Instanciation paresseuse : le client n'est créé qu'au premier appel.
+ * Cela évite de faire planter `next build` (et le chargement des routes
+ * qui importent ce module) quand STRIPE_SECRET_KEY n'est pas défini
+ * en local — la clé reste obligatoire au premier usage réel.
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-01-27.acacia' as any,
-  typescript: true,
-  timeout: 10000, // 10 second timeout
-  maxNetworkRetries: 2,
-});
+let stripeClient: Stripe | null = null
+
+function getStripeClient(): Stripe {
+  if (!stripeClient) {
+    stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2025-01-27.acacia' as any,
+      typescript: true,
+      timeout: 10000, // 10 second timeout
+      maxNetworkRetries: 2,
+    })
+  }
+  return stripeClient
+}
+
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop, receiver) {
+    const client = getStripeClient()
+    const value = Reflect.get(client as object, prop, receiver)
+    return typeof value === 'function' ? value.bind(client) : value
+  },
+})
 
 /**
  * Create a Stripe Checkout Session (hosted payment page)

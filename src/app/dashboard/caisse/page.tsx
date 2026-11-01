@@ -231,7 +231,7 @@ export default function CaissePage() {
   }
 
   return (
-    <div className="w-full space-y-6 mt-28 lg:mt-20">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="w-full flex items-center justify-between">
         <div>
