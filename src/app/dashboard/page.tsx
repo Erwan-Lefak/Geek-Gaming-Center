@@ -44,6 +44,12 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart'
+import {
+  DashCard,
+  StatusBadge,
+  orderStatusMeta,
+  paymentStatusMeta,
+} from './components/dash-ui'
 
 // ============================================================
 // Types & helpers
@@ -113,23 +119,6 @@ const fcfaCompact = (n: number) => {
   return String(n)
 }
 
-const orderStatusMeta: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'En attente', cls: 'bg-amber-500/15 text-amber-300' },
-  CONFIRMED: { label: 'Confirmée', cls: 'bg-sky-500/15 text-sky-300' },
-  PREPARING: { label: 'En préparation', cls: 'bg-violet-500/15 text-violet-300' },
-  READY: { label: 'Prête', cls: 'bg-cyan-500/15 text-cyan-300' },
-  COMPLETED: { label: 'Terminée', cls: 'bg-emerald-500/15 text-emerald-300' },
-  CANCELLED: { label: 'Annulée', cls: 'bg-rose-500/15 text-rose-300' },
-}
-
-const paymentStatusMeta: Record<string, { label: string; cls: string }> = {
-  PAID: { label: 'Payé', cls: 'bg-emerald-500/15 text-emerald-300' },
-  PENDING: { label: 'En attente', cls: 'bg-amber-500/15 text-amber-300' },
-  PARTIALLY_PAID: { label: 'Partiel', cls: 'bg-sky-500/15 text-sky-300' },
-  CANCELLED: { label: 'Annulé', cls: 'bg-rose-500/15 text-rose-300' },
-  REFUNDED: { label: 'Remboursé', cls: 'bg-slate-500/15 text-slate-300' },
-}
-
 // ============================================================
 // Blocs UI
 // ============================================================
@@ -196,35 +185,6 @@ function MetricCard({
         <p className="mt-1.5 text-xs text-slate-500">{hint}</p>
       </div>
     </div>
-  )
-}
-
-function CardShell({
-  title,
-  description,
-  action,
-  children,
-  className,
-}: {
-  title: string
-  description?: string
-  action?: React.ReactNode
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <section className={cn('dash-card flex flex-col p-5 lg:p-6', className)}>
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-slate-100">{title}</h2>
-          {description && (
-            <p className="mt-0.5 text-sm text-slate-500">{description}</p>
-          )}
-        </div>
-        {action}
-      </header>
-      {children}
-    </section>
   )
 }
 
@@ -474,14 +434,6 @@ function RecentOrdersTable({ orders }: { orders: Stats['recentOrders'] }) {
         </thead>
         <tbody>
           {orders.map((o) => {
-            const st = orderStatusMeta[o.status] ?? {
-              label: o.status,
-              cls: 'bg-slate-500/15 text-slate-300',
-            }
-            const pay = paymentStatusMeta[o.paymentStatus] ?? {
-              label: o.paymentStatus,
-              cls: 'bg-slate-500/15 text-slate-300',
-            }
             return (
               <tr
                 key={o.id}
@@ -492,24 +444,10 @@ function RecentOrdersTable({ orders }: { orders: Stats['recentOrders'] }) {
                 </td>
                 <td className="py-3 pr-4 text-slate-400">{o.customerName}</td>
                 <td className="py-3 pr-4">
-                  <span
-                    className={cn(
-                      'inline-block rounded-md px-2 py-0.5 text-xs font-medium',
-                      st.cls
-                    )}
-                  >
-                    {st.label}
-                  </span>
+                  <StatusBadge status={o.status} meta={orderStatusMeta} />
                 </td>
                 <td className="py-3 pr-4">
-                  <span
-                    className={cn(
-                      'inline-block rounded-md px-2 py-0.5 text-xs font-medium',
-                      pay.cls
-                    )}
-                  >
-                    {pay.label}
-                  </span>
+                  <StatusBadge status={o.paymentStatus} meta={paymentStatusMeta} />
                 </td>
                 <td className="py-3 pr-4 text-right font-medium text-slate-200 tabular-nums">
                   {fcfa(o.totalAmount)}
@@ -879,7 +817,7 @@ export default function DashboardPage() {
 
       {/* Graphiques */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <CardShell
+        <DashCard
           title="Chiffre d'affaires"
           description="Caisse et boutique en ligne — 14 derniers jours"
           className="lg:col-span-2"
@@ -894,19 +832,19 @@ export default function DashboardPage() {
           }
         >
           <RevenueAreaChart series={stats?.series ?? []} />
-        </CardShell>
+        </DashCard>
 
-        <CardShell
+        <DashCard
           title="Répartition du CA"
           description="30 derniers jours par activité"
         >
           <RevenueSplitDonut split={split} />
-        </CardShell>
+        </DashCard>
       </div>
 
       {/* Commandes + sessions */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <CardShell
+        <DashCard
           title="Dernières commandes"
           description="Commandes boutique récentes"
           className="lg:col-span-2"
@@ -921,9 +859,9 @@ export default function DashboardPage() {
           }
         >
           <RecentOrdersTable orders={stats?.recentOrders ?? []} />
-        </CardShell>
+        </DashCard>
 
-        <CardShell
+        <DashCard
           title="Sessions en cours"
           description={
             k
@@ -943,12 +881,12 @@ export default function DashboardPage() {
           }
         >
           <ActiveSessionsList sessions={stats?.activeSessionsList ?? []} />
-        </CardShell>
+        </DashCard>
       </div>
 
       {/* Événements + actions rapides */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <CardShell
+        <DashCard
           title="Événements à venir"
           description="Capacité et réservations"
           action={
@@ -962,15 +900,15 @@ export default function DashboardPage() {
           }
         >
           <EventsCard events={stats?.upcomingEvents ?? []} />
-        </CardShell>
+        </DashCard>
 
-        <CardShell
+        <DashCard
           title="Actions rapides"
           description="Raccourcis du quotidien"
           className="lg:col-span-2"
         >
           <QuickActions role={user?.role ?? 'CASHIER'} />
-        </CardShell>
+        </DashCard>
       </div>
     </div>
   )

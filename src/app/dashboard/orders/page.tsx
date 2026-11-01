@@ -1,14 +1,41 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
-import { Search, Calendar, Filter, Package, Download, User, Mail, Phone, MapPin, CreditCard, Clock, Edit, Trash2, Eye, Plus } from 'lucide-react'
+import {
+  Search,
+  Calendar,
+  Package,
+  Banknote,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  CreditCard,
+  Edit,
+  Trash2,
+  Eye,
+  Plus,
+  Hourglass,
+  CheckCircle2,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { formatFCFA } from '@/lib/currency'
+import {
+  DashPageHeader,
+  DashCard,
+  DashStat,
+  DashEmpty,
+  StatusBadge,
+  orderStatusMeta,
+  paymentStatusMeta,
+  dashInputCls,
+  dashSelectCls,
+  dashBtnPrimaryCls,
+  dashBtnOutlineCls,
+  dashBtnGhostCls,
+  dashTableHeadCls,
+} from '../components/dash-ui'
 
 interface OrderItem {
   id: string
@@ -35,6 +62,17 @@ interface Order {
     email: string
     phone?: string
   }
+}
+
+const paymentMethodLabel = (method: string) => {
+  const labels: Record<string, string> = {
+    CASH: 'Espèces',
+    CARD: 'Carte bancaire',
+    MOBILE_MONEY: 'Mobile Money',
+    MOBILE_MONEY_ORANGE: 'Orange Money',
+    MOBILE_MONEY_MTN: 'MTN Mobile Money',
+  }
+  return labels[method] ?? method
 }
 
 export default function OrdersPage() {
@@ -77,32 +115,6 @@ export default function OrdersPage() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: any }> = {
-      PENDING: { label: 'En attente', variant: 'warning' },
-      CONFIRMED: { label: 'Confirmée', variant: 'success' },
-      PREPARING: { label: 'En préparation', variant: 'info' },
-      READY: { label: 'Prête', variant: 'default' },
-      COMPLETED: { label: 'Terminée', variant: 'success' },
-      CANCELLED: { label: 'Annulée', variant: 'danger' },
-    }
-
-    const config = statusConfig[status] || statusConfig.PENDING
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
-
-  const getPaymentStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any }> = {
-      PENDING: { label: 'En attente', variant: 'warning' },
-      PAID: { label: 'Payée', variant: 'success' },
-      FAILED: { label: 'Échouée', variant: 'danger' },
-      REFUNDED: { label: 'Remboursée', variant: 'default' },
-    }
-
-    const statusConfig = config[status] || config.PENDING
-    return <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('fr-FR', {
@@ -139,26 +151,6 @@ export default function OrdersPage() {
       shippingAddress: order.shippingAddress || '',
     })
     setShowEditOrderModal(true)
-  }
-
-  const handleUpdateOrderStatus = async (orderId: string, status: string) => {
-    try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      })
-
-      if (response.ok) {
-        fetchOrders()
-        alert('Statut de la commande mis à jour!')
-      } else {
-        const data = await response.json()
-        throw new Error(data.error || 'Erreur lors de la mise à jour')
-      }
-    } catch (error: any) {
-      alert(error.message || 'Erreur lors de la mise à jour')
-    }
   }
 
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
@@ -308,7 +300,7 @@ export default function OrdersPage() {
         alert('Commande mise à jour avec succès !')
       } else {
         const data = await response.json()
-        alert(data.error || 'Erreur lors de la mise à jour de la commande')
+        alert(data.error || 'Erreur lors de la mise à jour')
       }
     } catch (error) {
       console.error('Error updating order:', error)
@@ -354,263 +346,172 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                Commandes Boutique
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1" style={{ color: 'var(--foreground)' }}>
-                Historique complet des commandes en ligne
-              </p>
-            </div>
-            <Button
-              onClick={() => setShowCreateOrderModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              Nouvelle Commande
-            </Button>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 md:gap-6">
+      <DashPageHeader
+        title="Commandes boutique"
+        description="Historique complet des commandes en ligne"
+        actions={
+          <button onClick={() => setShowCreateOrderModal(true)} className={dashBtnPrimaryCls}>
+            <Plus className="h-4 w-4" />
+            Nouvelle commande
+          </button>
+        }
+      />
+
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <DashStat icon={Package} label="Total commandes" value={stats.total} tone="violet" />
+        <DashStat icon={Hourglass} label="En attente" value={stats.pending} tone="amber" />
+        <DashStat icon={CheckCircle2} label="Confirmées" value={stats.confirmed} tone="emerald" />
+        <DashStat
+          icon={Banknote}
+          label="Revenu total"
+          value={formatFCFA(stats.totalRevenue)}
+          tone="sky"
+        />
       </div>
 
-      {/* Statistics Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Commandes</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1" style={{ color: 'var(--foreground)' }}>
-                    {stats.total}
-                  </p>
-                </div>
-                <Package className="w-8 h-8 text-purple-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">En attente</p>
-                  <p className="text-2xl font-bold text-yellow-500 mt-1">{stats.pending}</p>
-                </div>
-                <Calendar className="w-8 h-8 text-yellow-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Confirmées</p>
-                  <p className="text-2xl font-bold text-green-500 mt-1">{stats.confirmed}</p>
-                </div>
-                <Package className="w-8 h-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Revenu Total</p>
-                  <p className="text-2xl font-bold text-blue-500 mt-1">
-                    {formatFCFA(stats.totalRevenue)}
-                  </p>
-                </div>
-                <Download className="w-8 h-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <Input
+      {/* Filtres + tableau */}
+      <DashCard
+        title={`${filteredOrders.length} commande${filteredOrders.length !== 1 ? 's' : ''}`}
+        description="Cliquez sur une ligne pour voir les détails"
+        action={
+          <div className="flex flex-wrap gap-2">
+            <div className="relative min-w-[220px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <input
                 type="text"
-                placeholder="Rechercher par n° commande, client, email..."
+                placeholder="N° commande, client, email…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10"
+                className={cn(dashInputCls, 'pl-9')}
               />
             </div>
-
-            {/* Status Filter */}
-            <div className="w-full md:w-48">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Tous les statuts</option>
-                <option value="PENDING">En attente</option>
-                <option value="CONFIRMED">Confirmée</option>
-                <option value="PREPARING">En préparation</option>
-                <option value="READY">Prête</option>
-                <option value="COMPLETED">Terminée</option>
-                <option value="CANCELLED">Annulée</option>
-              </select>
-            </div>
-
-            {/* Date Filter */}
-            <div className="w-full md:w-48">
-              <select
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Toutes les dates</option>
-                <option value="today">Aujourd'hui</option>
-                <option value="week">7 derniers jours</option>
-                <option value="month">30 derniers jours</option>
-              </select>
-            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className={cn(dashSelectCls, 'w-auto')}
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="PENDING">En attente</option>
+              <option value="CONFIRMED">Confirmée</option>
+              <option value="PREPARING">En préparation</option>
+              <option value="READY">Prête</option>
+              <option value="COMPLETED">Terminée</option>
+              <option value="CANCELLED">Annulée</option>
+            </select>
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value as any)}
+              className={cn(dashSelectCls, 'w-auto')}
+            >
+              <option value="all">Toutes les dates</option>
+              <option value="today">Aujourd'hui</option>
+              <option value="week">7 derniers jours</option>
+              <option value="month">30 derniers jours</option>
+            </select>
           </div>
-
-          {/* Results count */}
-          <div className="mt-3 text-sm text-gray-600 dark:text-gray-300" style={{ color: 'var(--foreground)' }}>
-            {filteredOrders.length} commande{filteredOrders.length !== 1 ? 's' : ''} trouvée{filteredOrders.length !== 1 ? 's' : ''}
+        }
+      >
+        {loading && orders.length === 0 ? (
+          <div className="py-12 text-center text-sm text-slate-500">Chargement des commandes…</div>
+        ) : filteredOrders.length === 0 ? (
+          <DashEmpty
+            icon={Package}
+            title={
+              searchQuery || statusFilter !== 'all' || dateFilter !== 'all'
+                ? 'Aucune commande ne correspond à votre recherche'
+                : 'Aucune commande trouvée'
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto dash-scroll">
+            <table className="w-full min-w-[860px] text-sm">
+              <thead>
+                <tr>
+                  <th className={dashTableHeadCls}>N° commande</th>
+                  <th className={dashTableHeadCls}>Client</th>
+                  <th className={dashTableHeadCls}>Articles</th>
+                  <th className={dashTableHeadCls}>Statut</th>
+                  <th className={dashTableHeadCls}>Paiement</th>
+                  <th className={dashTableHeadCls}>Total</th>
+                  <th className={dashTableHeadCls}>Date</th>
+                  <th className={cn(dashTableHeadCls, 'text-right')}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order) => (
+                  <tr
+                    key={order.id}
+                    className="cursor-pointer border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                    onClick={() => handleOrderClick(order)}
+                  >
+                    <td className="py-3 pr-4 font-medium text-slate-200">
+                      {order.orderNumber}
+                    </td>
+                    <td className="py-3 pr-4">
+                      <div className="text-slate-200">
+                        {order.customer.firstName} {order.customer.lastName}
+                      </div>
+                      <div className="text-xs text-slate-500">{order.customer.email}</div>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <div className="text-slate-200">
+                        {order.items.length} article{order.items.length > 1 ? 's' : ''}
+                      </div>
+                      <div className="max-w-[180px] truncate text-xs text-slate-500">
+                        {order.items.map(item => item.productName).join(', ')}
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <StatusBadge status={order.status} meta={orderStatusMeta} />
+                    </td>
+                    <td className="py-3 pr-4">
+                      <StatusBadge status={order.paymentStatus} meta={paymentStatusMeta} />
+                      <div className="mt-1 text-xs text-slate-500">
+                        {paymentMethodLabel(order.paymentMethod)}
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4 font-semibold text-slate-100 tabular-nums">
+                      {formatFCFA(order.totalAmount)}
+                    </td>
+                    <td className="py-3 pr-4 text-xs text-slate-500">
+                      {formatDate(order.createdAt)}
+                    </td>
+                    <td className="py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => handleViewOrder(order)}
+                          title="Voir détails"
+                          className={dashBtnGhostCls}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEditOrder(order)}
+                          title="Modifier"
+                          className={dashBtnGhostCls}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
+                          title="Supprimer"
+                          className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
+        )}
+      </DashCard>
 
-      {/* Main Content - Table */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ backgroundColor: 'var(--background)' }}>
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-                Chargement des commandes...
-              </div>
-            ) : filteredOrders.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-                {searchQuery || statusFilter !== 'all' || dateFilter !== 'all'
-                  ? 'Aucune commande ne correspond à votre recherche'
-                  : 'Aucune commande trouvée'}
-              </div>
-            ) : (
-              <div className="rounded-md border dark:border-gray-700 overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="dark:border-gray-700 dark:bg-gray-800">
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>N° Commande</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Client</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Articles</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Statut</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Paiement</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Total</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>Date</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white text-right" style={{ color: 'var(--foreground)' }}>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredOrders.map((order) => (
-                      <TableRow
-                        key={order.id}
-                        className="dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handleOrderClick(order)}
-                      >
-                        <TableCell className="dark:bg-gray-800">
-                          <span className="font-medium text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                            {order.orderNumber}
-                          </span>
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          <div className="text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                            {order.customer.firstName} {order.customer.lastName}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {order.customer.email}
-                          </div>
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          <div className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                            {order.items.length} article{order.items.length > 1 ? 's' : ''}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {order.items.map(item => item.productName).join(', ').substring(0, 30)}
-                            {order.items.map(item => item.productName).join(', ').length > 30 ? '...' : ''}
-                          </div>
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          {getStatusBadge(order.status)}
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          <div className="space-y-1">
-                            {getPaymentStatusBadge(order.paymentStatus)}
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {order.paymentMethod === 'CARD' ? 'Carte bancaire' : order.paymentMethod}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          <span className="font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                            {formatFCFA(order.totalAmount)}
-                          </span>
-                        </TableCell>
-                        <TableCell className="dark:bg-gray-800">
-                          <div className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                            {formatDate(order.createdAt)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right dark:bg-gray-800">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleViewOrder(order)}
-                              title="Voir détails"
-                              className="dark:text-white dark:hover:bg-gray-700"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEditOrder(order)}
-                              title="Modifier"
-                              className="dark:text-white dark:hover:bg-gray-700"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
-                              title="Supprimer"
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Order Details Modal */}
+      {/* Modal : détails de la commande */}
       {selectedOrder && (
         <Modal
           isOpen={showOrderModal}
@@ -619,120 +520,110 @@ export default function OrdersPage() {
           size="xl"
         >
           <div className="space-y-6">
-            {/* Customer Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            {/* Informations client */}
+            <div className="grid grid-cols-1 gap-4 rounded-xl bg-white/[0.03] p-4 md:grid-cols-2">
               <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-purple-500" />
+                <User className="h-5 w-5 text-primary-400" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Client</p>
-                  <p className="font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                  <p className="text-xs text-slate-500">Client</p>
+                  <p className="font-semibold text-slate-100">
                     {selectedOrder.customer.firstName} {selectedOrder.customer.lastName}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-purple-500" />
+                <Mail className="h-5 w-5 text-primary-400" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                  <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                    {selectedOrder.customer.email}
-                  </p>
+                  <p className="text-xs text-slate-500">Email</p>
+                  <p className="text-sm text-slate-200">{selectedOrder.customer.email}</p>
                 </div>
               </div>
               {selectedOrder.customer.phone && (
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-purple-500" />
+                  <Phone className="h-5 w-5 text-primary-400" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Téléphone</p>
-                    <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                      {selectedOrder.customer.phone}
-                    </p>
+                    <p className="text-xs text-slate-500">Téléphone</p>
+                    <p className="text-sm text-slate-200">{selectedOrder.customer.phone}</p>
                   </div>
                 </div>
               )}
               {selectedOrder.shippingAddress && (
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-purple-500" />
+                  <MapPin className="h-5 w-5 text-primary-400" />
                   <div className="flex-1">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Adresse de livraison</p>
-                    <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap" style={{ color: 'var(--foreground)' }}>
+                    <p className="text-xs text-slate-500">Adresse de livraison</p>
+                    <p className="whitespace-pre-wrap text-sm text-slate-200">
                       {selectedOrder.shippingAddress}
                     </p>
                   </div>
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-purple-500" />
+                <Calendar className="h-5 w-5 text-primary-400" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Date</p>
-                  <p className="text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                    {formatDate(selectedOrder.createdAt)}
-                  </p>
+                  <p className="text-xs text-slate-500">Date</p>
+                  <p className="text-sm text-slate-200">{formatDate(selectedOrder.createdAt)}</p>
                 </div>
               </div>
             </div>
 
-            {/* Status & Payment */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Package className="w-4 h-4 text-purple-500" />
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Statut</p>
+            {/* Statut & paiement */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-xl bg-white/[0.03] p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <Package className="h-4 w-4 text-primary-400" />
+                  <p className="text-sm font-semibold text-slate-300">Statut</p>
                 </div>
-                {getStatusBadge(selectedOrder.status)}
+                <StatusBadge status={selectedOrder.status} meta={orderStatusMeta} />
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <CreditCard className="w-4 h-4 text-purple-500" />
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Paiement</p>
+              <div className="rounded-xl bg-white/[0.03] p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-primary-400" />
+                  <p className="text-sm font-semibold text-slate-300">Paiement</p>
                 </div>
-                {getPaymentStatusBadge(selectedOrder.paymentStatus)}
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {selectedOrder.paymentMethod === 'CARD' ? 'Carte bancaire' : selectedOrder.paymentMethod}
+                <StatusBadge status={selectedOrder.paymentStatus} meta={paymentStatusMeta} />
+                <p className="mt-1 text-xs text-slate-500">
+                  {paymentMethodLabel(selectedOrder.paymentMethod)}
                 </p>
               </div>
             </div>
 
-            {/* Order Items */}
+            {/* Articles */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-                <Package className="w-5 h-5" />
+              <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+                <Package className="h-5 w-5" />
                 Articles ({selectedOrder.items.length})
               </h3>
-              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
+              <div className="overflow-hidden rounded-xl border border-white/5">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-white/[0.03]">
+                      <th className={dashTableHeadCls}>Article</th>
+                      <th className={cn(dashTableHeadCls, 'text-center')}>Qté</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Prix unit.</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y dark:divide-gray-700">
+                  <tbody>
                     {selectedOrder.items.map((item) => (
-                      <tr key={item.id} className="dark:bg-gray-800">
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.productName}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.quantity}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                      <tr key={item.id} className="border-b border-white/[0.03] last:border-0">
+                        <td className="px-4 py-3 text-slate-200">{item.productName}</td>
+                        <td className="px-4 py-3 text-center text-slate-300">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right text-slate-300 tabular-nums">
                           {formatFCFA(item.unitPrice)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        <td className="px-4 py-3 text-right font-semibold text-slate-100 tabular-nums">
                           {formatFCFA(item.totalPrice)}
                         </td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                  <tfoot>
+                    <tr className="bg-white/[0.03]">
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-slate-200">
                         Total
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                      <td className="px-4 py-3 text-right text-lg font-bold text-primary-300 tabular-nums">
                         {formatFCFA(selectedOrder.totalAmount)}
                       </td>
                     </tr>
@@ -744,66 +635,71 @@ export default function OrdersPage() {
         </Modal>
       )}
 
-      {/* Create Order Modal */}
+      {/* Modal : nouvelle commande */}
       <Modal
         isOpen={showCreateOrderModal}
         onClose={() => setShowCreateOrderModal(false)}
-        title="Nouvelle Commande"
+        title="Nouvelle commande"
         size="xl"
       >
         <div className="space-y-6">
-          {/* Customer Info */}
+          {/* Informations client */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <User className="w-5 h-5" />
-              Informations Client
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+              <User className="h-5 w-5" />
+              Informations client
             </h3>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Prénom</label>
+                  <input
                     type="text"
                     value={orderForm.customerFirstName}
                     onChange={(e) => setOrderForm({ ...orderForm, customerFirstName: e.target.value })}
                     placeholder="Jean"
+                    className={dashInputCls}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Nom</label>
+                  <input
                     type="text"
                     value={orderForm.customerLastName}
                     onChange={(e) => setOrderForm({ ...orderForm, customerLastName: e.target.value })}
                     placeholder="Dupont"
+                    className={dashInputCls}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">
+                    Email <span className="text-rose-400">*</span>
+                  </label>
+                  <input
                     type="email"
                     value={orderForm.customerEmail}
                     onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
                     placeholder="client@example.com"
-                    required
+                    className={dashInputCls}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Téléphone</label>
+                  <input
                     type="tel"
                     value={orderForm.customerPhone}
                     onChange={(e) => setOrderForm({ ...orderForm, customerPhone: e.target.value })}
                     placeholder="+237 6 00 00 00 00"
+                    className={dashInputCls}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse de livraison</label>
+                <label className="mb-1 block text-sm text-slate-400">Adresse de livraison</label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className={dashInputCls}
                   rows={3}
                   value={orderForm.shippingAddress}
                   onChange={(e) => setOrderForm({ ...orderForm, shippingAddress: e.target.value })}
@@ -813,74 +709,69 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          {/* Order Items */}
+          {/* Articles */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-                <Package className="w-5 h-5" />
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-base font-semibold text-slate-100">
+                <Package className="h-5 w-5" />
                 Articles ({orderForm.items.length})
               </h3>
-              <Button
-                onClick={addItemToOrder}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4" />
-                Ajouter Article
-              </Button>
+              <button onClick={addItemToOrder} className={dashBtnOutlineCls}>
+                <Plus className="h-4 w-4" />
+                Ajouter un article
+              </button>
             </div>
 
             {orderForm.items.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <Package className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
-                <p className="text-gray-500 dark:text-gray-400">Aucun article. Cliquez sur "Ajouter Article" pour commencer.</p>
-              </div>
+              <DashEmpty
+                icon={Package}
+                title="Aucun article"
+                hint='Cliquez sur « Ajouter un article » pour commencer'
+              />
             ) : (
-              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Action</th>
+              <div className="overflow-hidden rounded-xl border border-white/5">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-white/[0.03]">
+                      <th className={dashTableHeadCls}>Article</th>
+                      <th className={cn(dashTableHeadCls, 'text-center')}>Qté</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Prix unit.</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Total</th>
+                      <th className={cn(dashTableHeadCls, 'text-center')}>Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y dark:divide-gray-700">
+                  <tbody>
                     {orderForm.items.map((item, index) => (
-                      <tr key={index} className="dark:bg-gray-800">
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.name}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.quantity}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                      <tr key={index} className="border-b border-white/[0.03] last:border-0">
+                        <td className="px-4 py-3 text-slate-200">{item.name}</td>
+                        <td className="px-4 py-3 text-center text-slate-300">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right text-slate-300 tabular-nums">
                           {formatFCFA(item.price)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        <td className="px-4 py-3 text-right font-semibold text-slate-100 tabular-nums">
                           {formatFCFA(item.quantity * item.price)}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <Button
+                          <button
                             onClick={() => removeItemFromOrder(index)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                            className={cn(dashBtnGhostCls, 'hover:text-rose-400')}
+                            title="Retirer"
                           >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                  <tfoot>
+                    <tr className="bg-white/[0.03]">
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-slate-200">
                         Total
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                      <td className="px-4 py-3 text-right text-lg font-bold text-primary-300 tabular-nums">
                         {formatFCFA(orderForm.totalAmount)}
                       </td>
-                      <td></td>
+                      <td />
                     </tr>
                   </tfoot>
                 </table>
@@ -888,17 +779,17 @@ export default function OrdersPage() {
             )}
           </div>
 
-          {/* Payment & Status */}
+          {/* Paiement & statut */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <CreditCard className="w-5 h-5" />
-              Paiement & Statut
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+              <CreditCard className="h-5 w-5" />
+              Paiement & statut
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mode de paiement</label>
+                <label className="mb-1 block text-sm text-slate-400">Mode de paiement</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className={dashSelectCls}
                   value={orderForm.paymentMethod}
                   onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value as any })}
                 >
@@ -908,9 +799,9 @@ export default function OrdersPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+                <label className="mb-1 block text-sm text-slate-400">Statut</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className={dashSelectCls}
                   value={orderForm.status}
                   onChange={(e) => setOrderForm({ ...orderForm, status: e.target.value as any })}
                 >
@@ -925,24 +816,21 @@ export default function OrdersPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 pt-4 border-t dark:border-gray-700">
-            <Button
+          <div className="flex gap-3 border-t border-white/5 pt-4">
+            <button
               onClick={() => setShowCreateOrderModal(false)}
-              className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+              className={cn(dashBtnOutlineCls, 'flex-1 justify-center')}
             >
               Annuler
-            </Button>
-            <Button
-              onClick={handleCreateOrder}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700"
-            >
-              Créer la Commande
-            </Button>
+            </button>
+            <button onClick={handleCreateOrder} className={cn(dashBtnPrimaryCls, 'flex-1 justify-center')}>
+              Créer la commande
+            </button>
           </div>
         </div>
       </Modal>
 
-      {/* Edit Order Modal */}
+      {/* Modal : modifier la commande */}
       <Modal
         isOpen={showEditOrderModal}
         onClose={() => {
@@ -953,58 +841,63 @@ export default function OrdersPage() {
         size="xl"
       >
         <div className="space-y-6">
-          {/* Customer Info */}
+          {/* Informations client */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <User className="w-5 h-5" />
-              Informations Client
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+              <User className="h-5 w-5" />
+              Informations client
             </h3>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Prénom</label>
+                  <input
                     type="text"
                     value={orderForm.customerFirstName}
                     onChange={(e) => setOrderForm({ ...orderForm, customerFirstName: e.target.value })}
                     placeholder="Jean"
+                    className={dashInputCls}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Nom</label>
+                  <input
                     type="text"
                     value={orderForm.customerLastName}
                     onChange={(e) => setOrderForm({ ...orderForm, customerLastName: e.target.value })}
                     placeholder="Dupont"
+                    className={dashInputCls}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">
+                    Email <span className="text-rose-400">*</span>
+                  </label>
+                  <input
                     type="email"
                     value={orderForm.customerEmail}
                     onChange={(e) => setOrderForm({ ...orderForm, customerEmail: e.target.value })}
                     placeholder="client@example.com"
-                    required
+                    className={dashInputCls}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
-                  <Input
+                  <label className="mb-1 block text-sm text-slate-400">Téléphone</label>
+                  <input
                     type="tel"
                     value={orderForm.customerPhone}
                     onChange={(e) => setOrderForm({ ...orderForm, customerPhone: e.target.value })}
                     placeholder="+237 6 00 00 00 00"
+                    className={dashInputCls}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse de livraison</label>
+                <label className="mb-1 block text-sm text-slate-400">Adresse de livraison</label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className={dashInputCls}
                   rows={3}
                   value={orderForm.shippingAddress}
                   onChange={(e) => setOrderForm({ ...orderForm, shippingAddress: e.target.value })}
@@ -1014,53 +907,46 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          {/* Order Items (read-only) */}
+          {/* Articles (lecture seule) */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <Package className="w-5 h-5" />
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+              <Package className="h-5 w-5" />
               Articles ({orderForm.items.length})
             </h3>
 
             {orderForm.items.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <Package className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
-                <p className="text-gray-500 dark:text-gray-400">Aucun article</p>
-              </div>
+              <DashEmpty icon={Package} title="Aucun article" />
             ) : (
-              <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Article</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Qté</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Prix unit.</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Total</th>
+              <div className="overflow-hidden rounded-xl border border-white/5">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-white/[0.03]">
+                      <th className={dashTableHeadCls}>Article</th>
+                      <th className={cn(dashTableHeadCls, 'text-center')}>Qté</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Prix unit.</th>
+                      <th className={cn(dashTableHeadCls, 'text-right')}>Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y dark:divide-gray-700">
+                  <tbody>
                     {orderForm.items.map((item, index) => (
-                      <tr key={index} className="dark:bg-gray-800">
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.name}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
-                          {item.quantity}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                      <tr key={index} className="border-b border-white/[0.03] last:border-0">
+                        <td className="px-4 py-3 text-slate-200">{item.name}</td>
+                        <td className="px-4 py-3 text-center text-slate-300">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right text-slate-300 tabular-nums">
                           {formatFCFA(item.price)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-right font-semibold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                        <td className="px-4 py-3 text-right font-semibold text-slate-100 tabular-nums">
                           {formatFCFA(item.quantity * item.price)}
                         </td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white" style={{ color: 'var(--foreground)' }}>
+                  <tfoot>
+                    <tr className="bg-white/[0.03]">
+                      <td colSpan={3} className="px-4 py-3 text-right font-bold text-slate-200">
                         Total
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-lg text-purple-600 dark:text-purple-400">
+                      <td className="px-4 py-3 text-right text-lg font-bold text-primary-300 tabular-nums">
                         {formatFCFA(orderForm.totalAmount)}
                       </td>
                     </tr>
@@ -1070,17 +956,17 @@ export default function OrdersPage() {
             )}
           </div>
 
-          {/* Status */}
+          {/* Statut */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <CreditCard className="w-5 h-5" />
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-100">
+              <CreditCard className="h-5 w-5" />
               Statut
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut de la commande</label>
+                <label className="mb-1 block text-sm text-slate-400">Statut de la commande</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className={dashSelectCls}
                   value={orderForm.status}
                   onChange={(e) => setOrderForm({ ...orderForm, status: e.target.value as any })}
                 >
@@ -1096,22 +982,19 @@ export default function OrdersPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 pt-4 border-t dark:border-gray-700">
-            <Button
+          <div className="flex gap-3 border-t border-white/5 pt-4">
+            <button
               onClick={() => {
                 setShowEditOrderModal(false)
                 setSelectedOrder(null)
               }}
-              className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+              className={cn(dashBtnOutlineCls, 'flex-1 justify-center')}
             >
               Annuler
-            </Button>
-            <Button
-              onClick={handleUpdateOrder}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700"
-            >
+            </button>
+            <button onClick={handleUpdateOrder} className={cn(dashBtnPrimaryCls, 'flex-1 justify-center')}>
               Mettre à jour
-            </Button>
+            </button>
           </div>
         </div>
       </Modal>

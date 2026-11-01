@@ -8,7 +8,7 @@ import { Modal } from '@/components/ui/modal'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { Wrench, Plus, AlertCircle, Clock } from 'lucide-react'
+import { Wrench, Plus, AlertCircle, Clock, Trash2 } from 'lucide-react'
 
 interface MaintenanceTicket {
   id: string
